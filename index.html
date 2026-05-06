@@ -1,181 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Dash</title>
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #38bdf8;
-            --text-main: #f1f5f9;
-        }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; }
-        
-        /* Sidebar */
-        nav { width: 240px; height: 100vh; background: #020617; padding: 20px; position: fixed; }
-        
-        /* Main Content */
-        main { margin-left: 280px; padding: 40px; width: 100%; }
-        
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #334155; }
-        .card h3 { font-size: 0.8rem; color: #94a3b8; margin: 0; }
-        .card p { font-size: 1.5rem; font-weight: bold; margin: 10px 0 0; }
+<title>Finance Dashboard</title>
 
-        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #334155; }
-        th { background: #334155; }
+<style>
+body { background:#0f0f0f; color:#fff; font-family:Arial; display:flex; }
+.sidebar { width:220px; background:#141414; padding:20px; }
+.main { flex:1; padding:20px; }
+.card { background:#1c1c1c; padding:15px; margin:10px; border-radius:10px; display:inline-block; width:22%; }
+.value { color:orange; font-size:22px; }
+table { width:100%; margin-top:20px; border-collapse: collapse; }
+td, th { padding:10px; border-bottom:1px solid #333; }
+button { padding:8px 12px; background:orange; border:none; cursor:pointer; }
+</style>
 
-        input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 6px; }
-        .btn { background: var(--accent); color: #000; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-    </style>
 </head>
+
 <body>
-    <nav>
-        <h2>FinanceDash</h2>
-        <p>Overview</p>
-        <p>Bills</p>
-        <p>Vendors</p>
-    </nav>
 
-    <main>
-        <section class="grid">
-            <div class="card"><h3>Pending</h3><p id="totalPending">$0</p></div>
-            <div class="card"><h3>Paid</h3><p id="totalPaid">$0</p></div>
-            <div class="card"><h3>Invoices</h3><p id="totalInvoices">0</p></div>
-            <div class="card"><h3>Overdue</h3><p id="overdueAmount" style="color:#ef4444">$0</p></div>
-        </section>
+<div class="sidebar">
+  <h3>Dashboard</h3>
+</div>
 
-        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <input type="text" id="searchInput" placeholder="Search bills..." onkeyup="filterTable()">
-            <select id="statusFilter" onchange="filterTable()">
-                <option value="All">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Paid">Paid</option>
-            </select>
-        </div>
+<div class="main">
 
-        <table id="billsTable">
-            <thead>
-                <tr>
-                    <th>Vendor</th><th>Item</th><th>Category</th><th>Amount</th><th>Date</th><th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+<h2>Payments Dashboard</h2>
+<button onclick="loadData()">Refresh</button>
 
-        <hr style="margin: 40px 0; border: 0.5px solid #334155;">
+<!-- CARDS -->
+<div>
+  <div class="card">Pending <div id="pending" class="value">0</div></div>
+  <div class="card">Paid <div id="paid" class="value">0</div></div>
+  <div class="card">Invoices <div id="count" class="value">0</div></div>
+</div>
 
-        <h3>Add New Bill</h3>
-        <form id="billForm" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-            <select id="vendorSelect" required onchange="autoFillVendorDetails()">
-                <option value="">Select Vendor</option>
-            </select>
-            <input type="text" id="item" placeholder="Item" required>
-            <input type="text" id="category" placeholder="Category">
-            <input type="number" id="amount" placeholder="Amount" required>
-            <input type="date" id="billDate" required>
-            <input type="text" id="bankName" placeholder="Bank" readonly>
-            <input type="text" id="accNum" placeholder="Account No" readonly>
-            <input type="text" id="ifsc" placeholder="IFSC" readonly>
-            <button type="submit" class="btn">Add Bill</button>
-        </form>
-    </main>
+<!-- TABLE -->
+<table>
+<thead>
+<tr>
+<th>Vendor</th>
+<th>Item</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
 
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec';
-        let bills = [];
-        let vendors = [];
+<!-- ADD FORM -->
+<h3>Add Payment</h3>
 
-        async function fetchData() {
-            const billRes = await fetch(`${API_URL}?action=getBills`);
-            bills = await billRes.json();
-            
-            const vendorRes = await fetch(`${API_URL}?action=getVendors`);
-            vendors = await vendorRes.json();
+<form onsubmit="addBill(event)">
+<input id="vendor" placeholder="Vendor"><br><br>
+<input id="item" placeholder="Item"><br><br>
+<input id="amount" placeholder="Amount"><br><br>
 
-            populateVendors();
-            renderDashboard();
-        }
+<select id="status">
+<option>Pending</option>
+<option>Paid</option>
+</select><br><br>
 
-        function populateVendors() {
-            const select = document.getElementById('vendorSelect');
-            vendors.forEach(v => {
-                let opt = document.createElement('option');
-                opt.value = v.vendorname;
-                opt.textContent = v.vendorname;
-                select.appendChild(opt);
-            });
-        }
+<button type="submit">Add</button>
+</form>
 
-        function autoFillVendorDetails() {
-            const name = document.getElementById('vendorSelect').value;
-            const vendor = vendors.find(v => v.vendorname === name);
-            if(vendor) {
-                document.getElementById('bankName').value = vendor.bankname;
-                document.getElementById('accNum').value = vendor.accountnumber;
-                document.getElementById('ifsc').value = vendor.ifsccode;
-            }
-        }
+</div>
 
-        function renderDashboard() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            let pending = 0, paid = 0;
+<script>
 
-            bills.forEach((bill, index) => {
-                const amt = parseFloat(bill.amount);
-                if(bill.status === 'Paid') paid += amt;
-                else pending += amt;
+const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${bill.vendor}</td>
-                        <td>${bill.item}</td>
-                        <td>${bill.category}</td>
-                        <td>$${amt}</td>
-                        <td>${bill.date}</td>
-                        <td>
-                            <select onchange="updateStatus(${index}, this.value)">
-                                <option ${bill.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option ${bill.status === 'Paid' ? 'selected' : ''}>Paid</option>
-                            </select>
-                        </td>
-                    </tr>
-                `;
-            });
+// LOAD DATA
+async function loadData() {
+  const res = await fetch(API + "?action=getBills");
+  const data = await res.json();
 
-            document.getElementById('totalPending').textContent = `$${pending.toLocaleString()}`;
-            document.getElementById('totalPaid').textContent = `$${paid.toLocaleString()}`;
-            document.getElementById('totalInvoices').textContent = bills.length;
-        }
+  let tbody = "";
+  let pending = 0, paid = 0;
 
-        document.getElementById('billForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const data = {
-                action: 'addBill',
-                vendor: document.getElementById('vendorSelect').value,
-                item: document.getElementById('item').value,
-                category: document.getElementById('category').value,
-                amount: document.getElementById('amount').value,
-                date: document.getElementById('billDate').value,
-                status: 'Pending',
-                bank: document.getElementById('bankName').value,
-                account: document.getElementById('accNum').value,
-                ifsc: document.getElementById('ifsc').value
-            };
+  data.slice(1).forEach((row, i) => {
+    if(row[5] === "Pending") pending += Number(row[4]);
+    if(row[5] === "Paid") paid += Number(row[4]);
 
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-            alert('Bill Added!');
-            fetchData();
-        };
+    tbody += `
+    <tr>
+      <td>${row[1]}</td>
+      <td>${row[2]}</td>
+      <td>${row[4]}</td>
+      <td>
+        <select onchange="updateStatus(${i+2}, this.value)">
+          <option ${row[5]=='Pending'?'selected':''}>Pending</option>
+          <option ${row[5]=='Paid'?'selected':''}>Paid</option>
+        </select>
+      </td>
+    </tr>`;
+  });
 
-        window.onload = fetchData;
-    </script>
+  document.getElementById("tbody").innerHTML = tbody;
+  document.getElementById("pending").innerText = pending;
+  document.getElementById("paid").innerText = paid;
+  document.getElementById("count").innerText = data.length - 1;
+}
+
+// ADD BILL
+async function addBill(e) {
+  e.preventDefault();
+
+  const row = [
+    new Date().toLocaleDateString(),
+    vendor.value,
+    item.value,
+    "",
+    amount.value,
+    status.value
+  ];
+
+  await fetch(API, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "addBill",
+      data: row
+    })
+  });
+
+  loadData();
+}
+
+// UPDATE STATUS
+async function updateStatus(rowIndex, status) {
+  await fetch(API, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "updateStatus",
+      rowIndex,
+      status
+    })
+  });
+}
+
+// INITIAL LOAD
+loadData();
+
+</script>
+
 </body>
 </html>
