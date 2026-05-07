@@ -237,8 +237,6 @@ body {
   font-size: 11px; font-weight: 600; color: var(--muted);
   text-transform: uppercase; letter-spacing: .9px;
 }
-
-/* Paid/Unpaid donut custom center */
 .donut-wrap {
   position: relative;
   display: flex; align-items: center; justify-content: center;
@@ -314,7 +312,6 @@ tbody tr:hover { background: var(--s2); }
 
 .amt-cell { font-family: var(--mono); font-weight: 600; }
 
-/* STATUS BADGES */
 .stb {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 3px 9px; border-radius: 20px;
@@ -342,11 +339,28 @@ tbody tr:hover { background: var(--s2); }
 }
 .del-btn:hover { background: rgba(240,85,85,.18); }
 
-/* CAT PILL */
 .cat-pill {
   font-size: 11px; background: var(--s3);
   padding: 3px 9px; border-radius: 5px; color: var(--muted);
 }
+
+/* ══════════════════════════════════════
+   MODAL (ADD VENDOR)
+══════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.modal {
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 24px; width: 100%; max-width: 500px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-hdr h3 { font-size: 16px; font-weight: 600; }
+.close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; transition: var(--trans); }
+.close-btn:hover { color: var(--txt); }
 
 /* ══════════════════════════════════════
    FORM PAGE
@@ -446,7 +460,26 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
 </head>
 <body>
 
-<!-- ══════════════════════════════════════ SIDEBAR -->
+<div class="modal-overlay" id="vendorModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h3>Add New Vendor</h3>
+      <button class="close-btn" onclick="closeModal('vendorModal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="fg full"><label>Vendor Name</label><input id="v-name" class="fc" placeholder="e.g. Acme Corp"/></div>
+      <div class="fg"><label>Default Item</label><input id="v-item" class="fc" placeholder="e.g. Supplies"/></div>
+      <div class="fg"><label>Category</label><input id="v-cat" class="fc" placeholder="e.g. Office"/></div>
+      <div class="fg full"><label>Bank Name</label><input id="v-bank" class="fc" placeholder="e.g. HDFC"/></div>
+      <div class="fg"><label>Account Details</label><input id="v-acc" class="fc" placeholder="XXXX-1234"/></div>
+      <div class="fg"><label>IFSC Code</label><input id="v-ifsc" class="fc" placeholder="HDFC0001234"/></div>
+    </div>
+    <div style="margin-top:20px; display:flex; gap:10px;">
+      <button class="submit-btn" onclick="submitVendor()"><i class="ti ti-device-floppy"></i> Save Vendor</button>
+    </div>
+  </div>
+</div>
+
 <aside class="sidebar">
   <div class="sb-logo">
     <div class="sb-mark">S</div>
@@ -485,10 +518,8 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
   </div>
 </aside>
 
-<!-- ══════════════════════════════════════ MAIN -->
 <div class="main">
 
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
     <div class="search-wrap">
@@ -501,10 +532,8 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
     </button>
   </header>
 
-  <!-- CONTENT -->
   <div class="content" id="content">
 
-    <!-- ── DASHBOARD ── -->
     <div id="v-dash">
       <div class="sec-label">Summary</div>
       <div class="cards-grid">
@@ -535,7 +564,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
 
       <div class="charts-row">
-        <!-- Category Bar Chart -->
         <div class="chart-card">
           <div class="chart-hdr">
             <div class="chart-title">Category-wise Spend</div>
@@ -545,12 +573,10 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
           </div>
         </div>
 
-        <!-- Paid / Unpaid Donut -->
         <div class="chart-card">
           <div class="chart-hdr">
             <div class="chart-title">Paid vs Unpaid Bills</div>
           </div>
-          <!-- Custom legend above -->
           <div style="display:flex;gap:16px;margin-bottom:14px;font-size:12px;color:var(--muted)">
             <span style="display:flex;align-items:center;gap:5px">
               <span style="width:10px;height:10px;border-radius:2px;background:#20cf78;display:inline-block"></span>
@@ -576,7 +602,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-    <!-- ── BILLS ── -->
     <div id="v-bills" style="display:none">
       <div class="filter-row">
         <button class="chip active" onclick="setFilter('all',this)">All</button>
@@ -621,16 +646,20 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-    <!-- ── ADD PAYMENT ── -->
     <div id="v-add" style="display:none">
       <div class="sec-label">New Payment</div>
       <div class="form-card">
         <div class="form-grid">
           <div class="fg">
             <label>Vendor</label>
-            <select id="f-vendor" class="fc" onchange="fillVendor()">
-              <option value="">— Select vendor —</option>
-            </select>
+            <div style="display:flex; gap:8px;">
+              <select id="f-vendor" class="fc" onchange="fillVendor()">
+                <option value="">— Select vendor —</option>
+              </select>
+              <button class="tb-btn" onclick="openModal('vendorModal')" style="padding: 0 12px;" title="Add New Vendor">
+                <i class="ti ti-plus"></i>
+              </button>
+            </div>
           </div>
           <div class="fg">
             <label>Item / Product</label>
@@ -678,19 +707,19 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-    <!-- ── VENDORS ── -->
     <div id="v-vend" style="display:none">
-      <div class="sec-label">Vendor Directory</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div class="sec-label" style="margin-bottom:0;">Vendor Directory</div>
+        <button class="tb-btn primary" onclick="openModal('vendorModal')">
+          <i class="ti ti-plus"></i> Add Vendor
+        </button>
+      </div>
       <div class="vend-grid" id="vendGrid">
         <div class="empty"><i class="ti ti-building-store"></i><p>No vendors loaded</p></div>
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-
-<!-- TOAST -->
-<div class="toast" id="toast">
+  </div></div><div class="toast" id="toast">
   <i class="ti ti-check" style="font-size:16px"></i>
   <span id="toastMsg"></span>
 </div>
@@ -711,6 +740,12 @@ const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34
 // ── HELPERS ──
 function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
 function norm(s){ return String(s||'').toLowerCase().trim(); }
+
+// ══════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 // ══════════════════════════════════════
 // NAV
@@ -746,7 +781,6 @@ async function loadData(){
     const bData = await bRes.json();
     const vData = await vRes.json();
 
-    // Map array rows to objects
     bills = (bData.data || []).slice(1).map((row, i) => ({
       _idx: i + 2,
       'Date':            row[0] || '',
@@ -893,7 +927,6 @@ function renderStatusChart(){
   const overdue = bills.filter(b => norm(b.Status) === 'overdue').length;
   const total   = bills.length;
 
-  // Update custom legend labels
   document.getElementById('leg-paid').textContent    = 'Paid — ' + paid;
   document.getElementById('leg-pending').textContent = 'Pending — ' + pending;
   document.getElementById('leg-overdue').textContent = 'Overdue — ' + overdue;
@@ -988,7 +1021,6 @@ function renderBillsTable(rows){
 
   body.innerHTML = rows.map(b => {
     const st  = norm(b.Status);
-    const stHtml = `<span class="stb ${st}"><span class="stb-dot"></span>${b.Status||'—'}</span>`;
     return `<tr>
       <td style="font-weight:600">${b['Vendor Name']||'—'}</td>
       <td>${b.Item||'—'}</td>
@@ -1012,9 +1044,6 @@ function renderBillsTable(rows){
   }).join('');
 }
 
-// ══════════════════════════════════════
-// STATUS UPDATE
-// ══════════════════════════════════════
 async function changeStatus(idx, status){
   const b = bills.find(x => x._idx === idx);
   if(b) b.Status = status;
@@ -1026,9 +1055,6 @@ async function changeStatus(idx, status){
   } catch(e){}
 }
 
-// ══════════════════════════════════════
-// DELETE BILL
-// ══════════════════════════════════════
 async function deleteBill(idx){
   if(!confirm('Delete this bill? This cannot be undone.')) return;
   bills = bills.filter(b => b._idx !== idx);
@@ -1097,7 +1123,13 @@ async function submitBill(){
   updateCards(); renderCharts(); applyFilters();
   msg.className='form-msg ok'; msg.textContent='✓ Bill added!';
   toast('Bill added successfully', 'ok');
-  resetForm();
+  
+  ['f-vendor','f-item','f-category','f-amount','f-bank','f-account','f-ifsc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-date').value   = new Date().toISOString().slice(0,10);
+  document.getElementById('f-status').value = 'Pending';
+  
   btn.disabled = false;
   btn.innerHTML = '<i class="ti ti-send"></i> Submit Payment';
 
@@ -1112,14 +1144,6 @@ async function submitBill(){
       })
     });
   } catch(e){}
-}
-
-function resetForm(){
-  ['f-vendor','f-item','f-category','f-amount','f-bank','f-account','f-ifsc'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('f-date').value   = new Date().toISOString().slice(0,10);
-  document.getElementById('f-status').value = 'Pending';
 }
 
 // ══════════════════════════════════════
@@ -1153,8 +1177,44 @@ function renderVendors(){
   `).join('');
 }
 
+async function submitVendor() {
+  const name = document.getElementById('v-name').value.trim();
+  const item = document.getElementById('v-item').value.trim();
+  const cat = document.getElementById('v-cat').value.trim();
+  const bank = document.getElementById('v-bank').value.trim();
+  const acc = document.getElementById('v-acc').value.trim();
+  const ifsc = document.getElementById('v-ifsc').value.trim();
+
+  if (!name) { toast('Vendor name is required', 'err'); return; }
+
+  const newV = {
+    'Vendor Name': name, 'Item': item, 'Category': cat,
+    'Bank Name': bank, 'Account Details': acc, 'IFSC Code': ifsc
+  };
+
+  vendors.push(newV);
+  buildVendorMap();
+  renderVendorDropdown();
+  renderVendors();
+
+  closeModal('vendorModal');
+  toast('Vendor added successfully', 'ok');
+
+  ['v-name','v-item','v-cat','v-bank','v-acc','v-ifsc'].forEach(id => document.getElementById(id).value = '');
+
+  try {
+    await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'addVendor',
+        row: [name, item, cat, bank, acc, ifsc]
+      })
+    });
+  } catch(e) {}
+}
+
 // ══════════════════════════════════════
-// SYNC STATE
+// MISC UI
 // ══════════════════════════════════════
 function setSyncState(s){
   const el = document.getElementById('syncTxt');
@@ -1171,9 +1231,6 @@ function setSyncState(s){
   }
 }
 
-// ══════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════
 let toastTimer;
 function toast(msg, type='ok'){
   const el = document.getElementById('toast');
@@ -1186,9 +1243,7 @@ function toast(msg, type='ok'){
   toastTimer = setTimeout(() => { el.className = 'toast'; }, 2800);
 }
 
-// ══════════════════════════════════════
 // INIT
-// ══════════════════════════════════════
 document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
 loadData();
 </script>
