@@ -1,438 +1,1195 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillBox Finance | Pro Version</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillBox Finance Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  :root {
-    --bg-base: #f4f5f9; --bg-surface: #ffffff; --bg-sunken: #eef0f6; --bg-hover: #f0f1f7; --txt-primary: #0d0e14; --txt-secondary: #5a5f7a; --txt-muted: #9297b0; --border: #e3e5ef; --accent: #4f46e5; --accent-soft: #eeecfd; --accent-text: #3730a3; --green: #16a34a; --green-soft: #f0fdf4; --green-text: #14532d; --red: #dc2626; --radius-md: 12px; --nav-width: 220px;
-  }
-  [data-theme="dark"] {
-    --bg-base: #0c0e16; --bg-surface: #131720; --bg-sunken: #0f1219; --bg-hover: #1a1f2e; --txt-primary: #e6e8f4; --txt-secondary: #7e86a8; --txt-muted: #40486a; --border: #1e2437; --accent: #818cf8; --accent-soft: #1e1b4b; --accent-text: #c7d2fe;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg-base); color: var(--txt-primary); min-height: 100vh; }
-  .layout { display: grid; grid-template-columns: var(--nav-width) 1fr; min-height: 100vh; }
-  
-  /* Sidebar */
-  .sidebar { background: var(--bg-surface); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
-  .logo { display: flex; align-items: center; gap: 10px; padding: 0 10px 24px; border-bottom: 1px solid var(--border); margin-bottom: 15px; }
-  .logo-mark { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; font-size: 14px; color: var(--txt-secondary); cursor: pointer; transition: 0.2s; margin-bottom: 4px; }
-  .nav-item.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #0b0d17;
+  color: #e4e6f0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
 
-  /* Main */
-  .main { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; }
-  .stat-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .stat-value { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; margin-top: 8px; }
-  
-  /* Dashboard specific Layout */
-  .dash-layout { display: block; }
-  
-  /* Table */
-  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-top: 15px;}
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--txt-muted); padding: 14px 20px; background: var(--bg-sunken); border-bottom: 1px solid var(--border);}
-  td { padding: 14px 20px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
-  
-  /* Form */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-  input, select { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-sunken); color: var(--txt-primary); width: 100%; outline: none; }
-  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s;}
-  .btn:hover { opacity: 0.9; }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
-  .btn-delete { background: #fef2f2; color: #dc2626; border: 1px solid #f87171; padding: 6px 12px; font-size: 12px; }
+/* ── DESIGN TOKENS ── */
+:root {
+  --bg:       #0b0d17;
+  --s1:       #10121e;
+  --s2:       #141828;
+  --s3:       #191d2e;
+  --s4:       #1e2236;
+  --border:   rgba(255,255,255,0.055);
+  --border2:  rgba(255,255,255,0.10);
+  --txt:      #e4e6f0;
+  --muted:    #717899;
+  --muted2:   #3d4260;
+  --purple:   #8b7cf8;
+  --purple2:  #6c5ef0;
+  --p-glow:   rgba(139,124,248,0.13);
+  --green:    #20cf78;
+  --g-soft:   rgba(32,207,120,0.10);
+  --red:      #f05555;
+  --r-soft:   rgba(240,85,85,0.10);
+  --amber:    #f0a830;
+  --a-soft:   rgba(240,168,48,0.10);
+  --cyan:     #35c9ef;
+  --c-soft:   rgba(53,201,239,0.10);
+  --mono:     'DM Mono', monospace;
+  --r:        10px;
+  --r2:       14px;
+  --r3:       18px;
+  --sidebar:  216px;
+  --trans:    .18s ease;
+}
 
-  .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; appearance: none; border: none; cursor: pointer; outline: none; }
-  .st-pending { background: #eeecfd; color: #3730a3; }
-  .st-paid { background: #f0fdf4; color: #14532d; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 99px; }
 
-  /* Top Toolbar */
-  .toolbar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 15px 20px; border-radius: var(--radius-md); border: 1px solid var(--border);}
-  .search-box { width: 300px; }
+/* ══════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--s1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex-shrink: 0;
+  z-index: 10;
+}
 
-  /* Modals */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-  .modal { background: var(--bg-surface); width: 500px; border-radius: var(--radius-md); padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .close-btn { background: none; border: none; font-size: 20px; color: var(--txt-muted); cursor: pointer; }
+.sb-logo {
+  padding: 22px 18px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sb-mark {
+  width: 34px; height: 34px;
+  background: var(--purple2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.sb-name { font-size: 14px; font-weight: 600; line-height: 1.25; }
+.sb-sub  { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
+
+.sb-nav { flex: 1; padding: 16px 10px; overflow-y: auto; }
+.nav-section {
+  font-size: 9.5px; font-weight: 600; letter-spacing: 1.3px;
+  color: var(--muted2); text-transform: uppercase;
+  padding: 0 8px 8px; margin-top: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px; border-radius: var(--r);
+  font-size: 13px; color: var(--muted);
+  cursor: pointer; transition: var(--trans);
+  margin-bottom: 2px;
+  border: none; background: none;
+  width: 100%; text-align: left;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-item i { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item:hover { background: var(--s3); color: var(--txt); }
+.nav-item.active {
+  background: var(--p-glow);
+  color: var(--purple);
+  border: 1px solid rgba(139,124,248,0.18);
+}
+
+.sb-footer {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+}
+.sync-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--muted); font-family: var(--mono);
+}
+.pulse {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); flex-shrink: 0;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* ══════════════════════════════════════
+   MAIN
+══════════════════════════════════════ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* TOP BAR */
+.topbar {
+  background: var(--s1);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 22px;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
+.topbar-title em { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 7px; }
+
+.search-wrap { position: relative; }
+.search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
+.search-input {
+  background: var(--s2); border: 1px solid var(--border2);
+  color: var(--txt); padding: 7px 12px 7px 32px;
+  border-radius: var(--r); font-size: 12px; width: 205px;
+  outline: none; font-family: 'DM Sans', sans-serif; transition: var(--trans);
+}
+.search-input:focus { border-color: var(--purple); }
+.search-input::placeholder { color: var(--muted2); }
+
+.tb-btn {
+  background: var(--s2); border: 1px solid var(--border2);
+  color: var(--txt); padding: 7px 13px;
+  border-radius: var(--r); font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: var(--trans); display: flex; align-items: center; gap: 6px;
+}
+.tb-btn:hover { border-color: var(--purple); color: var(--purple); }
+.tb-btn.primary { background: var(--purple2); border-color: var(--purple2); color: #fff; }
+.tb-btn.primary:hover { opacity: .88; }
+
+/* CONTENT AREA */
+.content {
+  flex: 1; overflow-y: auto; padding: 22px;
+}
+
+/* ══════════════════════════════════════
+   SUMMARY CARDS
+══════════════════════════════════════ */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 16px 18px;
+  position: relative; overflow: hidden;
+  cursor: pointer;
+  transition: var(--trans);
+}
+.card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  border-radius: 2px 2px 0 0;
+}
+.card.c-p::before { background: var(--purple); }
+.card.c-g::before { background: var(--green); }
+.card.c-a::before { background: var(--amber); }
+.card.c-r::before { background: var(--red); }
+.card-icon { position: absolute; right: 14px; top: 14px; font-size: 22px; opacity: .12; }
+.card-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.card-val { font-size: 23px; font-weight: 600; font-family: var(--mono); letter-spacing: -1px; }
+.card.c-p .card-val { color: var(--purple); }
+.card.c-g .card-val { color: var(--green); }
+.card.c-a .card-val { color: var(--amber); }
+.card.c-r .card-val { color: var(--red); }
+.card-sub { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--mono); }
+
+/* ══════════════════════════════════════
+   CHART AREA
+══════════════════════════════════════ */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 14px;
+  margin-top: 20px;
+}
+.chart-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 18px 20px;
+}
+.chart-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.chart-title {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .9px;
+}
+
+/* Paid/Unpaid donut custom center */
+.donut-wrap {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.donut-center {
+  position: absolute;
+  text-align: center; pointer-events: none;
+}
+.donut-center-val { font-size: 22px; font-weight: 600; font-family: var(--mono); color: var(--txt); }
+.donut-center-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-top: 2px; }
+
+/* ══════════════════════════════════════
+   FILTER ROW
+══════════════════════════════════════ */
+.filter-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px; flex-wrap: wrap;
+}
+.chip {
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border2); background: none;
+  color: var(--muted); cursor: pointer;
+  transition: var(--trans); font-family: 'DM Sans', sans-serif;
+}
+.chip:hover { border-color: var(--purple); color: var(--purple); }
+.chip.active { background: var(--purple2); border-color: var(--purple2); color: #fff; }
+.chip.f-g.active { background: var(--green); border-color: var(--green); color: #0b0d17; }
+.chip.f-a.active { background: var(--amber); border-color: var(--amber); color: #0b0d17; }
+.chip.f-r.active { background: var(--red); border-color: var(--red); color: #fff; }
+.filter-spacer { flex: 1; }
+.sort-sel {
+  background: var(--s2); border: 1px solid var(--border2);
+  color: var(--txt); padding: 6px 10px;
+  border-radius: var(--r); font-size: 12px; outline: none;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+
+/* ══════════════════════════════════════
+   TABLE
+══════════════════════════════════════ */
+.tbl-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+}
+.tbl-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 18px; border-bottom: 1px solid var(--border);
+}
+.tbl-title { font-size: 13px; font-weight: 600; }
+.tbl-count { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.tbl-scroll { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; min-width: 720px; }
+thead tr { background: var(--s2); }
+th {
+  padding: 10px 14px; font-size: 10px; font-weight: 600;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .8px;
+  text-align: left; border-bottom: 1px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+th:hover { color: var(--txt); }
+td {
+  padding: 10px 14px; font-size: 12.5px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background .1s; }
+tbody tr:hover { background: var(--s2); }
+
+.amt-cell { font-family: var(--mono); font-weight: 600; }
+
+/* STATUS BADGES */
+.stb {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+}
+.stb-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.stb.pending { background: var(--p-glow); color: var(--purple); border: 1px solid rgba(139,124,248,.22); }
+.stb.pending .stb-dot { background: var(--purple); }
+.stb.paid    { background: var(--g-soft); color: var(--green);  border: 1px solid rgba(32,207,120,.22); }
+.stb.paid .stb-dot    { background: var(--green); }
+.stb.overdue { background: var(--r-soft); color: var(--red);    border: 1px solid rgba(240,85,85,.22); }
+.stb.overdue .stb-dot { background: var(--red); }
+
+.st-sel {
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--txt); padding: 4px 8px;
+  border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; outline: none; font-family: 'DM Sans', sans-serif;
+}
+.del-btn {
+  background: var(--r-soft); border: 1px solid rgba(240,85,85,.2);
+  color: var(--red); padding: 4px 10px; border-radius: 6px;
+  font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: var(--trans);
+}
+.del-btn:hover { background: rgba(240,85,85,.18); }
+
+/* CAT PILL */
+.cat-pill {
+  font-size: 11px; background: var(--s3);
+  padding: 3px 9px; border-radius: 5px; color: var(--muted);
+}
+
+/* ══════════════════════════════════════
+   FORM PAGE
+══════════════════════════════════════ */
+.form-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 24px; max-width: 700px;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg.full { grid-column: 1 / -1; }
+label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.fc {
+  background: var(--s2); border: 1px solid var(--border2);
+  color: var(--txt); padding: 9px 12px;
+  border-radius: var(--r); font-size: 13px; outline: none;
+  font-family: 'DM Sans', sans-serif; width: 100%;
+  transition: var(--trans);
+}
+.fc:focus { border-color: var(--purple); }
+.fc[readonly] { color: var(--muted); cursor: not-allowed; }
+.fc::placeholder { color: var(--muted2); }
+.submit-btn {
+  background: var(--purple2); border: none; color: #fff;
+  padding: 10px 22px; border-radius: var(--r);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: var(--trans); display: flex; align-items: center; gap: 7px;
+}
+.submit-btn:hover { opacity: .88; }
+.submit-btn:disabled { opacity: .4; cursor: not-allowed; }
+.form-msg { font-size: 12px; font-family: var(--mono); }
+.form-msg.ok  { color: var(--green); }
+.form-msg.err { color: var(--red); }
+
+/* ══════════════════════════════════════
+   VENDOR CARDS
+══════════════════════════════════════ */
+.vend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+.vend-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 16px;
+  transition: var(--trans);
+}
+.vend-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.vend-avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--p-glow); border: 1px solid rgba(139,124,248,.22);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: var(--purple);
+  margin-bottom: 12px; flex-shrink: 0;
+}
+.vend-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.vend-cat { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.vend-info { font-size: 11px; color: var(--muted); font-family: var(--mono); line-height: 1.8; }
+.vend-info i { font-size: 12px; margin-right: 4px; vertical-align: -1px; }
+
+/* ══════════════════════════════════════
+   MISC
+══════════════════════════════════════ */
+.sec-label {
+  font-size: 10px; font-weight: 600; color: var(--muted2);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+.empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+.empty i { font-size: 32px; margin-bottom: 10px; opacity: .25; display: block; }
+.spinner {
+  display: inline-block; width: 13px; height: 13px;
+  border: 2px solid var(--border2); border-top-color: var(--purple);
+  border-radius: 50%; animation: spin .65s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: var(--r2); padding: 12px 18px;
+  font-size: 12px; display: flex; align-items: center; gap: 8px;
+  z-index: 9999; max-width: 290px;
+  transform: translateY(70px); opacity: 0;
+  transition: .28s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok i  { color: var(--green); font-size: 16px; }
+.toast.err i { color: var(--red); font-size: 16px; }
 </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="billModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>Quick Add Bill</h2>
-            <button class="close-btn" onclick="closeModal('billModal')">✕</button>
-        </div>
-        <div class="form-grid">
-            <div style="grid-column: span 2;">
-                <label style="font-size:11px">VENDOR</label>
-                <div style="display:flex; gap:10px;">
-                    <select id="m-vendor" onchange="autoFillModal()"></select>
-                    <button class="btn btn-outline" onclick="openModal('vendorModal')">+ New</button>
-                </div>
-            </div>
-            <div><label style="font-size:11px">ITEM/PRODUCT</label><input id="m-item"></div>
-            <div><label style="font-size:11px">CATEGORY</label><input id="m-category"></div>
-            <div><label style="font-size:11px">QUANTITY</label><input id="m-qty" type="number" placeholder="1"></div>
-            <div><label style="font-size:11px">AMOUNT (₹)</label><input id="m-amount" type="number"></div>
-            <div id="m-info" style="grid-column: span 2; font-size:11px; color:var(--txt-muted)"></div>
-            <button class="btn btn-primary" style="grid-column: span 2;" onclick="addBill()">Add Transaction</button>
-        </div>
+<!-- ══════════════════════════════════════ SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-mark">S</div>
+    <div>
+      <div class="sb-name">SkillBox</div>
+      <div class="sb-sub">Finance Pro</div>
     </div>
-</div>
+  </div>
 
-<div class="modal-overlay" id="vendorModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>Add Vendor Details</h2>
-            <button class="close-btn" onclick="closeModal('vendorModal')">✕</button>
-        </div>
-        <div class="form-grid">
-            <div style="grid-column: span 2;"><label style="font-size:11px">VENDOR NAME</label><input id="v-name"></div>
-            <div><label style="font-size:11px">DEFAULT PRODUCT</label><input id="v-prod"></div>
-            <div><label style="font-size:11px">CATEGORY</label><input id="v-cat"></div>
-            <div style="grid-column: span 2;"><label style="font-size:11px">BANK NAME</label><input id="v-bank"></div>
-            <div><label style="font-size:11px">ACCOUNT NO.</label><input id="v-acc"></div>
-            <div><label style="font-size:11px">IFSC CODE</label><input id="v-ifsc"></div>
-            <button class="btn btn-primary" style="grid-column: span 2;" onclick="addVendor()">Save Vendor</button>
-        </div>
-    </div>
-</div>
+  <nav class="sb-nav">
+    <div class="nav-section">Workspace</div>
+    <button class="nav-item active" id="n-dash" onclick="nav('dash',this)">
+      <i class="ti ti-layout-dashboard"></i> Dashboard
+    </button>
+    <button class="nav-item" id="n-bills" onclick="nav('bills',this)">
+      <i class="ti ti-receipt"></i> Bills
+    </button>
+    <button class="nav-item" id="n-add" onclick="nav('add',this)">
+      <i class="ti ti-circle-plus"></i> Add Payment
+    </button>
+    <button class="nav-item" id="n-vend" onclick="nav('vend',this)">
+      <i class="ti ti-building-store"></i> Vendors
+    </button>
 
-<div class="layout">
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-mark">S</div>
-      <div style="font-weight:600">SkillBox<br><span style="font-size:11px; color:var(--txt-muted)">Finance</span></div>
-    </div>
-    <div class="nav-item active" id="n-dash" onclick="switchTab('dash')">Dashboard</div>
-    <div class="nav-item" id="n-bills" onclick="switchTab('bills')">Bills & Transactions</div>
-    <div class="nav-item" id="n-vend" onclick="switchTab('vend')">Vendor Master</div>
-    <div style="margin-top:auto">
-        <button class="btn" style="width:100%; background:var(--bg-sunken)" onclick="toggleTheme()">Theme Toggle</button>
-    </div>
-  </aside>
+    <div class="nav-section" style="margin-top:20px">Actions</div>
+    <button class="nav-item" onclick="loadData()">
+      <i class="ti ti-refresh"></i> Sync Data
+    </button>
+  </nav>
 
-  <main class="main">
-    
+  <div class="sb-footer">
+    <div class="sync-row">
+      <div class="pulse"></div>
+      <span id="syncTxt">Connecting…</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════ MAIN -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input class="search-input" id="searchQ" placeholder="Search vendor, item, bank…" oninput="applyFilters()"/>
+    </div>
+    <button class="tb-btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
+    <button class="tb-btn primary" onclick="nav('add',document.getElementById('n-add'))">
+      <i class="ti ti-plus"></i> Add Bill
+    </button>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- ── DASHBOARD ── -->
     <div id="v-dash">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-            <h1 style="font-size:22px">Financial Summary</h1>
-            <div style="display:flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="openModal('billModal')">+ Quick Add Bill</button>
-                <button class="btn btn-outline" onclick="loadData()">Sync Data</button>
-            </div>
+      <div class="sec-label">Summary</div>
+      <div class="cards-grid">
+        <div class="card c-p" onclick="nav('bills',document.getElementById('n-bills'));setFilter('all')">
+          <i class="ti ti-receipt card-icon" aria-hidden="true"></i>
+          <div class="card-label">Total Invoices</div>
+          <div class="card-val" id="cd-count">0</div>
+          <div class="card-sub" id="cd-total">₹0 total value</div>
         </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card"><div>Total Pending</div><div class="stat-value" id="s-pending" style="color:var(--accent)">₹0</div></div>
-            <div class="stat-card"><div>Total Cleared</div><div class="stat-value" id="s-paid" style="color:var(--green)">₹0</div></div>
-            <div class="stat-card"><div>Invoice Count</div><div class="stat-value" id="s-count">0</div></div>
+        <div class="card c-a" onclick="nav('bills',document.getElementById('n-bills'));setFilter('pending')">
+          <i class="ti ti-clock card-icon" aria-hidden="true"></i>
+          <div class="card-label">Pending</div>
+          <div class="card-val" id="cd-pending">₹0</div>
+          <div class="card-sub" id="cd-pending-n">0 bills</div>
+        </div>
+        <div class="card c-g" onclick="nav('bills',document.getElementById('n-bills'));setFilter('paid')">
+          <i class="ti ti-check card-icon" aria-hidden="true"></i>
+          <div class="card-label">Cleared</div>
+          <div class="card-val" id="cd-paid">₹0</div>
+          <div class="card-sub" id="cd-paid-n">0 bills</div>
+        </div>
+        <div class="card c-r" onclick="nav('bills',document.getElementById('n-bills'));setFilter('overdue')">
+          <i class="ti ti-alert-triangle card-icon" aria-hidden="true"></i>
+          <div class="card-label">Overdue</div>
+          <div class="card-val" id="cd-overdue">₹0</div>
+          <div class="card-sub" id="cd-overdue-n">0 bills</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <!-- Category Bar Chart -->
+        <div class="chart-card">
+          <div class="chart-hdr">
+            <div class="chart-title">Category-wise Spend</div>
+          </div>
+          <div style="position:relative;height:240px">
+            <canvas id="catChart" role="img" aria-label="Bar chart showing spending by category">Category-wise spend breakdown.</canvas>
+          </div>
         </div>
 
-        <div class="dash-layout">
-            <div class="card" style="padding: 20px;">
-                <h3 style="font-size:16px; margin-bottom: 20px;">Category Wise Spend</h3>
-                <canvas id="revenueChart" style="max-height: 400px; width: 100%;"></canvas>
+        <!-- Paid / Unpaid Donut -->
+        <div class="chart-card">
+          <div class="chart-hdr">
+            <div class="chart-title">Paid vs Unpaid Bills</div>
+          </div>
+          <!-- Custom legend above -->
+          <div style="display:flex;gap:16px;margin-bottom:14px;font-size:12px;color:var(--muted)">
+            <span style="display:flex;align-items:center;gap:5px">
+              <span style="width:10px;height:10px;border-radius:2px;background:#20cf78;display:inline-block"></span>
+              <span id="leg-paid">Paid — 0</span>
+            </span>
+            <span style="display:flex;align-items:center;gap:5px">
+              <span style="width:10px;height:10px;border-radius:2px;background:#f0a830;display:inline-block"></span>
+              <span id="leg-pending">Pending — 0</span>
+            </span>
+            <span style="display:flex;align-items:center;gap:5px">
+              <span style="width:10px;height:10px;border-radius:2px;background:#f05555;display:inline-block"></span>
+              <span id="leg-overdue">Overdue — 0</span>
+            </span>
+          </div>
+          <div class="donut-wrap" style="height:190px;position:relative;display:flex;align-items:center;justify-content:center">
+            <canvas id="statusChart" role="img" aria-label="Doughnut chart showing paid vs unpaid vs overdue bill counts">Paid vs unpaid bills.</canvas>
+            <div class="donut-center" id="donutCenter">
+              <div class="donut-center-val" id="donut-val">0</div>
+              <div class="donut-center-lbl">Total Bills</div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
+    <!-- ── BILLS ── -->
     <div id="v-bills" style="display:none">
-        <div class="toolbar" style="margin-bottom:15px">
-            <h1 style="font-size:22px;">Transactions</h1>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" class="search-box" id="searchBills" placeholder="Search by Vendor, Item or Category..." onkeyup="renderBills()">
-                <button class="btn btn-primary" onclick="openModal('billModal')">+ Add Bill</button>
-            </div>
+      <div class="filter-row">
+        <button class="chip active" onclick="setFilter('all',this)">All</button>
+        <button class="chip f-a" onclick="setFilter('pending',this)">Pending</button>
+        <button class="chip f-g" onclick="setFilter('paid',this)">Paid</button>
+        <button class="chip f-r" onclick="setFilter('overdue',this)">Overdue</button>
+        <div class="filter-spacer"></div>
+        <select class="sort-sel" id="sortSel" onchange="applyFilters()">
+          <option value="">Sort by…</option>
+          <option value="amt-d">Amount ↓</option>
+          <option value="amt-a">Amount ↑</option>
+          <option value="date-d">Date ↓</option>
+          <option value="date-a">Date ↑</option>
+        </select>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-hdr">
+          <span class="tbl-title">Transactions</span>
+          <span class="tbl-count" id="billCount">— rows</span>
         </div>
-        <div class="card">
-            <table>
-                <thead><tr><th>Vendor Name</th><th>Item (Qty)</th><th>Category</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody id="bill-body"></tbody>
-            </table>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortCol('Vendor Name')">Vendor <i class="ti ti-selector" style="font-size:11px"></i></th>
+                <th onclick="sortCol('Item')">Item</th>
+                <th onclick="sortCol('Category')">Category</th>
+                <th onclick="sortCol('Amount')">Amount <i class="ti ti-selector" style="font-size:11px"></i></th>
+                <th onclick="sortCol('Date')">Date <i class="ti ti-selector" style="font-size:11px"></i></th>
+                <th>Status</th>
+                <th>Bank</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="billBody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">
+                <span class="spinner"></span>Loading bills…
+              </td></tr>
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
 
+    <!-- ── ADD PAYMENT ── -->
+    <div id="v-add" style="display:none">
+      <div class="sec-label">New Payment</div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="fg">
+            <label>Vendor</label>
+            <select id="f-vendor" class="fc" onchange="fillVendor()">
+              <option value="">— Select vendor —</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Item / Product</label>
+            <input id="f-item" class="fc" type="text" placeholder="e.g. Software License"/>
+          </div>
+          <div class="fg">
+            <label>Category</label>
+            <input id="f-category" class="fc" type="text" placeholder="e.g. Software"/>
+          </div>
+          <div class="fg">
+            <label>Amount (₹)</label>
+            <input id="f-amount" class="fc" type="number" placeholder="0"/>
+          </div>
+          <div class="fg">
+            <label>Date</label>
+            <input id="f-date" class="fc" type="date"/>
+          </div>
+          <div class="fg">
+            <label>Status</label>
+            <select id="f-status" class="fc">
+              <option>Pending</option>
+              <option>Paid</option>
+              <option>Overdue</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Bank Name</label>
+            <input id="f-bank" class="fc" readonly placeholder="Auto-filled from vendor"/>
+          </div>
+          <div class="fg">
+            <label>Account Details</label>
+            <input id="f-account" class="fc" readonly placeholder="Auto-filled from vendor"/>
+          </div>
+          <div class="fg full">
+            <label>IFSC Code</label>
+            <input id="f-ifsc" class="fc" readonly placeholder="Auto-filled from vendor"/>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
+          <button class="submit-btn" id="submitBtn" onclick="submitBill()">
+            <i class="ti ti-send"></i> Submit Payment
+          </button>
+          <span class="form-msg" id="formMsg"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VENDORS ── -->
     <div id="v-vend" style="display:none">
-        <div class="toolbar" style="margin-bottom:15px">
-            <h1 style="font-size:22px;">Vendor Directory</h1>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" class="search-box" id="searchVendors" placeholder="Search Vendor Name..." onkeyup="renderVendors()">
-                <button class="btn btn-primary" onclick="openModal('vendorModal')">+ Add Vendor</button>
-            </div>
-        </div>
-        <div class="card">
-            <table>
-                <thead><tr><th>Vendor Name</th><th>Category</th><th>Bank Name</th><th>Account Info</th></tr></thead>
-                <tbody id="vend-body"></tbody>
-            </table>
-        </div>
+      <div class="sec-label">Vendor Directory</div>
+      <div class="vend-grid" id="vendGrid">
+        <div class="empty"><i class="ti ti-building-store"></i><p>No vendors loaded</p></div>
+      </div>
     </div>
 
-  </main>
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="ti ti-check" style="font-size:16px"></i>
+  <span id="toastMsg"></span>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
+// ══════════════════════════════════════
+// CONFIG — Replace with your Apps Script Web App URL
+// ══════════════════════════════════════
+const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
-let allBills = [];
-let allVendors = [];
-let spendChart = null;
+// ── STATE ──
+let bills = [], vendors = [], vendorMap = {};
+let activeFilter = 'all', sortDir = {};
+let catChartInst = null, statusChartInst = null;
 
-// ── TAB SWITCHING ──
-function switchTab(tab) {
-    const views = ['v-dash', 'v-bills', 'v-vend'];
-    const navs = ['n-dash', 'n-bills', 'n-vend'];
-    
-    views.forEach(v => document.getElementById(v).style.display = 'none');
-    navs.forEach(n => document.getElementById(n).classList.remove('active'));
-    
-    document.getElementById('v-' + tab).style.display = 'block';
-    document.getElementById('n-' + tab).classList.add('active');
-    
-    if(tab === 'bills') renderBills();
-    if(tab === 'vend') renderVendors();
+const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34d39a','#fbbf24'];
+
+// ── HELPERS ──
+function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
+function norm(s){ return String(s||'').toLowerCase().trim(); }
+
+// ══════════════════════════════════════
+// NAV
+// ══════════════════════════════════════
+function nav(page, btn){
+  ['dash','bills','add','vend'].forEach(p=>{
+    document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none';
+    document.getElementById('n-'+p).classList.remove('active');
+  });
+  if(btn) btn.classList.add('active');
+  const titles = {
+    dash:  ['Dashboard','Overview'],
+    bills: ['Bills','Transactions'],
+    add:   ['Add Payment','New Bill'],
+    vend:  ['Vendors','Directory']
+  };
+  document.getElementById('pgTitle').childNodes[0].textContent = titles[page][0] + ' ';
+  document.getElementById('pgSub').textContent = titles[page][1];
+  if(page === 'bills') applyFilters();
+  if(page === 'vend')  renderVendors();
 }
 
-// ── MODALS ──
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+// ══════════════════════════════════════
+// LOAD DATA
+// ══════════════════════════════════════
+async function loadData(){
+  setSyncState('loading');
+  try {
+    const [bRes, vRes] = await Promise.all([
+      fetch(API + '?action=getBills'),
+      fetch(API + '?action=getVendors')
+    ]);
+    const bData = await bRes.json();
+    const vData = await vRes.json();
 
-// ── FETCH DATA ──
-async function loadData() {
-    try {
-        const [bRes, vRes] = await Promise.all([
-            fetch(API_URL + "?action=getBills"),
-            fetch(API_URL + "?action=getVendors")
-        ]);
-        const bData = await bRes.json();
-        const vData = await vRes.json();
-        
-        allBills = bData.data.slice(1).map((row, index) => ({ originalIndex: index + 2, data: row }));
-        allVendors = vData.data.slice(1);
-        
-        updateDashboard();
-        populateVendors();
-        renderBills();
-        renderVendors();
-    } catch(e) { 
-        console.error("Sync Error", e);
-    }
+    // Map array rows to objects
+    bills = (bData.data || []).slice(1).map((row, i) => ({
+      _idx: i + 2,
+      'Date':            row[0] || '',
+      'Vendor Name':     row[1] || '',
+      'Item':            row[2] || '',
+      'Category':        row[3] || '',
+      'Amount':          row[4] || 0,
+      'Status':          row[5] || 'Pending',
+      'Bank Name':       row[6] || '',
+      'Account Details': row[7] || '',
+      'IFSC Code':       row[8] || '',
+      'Qty':             row[9] || 1
+    }));
+    vendors = (vData.data || []).slice(1).map(r => ({
+      'Vendor Name':     r[0] || '',
+      'Item':            r[1] || '',
+      'Category':        r[2] || '',
+      'Bank Name':       r[3] || '',
+      'Account Details': r[4] || '',
+      'IFSC Code':       r[5] || ''
+    }));
+
+    buildVendorMap();
+    refresh();
+    setSyncState('ok');
+    toast('Data synced successfully', 'ok');
+  } catch(e) {
+    setSyncState('demo');
+    loadDemo();
+  }
 }
 
-function updateDashboard() {
-    let pending = 0, paid = 0;
-    let categoryData = {};
-
-    allBills.forEach(r => {
-        const row = r.data;
-        const amt = Number(row[4]) || 0;
-        const category = row[3] || "Other"; 
-        
-        if(row[5] === "Paid") paid += amt; else pending += amt;
-        
-        if(!categoryData[category]) categoryData[category] = 0;
-        categoryData[category] += amt;
-    });
-
-    document.getElementById('s-pending').textContent = '₹' + pending.toLocaleString('en-IN');
-    document.getElementById('s-paid').textContent = '₹' + paid.toLocaleString('en-IN');
-    document.getElementById('s-count').textContent = allBills.length;
-
-    updateChart(categoryData);
+function loadDemo(){
+  bills = [
+    {_idx:2,'Vendor Name':'TechCorp Ltd','Item':'Software License','Category':'Software','Amount':45000,'Date':'2024-05-01','Status':'Paid','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1},
+    {_idx:3,'Vendor Name':'QuickShip','Item':'Delivery Services','Category':'Logistics','Amount':12500,'Date':'2024-05-10','Status':'Pending','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678','Qty':1},
+    {_idx:4,'Vendor Name':'CloudBase','Item':'Hosting','Category':'Infrastructure','Amount':8200,'Date':'2024-04-28','Status':'Overdue','Bank Name':'SBI','Account Details':'XXXX-9012','IFSC Code':'SBIN0009012','Qty':1},
+    {_idx:5,'Vendor Name':'DesignStudio','Item':'Brand Assets','Category':'Design','Amount':32000,'Date':'2024-05-15','Status':'Pending','Bank Name':'Axis Bank','Account Details':'XXXX-3456','IFSC Code':'UTIB0003456','Qty':1},
+    {_idx:6,'Vendor Name':'TechCorp Ltd','Item':'Annual Support','Category':'Software','Amount':18000,'Date':'2024-05-03','Status':'Paid','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1},
+    {_idx:7,'Vendor Name':'OfficePro','Item':'Stationery','Category':'Office','Amount':3400,'Date':'2024-04-20','Status':'Overdue','Bank Name':'Kotak Bank','Account Details':'XXXX-7890','IFSC Code':'KKBK0007890','Qty':1},
+    {_idx:8,'Vendor Name':'QuickShip','Item':'Courier Batch','Category':'Logistics','Amount':6800,'Date':'2024-05-18','Status':'Paid','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678','Qty':3},
+    {_idx:9,'Vendor Name':'SaaSPlatform','Item':'CRM License','Category':'Software','Amount':22000,'Date':'2024-05-12','Status':'Pending','Bank Name':'Axis Bank','Account Details':'XXXX-6543','IFSC Code':'UTIB0006543','Qty':1},
+  ];
+  vendors = [
+    {'Vendor Name':'TechCorp Ltd','Item':'Software License','Category':'Software','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234'},
+    {'Vendor Name':'QuickShip','Item':'Delivery Services','Category':'Logistics','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678'},
+    {'Vendor Name':'CloudBase','Item':'Hosting','Category':'Infrastructure','Bank Name':'SBI','Account Details':'XXXX-9012','IFSC Code':'SBIN0009012'},
+    {'Vendor Name':'DesignStudio','Item':'Brand Assets','Category':'Design','Bank Name':'Axis Bank','Account Details':'XXXX-3456','IFSC Code':'UTIB0003456'},
+    {'Vendor Name':'OfficePro','Item':'Stationery','Category':'Office','Bank Name':'Kotak Bank','Account Details':'XXXX-7890','IFSC Code':'KKBK0007890'},
+    {'Vendor Name':'SaaSPlatform','Item':'CRM License','Category':'Software','Bank Name':'Axis Bank','Account Details':'XXXX-6543','IFSC Code':'UTIB0006543'},
+  ];
+  buildVendorMap();
+  refresh();
 }
 
-function updateChart(data) {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const labels = Object.keys(data);
-    const values = Object.values(data);
+function buildVendorMap(){
+  vendorMap = {};
+  vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; });
+}
 
-    if(spendChart) spendChart.destroy();
+function refresh(){
+  updateCards();
+  renderCharts();
+  renderVendorDropdown();
+  applyFilters();
+  renderVendors();
+}
 
-    spendChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Spend Amount (₹)',
-                data: values,
-                backgroundColor: '#4f46e5',
-                borderRadius: 4
-            }]
+// ══════════════════════════════════════
+// CARDS
+// ══════════════════════════════════════
+function updateCards(){
+  const pending = bills.filter(b => norm(b.Status) === 'pending');
+  const paid    = bills.filter(b => norm(b.Status) === 'paid');
+  const overdue = bills.filter(b => norm(b.Status) === 'overdue');
+  const sum = arr => arr.reduce((a,b) => a + Number(b.Amount||0), 0);
+  const total = sum(bills);
+
+  document.getElementById('cd-count').textContent    = bills.length;
+  document.getElementById('cd-total').textContent    = fmt(total) + ' total value';
+  document.getElementById('cd-pending').textContent  = fmt(sum(pending));
+  document.getElementById('cd-pending-n').textContent= pending.length + ' bill' + (pending.length!==1?'s':'');
+  document.getElementById('cd-paid').textContent     = fmt(sum(paid));
+  document.getElementById('cd-paid-n').textContent   = paid.length + ' bill' + (paid.length!==1?'s':'');
+  document.getElementById('cd-overdue').textContent  = fmt(sum(overdue));
+  document.getElementById('cd-overdue-n').textContent= overdue.length + ' bill' + (overdue.length!==1?'s':'');
+}
+
+// ══════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════
+function renderCharts(){
+  renderCatChart();
+  renderStatusChart();
+}
+
+function renderCatChart(){
+  const catMap = {};
+  bills.forEach(b => {
+    const c = b.Category || 'Other';
+    catMap[c] = (catMap[c]||0) + Number(b.Amount||0);
+  });
+  const labels = Object.keys(catMap);
+  const values = Object.values(catMap);
+
+  if(catChartInst) catChartInst.destroy();
+  const ctx = document.getElementById('catChart').getContext('2d');
+  catChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Spend (₹)',
+        data: values,
+        backgroundColor: COLORS,
+        borderRadius: 7,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          ticks: { color: '#717899', font: { size: 10, family: 'DM Sans' } },
+          grid:  { color: 'rgba(255,255,255,0.04)' }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
+        y: {
+          ticks: {
+            color: '#717899', font: { size: 10, family: 'DM Mono' },
+            callback: v => '₹' + Number(v).toLocaleString('en-IN')
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' }
         }
-    });
-}
-
-function populateVendors() {
-    const selects = [document.getElementById('m-vendor')];
-    selects.forEach(sel => {
-        if(!sel) return;
-        sel.innerHTML = '<option value="">Choose Vendor...</option>';
-        allVendors.forEach(v => {
-            if(v[0]) sel.innerHTML += `<option value="${v[0]}">${v[0]}</option>`;
-        });
-    });
-}
-
-function autoFillModal() {
-    const vName = document.getElementById('m-vendor').value;
-    const v = allVendors.find(x => x[0] === vName);
-    if(v) {
-        document.getElementById('m-item').value = v[1] || '';
-        document.getElementById('m-category').value = v[2] || '';
-        document.getElementById('m-info').textContent = `Bank: ${v[3]} | Acc: ${v[4]} | IFSC: ${v[5]}`;
+      }
     }
+  });
 }
 
-// ── RENDERING TABLES ──
-function renderBills() {
-    const searchTerm = document.getElementById('searchBills').value.toLowerCase();
-    const tbody = document.getElementById('bill-body');
-    
-    const filtered = allBills.filter(r => {
-        const row = r.data;
-        const text = (row[1] + " " + row[2] + " " + row[3]).toLowerCase();
-        return text.includes(searchTerm);
-    });
+function renderStatusChart(){
+  const paid    = bills.filter(b => norm(b.Status) === 'paid').length;
+  const pending = bills.filter(b => norm(b.Status) === 'pending').length;
+  const overdue = bills.filter(b => norm(b.Status) === 'overdue').length;
+  const total   = bills.length;
 
-    tbody.innerHTML = filtered.map(r => {
-        const row = r.data;
-        const oIndex = r.originalIndex;
-        const qty = row[9] || 1; 
-        return `
-        <tr>
-            <td style="font-weight:600">${row[1]}</td>
-            <td>${row[2]} <span style="color:var(--txt-muted); font-size:12px">(Qty: ${qty})</span></td>
-            <td><span style="font-size:11px; background:var(--bg-sunken); padding:3px 8px; border-radius:4px">${row[3] || 'N/A'}</span></td>
-            <td style="font-family:DM Mono">₹${(Number(row[4])||0).toLocaleString('en-IN')}</td>
-            <td>
-                <select class="status-badge ${row[5]==='Paid'?'st-paid':'st-pending'}" onchange="updateStatus(${oIndex}, this.value, this)">
-                    <option ${row[5]==='Pending'?'selected':''}>Pending</option>
-                    <option ${row[5]==='Paid'?'selected':''}>Paid</option>
-                </select>
-            </td>
-            <td>
-                <button class="btn btn-delete" onclick="deleteBill(${oIndex})">🗑️ Delete</button>
-            </td>
-        </tr>`;
-    }).join('');
-}
+  // Update custom legend labels
+  document.getElementById('leg-paid').textContent    = 'Paid — ' + paid;
+  document.getElementById('leg-pending').textContent = 'Pending — ' + pending;
+  document.getElementById('leg-overdue').textContent = 'Overdue — ' + overdue;
+  document.getElementById('donut-val').textContent   = total;
 
-function renderVendors() {
-    const searchTerm = document.getElementById('searchVendors').value.toLowerCase();
-    const tbody = document.getElementById('vend-body');
-    
-    const filtered = allVendors.filter(v => (v[0] || "").toLowerCase().includes(searchTerm));
-
-    tbody.innerHTML = filtered.map(v => `
-        <tr>
-            <td style="font-weight:600">${v[0]}</td>
-            <td><span style="font-size:11px; background:var(--bg-sunken); padding:3px 8px; border-radius:4px">${v[2]}</span></td>
-            <td>${v[3]}</td>
-            <td style="font-size:12px; color:var(--txt-secondary)">A/C: ${v[4]}<br>IFSC: ${v[5]}</td>
-        </tr>
-    `).join('');
-}
-
-// ── ACTIONS ──
-function addBill() {
-    const vName = document.getElementById(`m-vendor`).value;
-    const item = document.getElementById(`m-item`).value;
-    const cat = document.getElementById(`m-category`).value;
-    const qty = document.getElementById(`m-qty`).value || 1;
-    const amt = document.getElementById(`m-amount`).value;
-    
-    if(!vName || !amt) return alert("Missing Vendor or Amount!");
-
-    const vInfo = allVendors.find(x => x[0] === vName) || ["","","","","",""];
-    
-    const rowData = [new Date().toLocaleDateString(), vName, item, cat, amt, "Pending", vInfo[3], vInfo[4], vInfo[5], qty];
-    
-    allBills.push({ originalIndex: allBills.length + 2, data: rowData });
-    updateDashboard();
-    renderBills();
-    
-    closeModal('billModal');
-    document.getElementById(`m-amount`).value = "";
-    document.getElementById(`m-qty`).value = "1";
-
-    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row: rowData }) });
-}
-
-// Delete Bill Functionality
-async function deleteBill(originalIndex) {
-    if(!confirm("Are you sure you want to delete this bill? This cannot be undone.")) return;
-    
-    // Remove locally so UI updates instantly
-    allBills = allBills.filter(b => b.originalIndex !== originalIndex);
-    updateDashboard();
-    renderBills();
-
-    // Call backend to delete row
-    try {
-        await fetch(API_URL, { 
-            method: "POST", 
-            body: JSON.stringify({ action: "deleteBill", rowIndex: originalIndex }) 
-        });
-        
-        // Reload data after deleting to get fresh Row Indices from Google Sheet
-        loadData(); 
-    } catch(e) {
-        console.error("Error deleting bill", e);
+  if(statusChartInst) statusChartInst.destroy();
+  const ctx = document.getElementById('statusChart').getContext('2d');
+  statusChartInst = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Paid','Pending','Overdue'],
+      datasets: [{
+        data: [paid, pending, overdue],
+        backgroundColor: ['#20cf78','#f0a830','#f05555'],
+        borderColor:     ['#20cf78','#f0a830','#f05555'],
+        borderWidth: 2,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' bill' + (ctx.parsed!==1?'s':'')
+          }
+        }
+      }
     }
+  });
 }
 
-async function addVendor() {
-    const name = document.getElementById('v-name').value;
-    const prod = document.getElementById('v-prod').value;
-    const cat = document.getElementById('v-cat').value;
-    const bank = document.getElementById('v-bank').value;
-    const acc = document.getElementById('v-acc').value;
-    const ifsc = document.getElementById('v-ifsc').value;
-
-    if(!name) return alert("Vendor Name required");
-
-    const newVendor = [name, prod, cat, bank, acc, ifsc];
-    allVendors.push(newVendor);
-    populateVendors();
-    renderVendors();
-    closeModal('vendorModal');
-
-    try {
-        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addVendor", row: newVendor }) });
-    } catch(e) { console.error("Error saving vendor", e); }
+// ══════════════════════════════════════
+// BILLS TABLE
+// ══════════════════════════════════════
+function setFilter(f, btn){
+  activeFilter = f;
+  document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else {
+    const map = { all:0, pending:1, paid:2, overdue:3 };
+    const chips = document.querySelectorAll('.chip');
+    if(map[f] !== undefined && chips[map[f]]) chips[map[f]].classList.add('active');
+  }
+  applyFilters();
 }
 
-function updateStatus(originalIndex, status, el) {
-    el.className = "status-badge " + (status === 'Paid' ? 'st-paid' : 'st-pending');
-    let target = allBills.find(b => b.originalIndex === originalIndex);
-    if(target) target.data[5] = status; 
-    
-    updateDashboard(); 
-    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateStatus", rowIndex: originalIndex, status: status }) });
+function applyFilters(){
+  const q    = (document.getElementById('searchQ').value || '').toLowerCase();
+  const sort = document.getElementById('sortSel') ? document.getElementById('sortSel').value : '';
+
+  let filtered = bills.filter(b => {
+    const sm = activeFilter === 'all' || norm(b.Status) === activeFilter;
+    const qm = !q || Object.values(b).some(v => String(v).toLowerCase().includes(q));
+    return sm && qm;
+  });
+
+  if(sort === 'amt-d') filtered.sort((a,b) => Number(b.Amount) - Number(a.Amount));
+  if(sort === 'amt-a') filtered.sort((a,b) => Number(a.Amount) - Number(b.Amount));
+  if(sort === 'date-d') filtered.sort((a,b) => new Date(b.Date) - new Date(a.Date));
+  if(sort === 'date-a') filtered.sort((a,b) => new Date(a.Date) - new Date(b.Date));
+
+  renderBillsTable(filtered);
 }
 
-function toggleTheme() {
-    const theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", theme);
+function sortCol(key){
+  sortDir[key] = !sortDir[key];
+  bills.sort((a,b) => {
+    const av = a[key]||'', bv = b[key]||'';
+    const na = isNaN(av) ? null : Number(av);
+    const nb = isNaN(bv) ? null : Number(bv);
+    if(na!==null && nb!==null) return sortDir[key] ? na-nb : nb-na;
+    return sortDir[key]
+      ? String(av).localeCompare(String(bv))
+      : String(bv).localeCompare(String(av));
+  });
+  applyFilters();
 }
 
+function renderBillsTable(rows){
+  const body = document.getElementById('billBody');
+  const cnt  = document.getElementById('billCount');
+  cnt.textContent = rows.length + ' row' + (rows.length!==1?'s':'');
+
+  if(!rows.length){
+    body.innerHTML = `<tr><td colspan="8"><div class="empty"><i class="ti ti-search"></i><p>No matching records</p></div></td></tr>`;
+    return;
+  }
+
+  body.innerHTML = rows.map(b => {
+    const st  = norm(b.Status);
+    const stHtml = `<span class="stb ${st}"><span class="stb-dot"></span>${b.Status||'—'}</span>`;
+    return `<tr>
+      <td style="font-weight:600">${b['Vendor Name']||'—'}</td>
+      <td>${b.Item||'—'}</td>
+      <td><span class="cat-pill">${b.Category||'—'}</span></td>
+      <td class="amt-cell">${fmt(b.Amount)}</td>
+      <td style="color:var(--muted);font-family:var(--mono);font-size:11px">${b.Date||'—'}</td>
+      <td>
+        <select class="st-sel" onchange="changeStatus(${b._idx}, this.value)">
+          ${['Pending','Paid','Overdue'].map(o =>
+            `<option${norm(o)===st?' selected':''}>${o}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td style="font-size:11px;color:var(--muted)">${b['Bank Name']||'—'}</td>
+      <td>
+        <button class="del-btn" onclick="deleteBill(${b._idx})">
+          <i class="ti ti-trash"></i>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// STATUS UPDATE
+// ══════════════════════════════════════
+async function changeStatus(idx, status){
+  const b = bills.find(x => x._idx === idx);
+  if(b) b.Status = status;
+  updateCards();
+  renderStatusChart();
+  toast('Status updated → ' + status, 'ok');
+  try {
+    await fetch(API, { method:'POST', body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status }) });
+  } catch(e){}
+}
+
+// ══════════════════════════════════════
+// DELETE BILL
+// ══════════════════════════════════════
+async function deleteBill(idx){
+  if(!confirm('Delete this bill? This cannot be undone.')) return;
+  bills = bills.filter(b => b._idx !== idx);
+  updateCards();
+  renderCharts();
+  applyFilters();
+  toast('Bill deleted', 'ok');
+  try {
+    await fetch(API, { method:'POST', body: JSON.stringify({ action:'deleteBill', rowIndex:idx }) });
+    loadData();
+  } catch(e){}
+}
+
+// ══════════════════════════════════════
+// ADD PAYMENT FORM
+// ══════════════════════════════════════
+function renderVendorDropdown(){
+  const sel = document.getElementById('f-vendor');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select vendor —</option>';
+  Object.keys(vendorMap).forEach(name => {
+    const o = document.createElement('option');
+    o.value = name; o.textContent = name;
+    sel.appendChild(o);
+  });
+  if(cur) sel.value = cur;
+}
+
+function fillVendor(){
+  const v = vendorMap[document.getElementById('f-vendor').value] || {};
+  document.getElementById('f-bank').value    = v['Bank Name'] || '';
+  document.getElementById('f-account').value = v['Account Details'] || '';
+  document.getElementById('f-ifsc').value    = v['IFSC Code'] || '';
+  document.getElementById('f-category').value= v['Category'] || '';
+}
+
+async function submitBill(){
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('formMsg');
+  const vendor = document.getElementById('f-vendor').value;
+  const amount = document.getElementById('f-amount').value;
+
+  if(!vendor || !amount){
+    msg.className='form-msg err'; msg.textContent='Vendor and Amount are required.'; return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Submitting…';
+  msg.textContent = '';
+
+  const newBill = {
+    _idx:              bills.length + 2,
+    'Date':            document.getElementById('f-date').value,
+    'Vendor Name':     vendor,
+    'Item':            document.getElementById('f-item').value,
+    'Category':        document.getElementById('f-category').value,
+    'Amount':          Number(amount),
+    'Status':          document.getElementById('f-status').value,
+    'Bank Name':       document.getElementById('f-bank').value,
+    'Account Details': document.getElementById('f-account').value,
+    'IFSC Code':       document.getElementById('f-ifsc').value,
+    'Qty': 1
+  };
+
+  bills.push(newBill);
+  updateCards(); renderCharts(); applyFilters();
+  msg.className='form-msg ok'; msg.textContent='✓ Bill added!';
+  toast('Bill added successfully', 'ok');
+  resetForm();
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-send"></i> Submit Payment';
+
+  try {
+    await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'addBill',
+        row: [newBill.Date, newBill['Vendor Name'], newBill.Item,
+              newBill.Category, newBill.Amount, newBill.Status,
+              newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty]
+      })
+    });
+  } catch(e){}
+}
+
+function resetForm(){
+  ['f-vendor','f-item','f-category','f-amount','f-bank','f-account','f-ifsc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-date').value   = new Date().toISOString().slice(0,10);
+  document.getElementById('f-status').value = 'Pending';
+}
+
+// ══════════════════════════════════════
+// VENDORS PAGE
+// ══════════════════════════════════════
+function renderVendors(){
+  const q    = (document.getElementById('searchQ').value || '').toLowerCase();
+  const grid = document.getElementById('vendGrid');
+  const list = vendors.filter(v =>
+    !q || Object.values(v).some(x => String(x).toLowerCase().includes(q))
+  );
+  if(!list.length){
+    grid.innerHTML = `<div class="empty"><i class="ti ti-building-store"></i><p>No vendors found</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(v => `
+    <div class="vend-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div>
+        <div>
+          <div class="vend-name">${v['Vendor Name']||'—'}</div>
+          <div class="vend-cat">${v.Category||'—'}</div>
+        </div>
+      </div>
+      <div class="vend-info">
+        <div><i class="ti ti-building-bank"></i>${v['Bank Name']||'—'}</div>
+        <div><i class="ti ti-credit-card"></i>${v['Account Details']||'—'}</div>
+        <div><i class="ti ti-code"></i>${v['IFSC Code']||'—'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════
+// SYNC STATE
+// ══════════════════════════════════════
+function setSyncState(s){
+  const el = document.getElementById('syncTxt');
+  const dot = document.querySelector('.pulse');
+  if(s === 'ok'){
+    dot.style.background = '#20cf78';
+    el.textContent = 'Synced ' + new Date().toLocaleTimeString();
+  } else if(s === 'loading'){
+    dot.style.background = '#f0a830';
+    el.textContent = 'Syncing…';
+  } else {
+    dot.style.background = '#f05555';
+    el.textContent = 'Demo mode';
+  }
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+let toastTimer;
+function toast(msg, type='ok'){
+  const el = document.getElementById('toast');
+  const m  = document.getElementById('toastMsg');
+  const ic = el.querySelector('i');
+  ic.className = type === 'ok' ? 'ti ti-check' : 'ti ti-x';
+  m.textContent = msg;
+  el.className  = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, 2800);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
 loadData();
 </script>
 </body>
