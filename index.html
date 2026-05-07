@@ -1,178 +1,544 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Finance Debug Dashboard</title>
+<title>Finance Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
 body{
+  background:#0d0d0d;
+  color:#fff;
+  display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  width:240px;
+  height:100vh;
   background:#111;
-  color:white;
-  font-family:Arial;
+  border-right:1px solid #222;
   padding:20px;
 }
 
-button{
-  background:orange;
+.logo{
+  font-size:22px;
+  font-weight:600;
+  color:#ff7a00;
+  margin-bottom:30px;
+}
+
+.menu a{
+  display:block;
+  color:#999;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  text-decoration:none;
+}
+
+.menu a:hover,
+.menu a.active{
+  background:#ff7a00;
+  color:#000;
+}
+
+/* MAIN */
+
+.main{
+  flex:1;
+  padding:25px;
+}
+
+/* HEADER */
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header h1{
+  font-size:32px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+}
+
+.btn{
+  padding:10px 18px;
   border:none;
-  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  background:#1e1e1e;
+  color:#fff;
+}
+
+.btn.orange{
+  background:#ff7a00;
+  color:#000;
+}
+
+/* FILTERS */
+
+.filters{
+  margin-top:20px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.filter-btn{
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:#1c1c1c;
+  color:#999;
   cursor:pointer;
 }
 
-.card{
+.filter-btn.active{
+  background:#ff7a00;
+  color:#000;
+}
+
+.search{
+  margin-left:auto;
+  padding:10px 14px;
+  width:260px;
   background:#1c1c1c;
+  border:none;
+  border-radius:20px;
+  color:#fff;
+}
+
+/* CARDS */
+
+.cards{
+  margin-top:25px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
+.card{
+  background:#161616;
+  border:1px solid #222;
+  border-radius:18px;
   padding:20px;
-  margin:10px 0;
-  border-radius:10px;
+}
+
+.card-title{
+  color:#888;
+  font-size:14px;
+}
+
+.card-value{
+  margin-top:10px;
+  font-size:30px;
+  color:#ff7a00;
+}
+
+/* TABLE */
+
+.table-box{
+  margin-top:25px;
+  background:#161616;
+  border:1px solid #222;
+  border-radius:18px;
+  padding:20px;
+}
+
+.table-header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:15px;
 }
 
 table{
   width:100%;
-  margin-top:20px;
   border-collapse:collapse;
 }
 
-td,th{
-  border:1px solid #333;
-  padding:10px;
+th{
+  text-align:left;
+  color:#777;
+  font-size:13px;
+  padding-bottom:15px;
 }
 
-#debug{
-  background:#000;
-  color:#0f0;
-  padding:10px;
-  margin-top:20px;
-  height:250px;
-  overflow:auto;
-  border:1px solid #333;
+td{
+  padding:14px 0;
+  border-bottom:1px solid #222;
 }
+
+.status{
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  border:none;
+}
+
+.pending{
+  background:#ff3d3d;
+  color:#fff;
+}
+
+.paid{
+  background:#00c853;
+  color:#fff;
+}
+
+.overdue{
+  background:#ff9100;
+  color:#fff;
+}
+
+/* FORM */
+
+.form-box{
+  margin-top:25px;
+  background:#161616;
+  border:1px solid #222;
+  border-radius:18px;
+  padding:20px;
+}
+
+.form-box h2{
+  margin-bottom:15px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#1f1f1f;
+  color:#fff;
+}
+
+.submit-btn{
+  margin-top:15px;
+  background:#ff7a00;
+  color:#000;
+  border:none;
+  padding:12px 20px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
 </style>
 </head>
 
 <body>
 
-<h1>Finance Dashboard DEBUG</h1>
+<!-- SIDEBAR -->
 
-<button onclick="loadData()">Load Data</button>
+<div class="sidebar">
 
-<div class="card">
-  Pending: <span id="pending">0</span>
+  <div class="logo">Skill in a Box</div>
+
+  <div class="menu">
+    <a class="active">Dashboard</a>
+    <a>Payments</a>
+    <a>Vendors</a>
+    <a>Invoices</a>
+    <a>Analytics</a>
+    <a>Settings</a>
+  </div>
+
 </div>
 
-<div class="card">
-  Paid: <span id="paid">0</span>
+<!-- MAIN -->
+
+<div class="main">
+
+  <!-- HEADER -->
+
+  <div class="header">
+    <h1>Payments Dashboard</h1>
+
+    <div class="actions">
+      <button class="btn">Export</button>
+      <button class="btn orange" onclick="loadData()">Refresh</button>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+
+  <div class="filters">
+
+    <button class="filter-btn active" onclick="filterStatus('All')">All</button>
+
+    <button class="filter-btn" onclick="filterStatus('Pending')">Pending</button>
+
+    <button class="filter-btn" onclick="filterStatus('Paid')">Paid</button>
+
+    <button class="filter-btn" onclick="filterStatus('Overdue')">Overdue</button>
+
+    <input
+      class="search"
+      placeholder="Search vendor or item..."
+      onkeyup="searchTable(this.value)"
+    >
+
+  </div>
+
+  <!-- CARDS -->
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-title">Pending Amount</div>
+      <div class="card-value" id="pending">₹0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Paid Amount</div>
+      <div class="card-value" id="paid">₹0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Overdue Amount</div>
+      <div class="card-value" id="overdue">₹0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Invoices</div>
+      <div class="card-value" id="count">0</div>
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+
+  <div class="table-box">
+
+    <div class="table-header">
+      <h2>All Transactions</h2>
+    </div>
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Vendor</th>
+          <th>Item</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="tbody"></tbody>
+
+    </table>
+
+  </div>
+
+  <!-- ADD PAYMENT -->
+
+  <div class="form-box">
+
+    <h2>Add Payment</h2>
+
+    <form onsubmit="addBill(event)">
+
+      <div class="form-grid">
+
+        <input id="vendor" placeholder="Vendor">
+
+        <input id="item" placeholder="Item">
+
+        <input id="amount" placeholder="Amount">
+
+        <select id="status">
+          <option>Pending</option>
+          <option>Paid</option>
+          <option>Overdue</option>
+        </select>
+
+      </div>
+
+      <button class="submit-btn">Add Payment</button>
+
+    </form>
+
+  </div>
+
 </div>
-
-<div class="card">
-  Invoices: <span id="count">0</span>
-</div>
-
-<table>
-<thead>
-<tr>
-<th>Vendor</th>
-<th>Item</th>
-<th>Amount</th>
-<th>Status</th>
-</tr>
-</thead>
-
-<tbody id="tbody"></tbody>
-
-</table>
-
-<h3>Debug Console</h3>
-
-<div id="debug"></div>
 
 <script>
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
-function log(msg){
+let allData = [];
+let currentFilter = "All";
 
-  console.log(msg);
-
-  document.getElementById("debug").innerHTML += "<br>" + JSON.stringify(msg);
-
-}
+/* LOAD DATA */
 
 async function loadData(){
 
-  try {
+  const res = await fetch(API_URL + "?action=getBills");
 
-    log("Loading data...");
+  const json = await res.json();
 
-    const url = API_URL + "?action=getBills";
+  allData = json.data.slice(1);
 
-    log(url);
+  renderTable(allData);
 
-    const response = await fetch(url);
+}
 
-    log("Response received");
+/* RENDER */
 
-    const json = await response.json();
+function renderTable(data){
 
-    log(json);
+  let html = "";
 
-    if(!json.success){
+  let pending = 0;
+  let paid = 0;
+  let overdue = 0;
 
-      log("Backend Error:");
-      log(json.error || json.message);
+  data.forEach((row,i)=>{
 
-      return;
-    }
+    const status = row[5];
 
-    const data = json.data;
+    if(status=="Pending") pending += Number(row[4]);
+    if(status=="Paid") paid += Number(row[4]);
+    if(status=="Overdue") overdue += Number(row[4]);
 
-    log("Rows found: " + data.length);
+    html += `
+    <tr>
+      <td>${row[1]}</td>
+      <td>${row[2]}</td>
+      <td>₹${row[4]}</td>
+      <td>
+        <select
+          class="status ${status.toLowerCase()}"
+          onchange="updateStatus(${i+2},this.value)"
+        >
+          <option ${status=="Pending"?"selected":""}>Pending</option>
+          <option ${status=="Paid"?"selected":""}>Paid</option>
+          <option ${status=="Overdue"?"selected":""}>Overdue</option>
+        </select>
+      </td>
+    </tr>
+    `;
+  });
 
-    let html = "";
+  tbody.innerHTML = html;
 
-    let pending = 0;
-    let paid = 0;
+  pending.innerText = "₹" + pending;
+  paid.innerText = "₹" + paid;
+  overdue.innerText = "₹" + overdue;
+  count.innerText = data.length;
 
-    data.slice(1).forEach((row, i) => {
+}
 
-      log(row);
+/* ADD BILL */
 
-      if(row[5] === "Pending"){
-        pending += Number(row[4]);
-      }
+async function addBill(e){
 
-      if(row[5] === "Paid"){
-        paid += Number(row[4]);
-      }
+  e.preventDefault();
 
-      html += `
-      <tr>
-        <td>${row[1]}</td>
-        <td>${row[2]}</td>
-        <td>${row[4]}</td>
-        <td>${row[5]}</td>
-      </tr>
-      `;
+  const row = [
+    new Date().toLocaleDateString(),
+    vendor.value,
+    item.value,
+    "",
+    amount.value,
+    status.value
+  ];
 
-    });
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"addBill",
+      row
+    })
+  });
 
-    document.getElementById("tbody").innerHTML = html;
+  vendor.value="";
+  item.value="";
+  amount.value="";
 
-    document.getElementById("pending").innerText = pending;
+  loadData();
 
-    document.getElementById("paid").innerText = paid;
+}
 
-    document.getElementById("count").innerText = data.length - 1;
+/* UPDATE STATUS */
 
-    log("DONE");
+async function updateStatus(rowIndex,status){
 
-  } catch(err){
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"updateStatus",
+      rowIndex,
+      status
+    })
+  });
 
-    log("FRONTEND ERROR:");
-    log(err.toString());
+}
 
+/* FILTER */
+
+function filterStatus(status){
+
+  currentFilter = status;
+
+  document.querySelectorAll(".filter-btn")
+    .forEach(btn=>btn.classList.remove("active"));
+
+  event.target.classList.add("active");
+
+  if(status=="All"){
+    renderTable(allData);
+  } else {
+    renderTable(allData.filter(r=>r[5]==status));
   }
 
 }
+
+/* SEARCH */
+
+function searchTable(value){
+
+  value = value.toLowerCase();
+
+  let filtered = allData.filter(r=>
+
+    r[1].toLowerCase().includes(value) ||
+    r[2].toLowerCase().includes(value)
+
+  );
+
+  if(currentFilter!="All"){
+    filtered = filtered.filter(r=>r[5]==currentFilter);
+  }
+
+  renderTable(filtered);
+
+}
+
+loadData();
 
 </script>
 
