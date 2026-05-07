@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillBox Finance | Multi-Tab</title>
+<title>SkillBox Finance | Pro Version</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
   :root {
     --bg-base: #f4f5f9; --bg-surface: #ffffff; --bg-sunken: #eef0f6; --bg-hover: #f0f1f7; --txt-primary: #0d0e14; --txt-secondary: #5a5f7a; --txt-muted: #9297b0; --border: #e3e5ef; --accent: #4f46e5; --accent-soft: #eeecfd; --accent-text: #3730a3; --green: #16a34a; --green-soft: #f0fdf4; --green-text: #14532d; --red: #dc2626; --radius-md: 12px; --nav-width: 220px;
@@ -25,29 +27,87 @@
 
   /* Main */
   .main { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 10px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; }
   .stat-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .stat-value { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; margin-top: 8px; }
   
+  /* Dashboard specific Layout */
+  .dash-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;}
+  
   /* Table */
-  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-top: 15px;}
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--txt-muted); padding: 14px 20px; background: var(--bg-sunken); }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--txt-muted); padding: 14px 20px; background: var(--bg-sunken); border-bottom: 1px solid var(--border);}
   td { padding: 14px 20px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
   
   /* Form */
   .form-card { padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
-  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+  .form-grid.full { grid-template-columns: 1fr; }
   input, select { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-sunken); color: var(--txt-primary); width: 100%; outline: none; }
-  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s;}
+  .btn:hover { opacity: 0.9; }
   .btn-primary { background: var(--accent); color: white; }
+  .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
 
-  .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; appearance: none; border: none; }
+  .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; appearance: none; border: none; cursor: pointer; outline: none; }
   .st-pending { background: #eeecfd; color: #3730a3; }
   .st-paid { background: #f0fdf4; color: #14532d; }
+
+  /* Top Toolbar */
+  .toolbar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 15px 20px; border-radius: var(--radius-md); border: 1px solid var(--border);}
+  .search-box { width: 300px; }
+
+  /* Modals */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+  .modal { background: var(--bg-surface); width: 500px; border-radius: var(--radius-md); padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .close-btn { background: none; border: none; font-size: 20px; color: var(--txt-muted); cursor: pointer; }
 </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="billModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Quick Add Bill</h2>
+            <button class="close-btn" onclick="closeModal('billModal')">✕</button>
+        </div>
+        <div class="form-grid">
+            <div style="grid-column: span 2;">
+                <label style="font-size:11px">VENDOR</label>
+                <div style="display:flex; gap:10px;">
+                    <select id="m-vendor" onchange="autoFillModal()"></select>
+                    <button class="btn btn-outline" onclick="openModal('vendorModal')">+ New</button>
+                </div>
+            </div>
+            <div><label style="font-size:11px">ITEM/PRODUCT</label><input id="m-item"></div>
+            <div><label style="font-size:11px">CATEGORY</label><input id="m-category"></div>
+            <div><label style="font-size:11px">QUANTITY</label><input id="m-qty" type="number" placeholder="1"></div>
+            <div><label style="font-size:11px">AMOUNT (₹)</label><input id="m-amount" type="number"></div>
+            <div id="m-info" style="grid-column: span 2; font-size:11px; color:var(--txt-muted)"></div>
+            <button class="btn btn-primary" style="grid-column: span 2;" onclick="addBill()">Add Transaction</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="vendorModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Add Vendor Details</h2>
+            <button class="close-btn" onclick="closeModal('vendorModal')">✕</button>
+        </div>
+        <div class="form-grid">
+            <div style="grid-column: span 2;"><label style="font-size:11px">VENDOR NAME</label><input id="v-name"></div>
+            <div><label style="font-size:11px">DEFAULT PRODUCT</label><input id="v-prod"></div>
+            <div><label style="font-size:11px">CATEGORY</label><input id="v-cat"></div>
+            <div style="grid-column: span 2;"><label style="font-size:11px">BANK NAME</label><input id="v-bank"></div>
+            <div><label style="font-size:11px">ACCOUNT NO.</label><input id="v-acc"></div>
+            <div><label style="font-size:11px">IFSC CODE</label><input id="v-ifsc"></div>
+            <button class="btn btn-primary" style="grid-column: span 2;" onclick="addVendor()">Save Vendor</button>
+        </div>
+    </div>
+</div>
 
 <div class="layout">
   <aside class="sidebar">
@@ -56,7 +116,7 @@
       <div style="font-weight:600">SkillBox<br><span style="font-size:11px; color:var(--txt-muted)">Finance</span></div>
     </div>
     <div class="nav-item active" id="n-dash" onclick="switchTab('dash')">Dashboard</div>
-    <div class="nav-item" id="n-bills" onclick="switchTab('bills')">Bills / Transactions</div>
+    <div class="nav-item" id="n-bills" onclick="switchTab('bills')">Bills & Transactions</div>
     <div class="nav-item" id="n-vend" onclick="switchTab('vend')">Vendor Master</div>
     <div style="margin-top:auto">
         <button class="btn" style="width:100%; background:var(--bg-sunken)" onclick="toggleTheme()">Theme Toggle</button>
@@ -68,42 +128,71 @@
     <div id="v-dash">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
             <h1 style="font-size:22px">Financial Summary</h1>
-            <button class="btn btn-primary" onclick="loadData()">Sync Sheets</button>
+            <div style="display:flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="openModal('billModal')">+ Quick Add Bill</button>
+                <button class="btn btn-outline" onclick="loadData()">Sync Data</button>
+            </div>
         </div>
         
         <div class="stats-grid">
             <div class="stat-card"><div>Total Pending</div><div class="stat-value" id="s-pending" style="color:var(--accent)">₹0</div></div>
             <div class="stat-card"><div>Total Cleared</div><div class="stat-value" id="s-paid" style="color:var(--green)">₹0</div></div>
             <div class="stat-card"><div>Invoice Count</div><div class="stat-value" id="s-count">0</div></div>
-            <div class="stat-card"><div>Last Updated</div><div class="stat-value" id="s-time" style="font-size:14px; color:var(--txt-muted)">-</div></div>
         </div>
 
-        <div class="form-card" style="margin-top:10px">
-            <h3 style="font-size:16px">Quick Add Bill</h3>
-            <div class="form-grid">
-                <div><label style="font-size:11px">VENDOR</label><select id="f-vendor" onchange="autoFill()"></select></div>
-                <div><label style="font-size:11px">ITEM/PRODUCT</label><input id="f-item"></div>
-                <div><label style="font-size:11px">AMOUNT (₹)</label><input id="f-amount" type="number"></div>
-                <div style="display:flex; align-items:flex-end">
-                    <button class="btn btn-primary" style="width:100%" onclick="addBill()">Add Transaction</button>
+        <div class="dash-layout">
+            <div class="form-card">
+                <h3 style="font-size:16px; margin-bottom: 20px;">Category Wise Spend</h3>
+                <canvas id="revenueChart" style="max-height: 300px; width: 100%;"></canvas>
+            </div>
+            
+            <div class="form-card">
+                <h3 style="font-size:16px">Quick Add Form</h3>
+                <div class="form-grid full">
+                    <div>
+                        <label style="font-size:11px">VENDOR</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="q-vendor" onchange="autoFillQuick()"></select>
+                            <button class="btn btn-outline" style="padding: 10px;" onclick="openModal('vendorModal')">+</button>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+                        <div><label style="font-size:11px">ITEM</label><input id="q-item"></div>
+                        <div><label style="font-size:11px">QTY</label><input id="q-qty" type="number" placeholder="1"></div>
+                    </div>
+                    <div><label style="font-size:11px">CATEGORY</label><input id="q-category"></div>
+                    <div><label style="font-size:11px">AMOUNT (₹)</label><input id="q-amount" type="number"></div>
+                    <div id="q-info" style="font-size:11px; color:var(--txt-muted)"></div>
+                    <button class="btn btn-primary" onclick="quickAddSubmit()">Add Transaction</button>
                 </div>
-                <div id="v-info" style="grid-column: span 3; font-size:11px; color:var(--txt-muted)"></div>
             </div>
         </div>
     </div>
 
     <div id="v-bills" style="display:none">
-        <h1 style="font-size:22px; margin-bottom:15px">Transactions (Bills Sheet)</h1>
+        <div class="toolbar" style="margin-bottom:15px">
+            <h1 style="font-size:22px;">Transactions</h1>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" class="search-box" id="searchBills" placeholder="Search by Vendor, Item or Category..." onkeyup="renderBills()">
+                <button class="btn btn-primary" onclick="openModal('billModal')">+ Add Bill</button>
+            </div>
+        </div>
         <div class="card">
             <table>
-                <thead><tr><th>Vendor Name</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+                <thead><tr><th>Vendor Name</th><th>Item (Qty)</th><th>Category</th><th>Amount</th><th>Status</th></tr></thead>
                 <tbody id="bill-body"></tbody>
             </table>
         </div>
     </div>
 
     <div id="v-vend" style="display:none">
-        <h1 style="font-size:22px; margin-bottom:15px">Vendor Directory</h1>
+        <div class="toolbar" style="margin-bottom:15px">
+            <h1 style="font-size:22px;">Vendor Directory</h1>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" class="search-box" id="searchVendors" placeholder="Search Vendor Name..." onkeyup="renderVendors()">
+                <button class="btn btn-primary" onclick="openModal('vendorModal')">+ Add Vendor</button>
+            </div>
+        </div>
         <div class="card">
             <table>
                 <thead><tr><th>Vendor Name</th><th>Category</th><th>Bank Name</th><th>Account Info</th></tr></thead>
@@ -116,10 +205,12 @@
 </div>
 
 <script>
+// IMPORTANT: Paste your actual deployed Google Apps Script URL here
 const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
 let allBills = [];
 let allVendors = [];
+let spendChart = null;
 
 // ── TAB SWITCHING ──
 function switchTab(tab) {
@@ -136,9 +227,12 @@ function switchTab(tab) {
     if(tab === 'vend') renderVendors();
 }
 
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
 // ── FETCH DATA ──
 async function loadData() {
-    document.getElementById('s-time').textContent = "Syncing...";
     try {
         const [bRes, vRes] = await Promise.all([
             fetch(API_URL + "?action=getBills"),
@@ -147,64 +241,130 @@ async function loadData() {
         const bData = await bRes.json();
         const vData = await vRes.json();
         
-        allBills = bData.data.slice(1);
+        // Storing original index to prevent bugs when filtering
+        allBills = bData.data.slice(1).map((row, index) => ({ originalIndex: index + 2, data: row }));
         allVendors = vData.data.slice(1);
         
-        updateSummary();
+        updateDashboard();
         populateVendors();
-        document.getElementById('s-time').textContent = new Date().toLocaleTimeString();
+        renderBills();
+        renderVendors();
     } catch(e) { 
-        alert("Sync Failed!"); 
-        console.error(e);
+        console.error("Sync Error", e);
     }
 }
 
-function updateSummary() {
+function updateDashboard() {
     let pending = 0, paid = 0;
+    let categoryData = {};
+
     allBills.forEach(r => {
-        const amt = Number(r[4]) || 0;
-        if(r[5] === "Paid") paid += amt; else pending += amt;
+        const row = r.data;
+        const amt = Number(row[4]) || 0;
+        const category = row[3] || "Other"; // Assuming category is at index 3
+        
+        if(row[5] === "Paid") paid += amt; else pending += amt;
+        
+        // Sum category spends
+        if(!categoryData[category]) categoryData[category] = 0;
+        categoryData[category] += amt;
     });
+
     document.getElementById('s-pending').textContent = '₹' + pending.toLocaleString('en-IN');
     document.getElementById('s-paid').textContent = '₹' + paid.toLocaleString('en-IN');
     document.getElementById('s-count').textContent = allBills.length;
+
+    updateChart(categoryData);
 }
 
-function populateVendors() {
-    const sel = document.getElementById('f-vendor');
-    sel.innerHTML = '<option value="">Choose Vendor</option>';
-    allVendors.forEach(v => {
-        if(v[0]) sel.innerHTML += `<option value="${v[0]}">${v[0]}</option>`;
+function updateChart(data) {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const labels = Object.keys(data);
+    const values = Object.values(data);
+
+    if(spendChart) spendChart.destroy(); // Destroy previous chart
+
+    spendChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Spend Amount (₹)',
+                data: values,
+                backgroundColor: '#4f46e5',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
     });
 }
 
-function autoFill() {
-    const v = allVendors.find(x => x[0] === document.getElementById('f-vendor').value);
+function populateVendors() {
+    const selects = [document.getElementById('f-vendor'), document.getElementById('m-vendor'), document.getElementById('q-vendor')];
+    selects.forEach(sel => {
+        if(!sel) return;
+        sel.innerHTML = '<option value="">Choose Vendor...</option>';
+        allVendors.forEach(v => {
+            if(v[0]) sel.innerHTML += `<option value="${v[0]}">${v[0]}</option>`;
+        });
+    });
+}
+
+function autoFill(prefix) {
+    const vName = document.getElementById(`${prefix}-vendor`).value;
+    const v = allVendors.find(x => x[0] === vName);
     if(v) {
-        document.getElementById('f-item').value = v[1]; // Product/Item
-        document.getElementById('v-info').textContent = `Bank: ${v[3]} | Acc: ${v[4]} | IFSC: ${v[5]}`;
+        document.getElementById(`${prefix}-item`).value = v[1] || '';
+        document.getElementById(`${prefix}-category`).value = v[2] || '';
+        document.getElementById(`${prefix}-info`).textContent = `Bank: ${v[3]} | Acc: ${v[4]} | IFSC: ${v[5]}`;
     }
 }
+function autoFillQuick() { autoFill('q'); }
+function autoFillModal() { autoFill('m'); }
 
 // ── RENDERING TABLES ──
 function renderBills() {
-    document.getElementById('bill-body').innerHTML = allBills.map((r, i) => `
+    const searchTerm = document.getElementById('searchBills').value.toLowerCase();
+    const tbody = document.getElementById('bill-body');
+    
+    // Filter logic
+    const filtered = allBills.filter(r => {
+        const row = r.data;
+        const text = (row[1] + " " + row[2] + " " + row[3]).toLowerCase();
+        return text.includes(searchTerm);
+    });
+
+    tbody.innerHTML = filtered.map(r => {
+        const row = r.data;
+        const oIndex = r.originalIndex;
+        const qty = row[9] || 1; // Assuming we append Quantity at index 9, or it's mixed in Item
+        return `
         <tr>
-            <td style="font-weight:600">${r[1]}</td>
-            <td>${r[2]}</td>
-            <td style="font-family:DM Mono">₹${(Number(r[4])||0).toLocaleString('en-IN')}</td>
+            <td style="font-weight:600">${row[1]}</td>
+            <td>${row[2]} <span style="color:var(--txt-muted); font-size:12px">(Qty: ${qty})</span></td>
+            <td><span style="font-size:11px; background:var(--bg-sunken); padding:3px 8px; border-radius:4px">${row[3] || 'N/A'}</span></td>
+            <td style="font-family:DM Mono">₹${(Number(row[4])||0).toLocaleString('en-IN')}</td>
             <td>
-                <select class="status-badge ${r[5]==='Paid'?'st-paid':'st-pending'}" onchange="updateStatus(${i+2}, this.value, this)">
-                    <option ${r[5]==='Pending'?'selected':''}>Pending</option>
-                    <option ${r[5]==='Paid'?'selected':''}>Paid</option>
+                <select class="status-badge ${row[5]==='Paid'?'st-paid':'st-pending'}" onchange="updateStatus(${oIndex}, this.value, this)">
+                    <option ${row[5]==='Pending'?'selected':''}>Pending</option>
+                    <option ${row[5]==='Paid'?'selected':''}>Paid</option>
                 </select>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 }
 
 function renderVendors() {
-    document.getElementById('vend-body').innerHTML = allVendors.map(v => `
+    const searchTerm = document.getElementById('searchVendors').value.toLowerCase();
+    const tbody = document.getElementById('vend-body');
+    
+    const filtered = allVendors.filter(v => (v[0] || "").toLowerCase().includes(searchTerm));
+
+    tbody.innerHTML = filtered.map(v => `
         <tr>
             <td style="font-weight:600">${v[0]}</td>
             <td><span style="font-size:11px; background:var(--bg-sunken); padding:3px 8px; border-radius:4px">${v[2]}</span></td>
@@ -215,31 +375,80 @@ function renderVendors() {
 }
 
 // ── ACTIONS ──
-async function addBill() {
-    const vName = document.getElementById('f-vendor').value;
-    const item = document.getElementById('f-item').value;
-    const amt = document.getElementById('f-amount').value;
-    if(!vName || !amt) return alert("Missing Data");
+function quickAddSubmit() { processAddBill('q'); }
+function addBill() { processAddBill('m'); }
 
-    const vInfo = allVendors.find(x => x[0] === vName);
-    const row = [new Date().toLocaleDateString(), vName, item, vInfo[2], amt, "Pending", vInfo[3], vInfo[4], vInfo[5]];
+async function processAddBill(prefix) {
+    const vName = document.getElementById(`${prefix}-vendor`).value;
+    const item = document.getElementById(`${prefix}-item`).value;
+    const cat = document.getElementById(`${prefix}-category`).value;
+    const qty = document.getElementById(`${prefix}-qty`).value || 1;
+    const amt = document.getElementById(`${prefix}-amount`).value;
     
-    allBills.push(row);
-    updateSummary();
-    alert("Bill Added! Switching to Bills tab...");
-    switchTab('bills');
+    if(!vName || !amt) return alert("Missing Vendor or Amount!");
 
-    await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row }) });
+    const vInfo = allVendors.find(x => x[0] === vName) || ["","","","","",""];
+    
+    // Structure: [Date, Vendor, Item, Category, Amount, Status, Bank, Acc, IFSC, Quantity]
+    const rowData = [new Date().toLocaleDateString(), vName, item, cat, amt, "Pending", vInfo[3], vInfo[4], vInfo[5], qty];
+    
+    // Add to local state immediately
+    allBills.push({ originalIndex: allBills.length + 2, data: rowData });
+    updateDashboard();
+    renderBills();
+    
+    closeModal('billModal');
+    
+    // Reset Inputs
+    document.getElementById(`${prefix}-amount`).value = "";
+    document.getElementById(`${prefix}-qty`).value = "1";
+
+    // Send to Google Sheets
+    try {
+        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row: rowData }) });
+    } catch(e) { console.error("Error saving bill", e); }
 }
 
-function updateStatus(rowIndex, status, el) {
+async function addVendor() {
+    const name = document.getElementById('v-name').value;
+    const prod = document.getElementById('v-prod').value;
+    const cat = document.getElementById('v-cat').value;
+    const bank = document.getElementById('v-bank').value;
+    const acc = document.getElementById('v-acc').value;
+    const ifsc = document.getElementById('v-ifsc').value;
+
+    if(!name) return alert("Vendor Name required");
+
+    const newVendor = [name, prod, cat, bank, acc, ifsc];
+    allVendors.push(newVendor);
+    populateVendors();
+    renderVendors();
+    closeModal('vendorModal');
+
+    // NOTE: You need an "addVendor" block in your Google Apps Script doPost() to save this permanently
+    try {
+        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addVendor", row: newVendor }) });
+    } catch(e) { console.error("Error saving vendor", e); }
+}
+
+// Fixed Status Bug: Uses Original Index and updates local state so it doesn't revert
+function updateStatus(originalIndex, status, el) {
     el.className = "status-badge " + (status === 'Paid' ? 'st-paid' : 'st-pending');
-    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateStatus", rowIndex, status }) });
+    
+    // Find item and update local state
+    let target = allBills.find(b => b.originalIndex === originalIndex);
+    if(target) target.data[5] = status; 
+    
+    updateDashboard(); // Updates sums and chart immediately
+    
+    // Save to server
+    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateStatus", rowIndex: originalIndex, status: status }) });
 }
 
 function toggleTheme() {
     const theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", theme);
+    // Refresh chart to adapt colors if needed (optional)
 }
 
 loadData();
