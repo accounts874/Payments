@@ -32,7 +32,7 @@
   .stat-value { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; margin-top: 8px; }
   
   /* Dashboard specific Layout */
-  .dash-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;}
+  .dash-layout { display: block; }
   
   /* Table */
   .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-top: 15px;}
@@ -41,14 +41,13 @@
   td { padding: 14px 20px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
   
   /* Form */
-  .form-card { padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-  .form-grid.full { grid-template-columns: 1fr; }
   input, select { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-sunken); color: var(--txt-primary); width: 100%; outline: none; }
   .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s;}
   .btn:hover { opacity: 0.9; }
   .btn-primary { background: var(--accent); color: white; }
   .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+  .btn-delete { background: #fef2f2; color: #dc2626; border: 1px solid #f87171; padding: 6px 12px; font-size: 12px; }
 
   .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; appearance: none; border: none; cursor: pointer; outline: none; }
   .st-pending { background: #eeecfd; color: #3730a3; }
@@ -141,30 +140,9 @@
         </div>
 
         <div class="dash-layout">
-            <div class="form-card">
+            <div class="card" style="padding: 20px;">
                 <h3 style="font-size:16px; margin-bottom: 20px;">Category Wise Spend</h3>
-                <canvas id="revenueChart" style="max-height: 300px; width: 100%;"></canvas>
-            </div>
-            
-            <div class="form-card">
-                <h3 style="font-size:16px">Quick Add Form</h3>
-                <div class="form-grid full">
-                    <div>
-                        <label style="font-size:11px">VENDOR</label>
-                        <div style="display:flex; gap:10px;">
-                            <select id="q-vendor" onchange="autoFillQuick()"></select>
-                            <button class="btn btn-outline" style="padding: 10px;" onclick="openModal('vendorModal')">+</button>
-                        </div>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
-                        <div><label style="font-size:11px">ITEM</label><input id="q-item"></div>
-                        <div><label style="font-size:11px">QTY</label><input id="q-qty" type="number" placeholder="1"></div>
-                    </div>
-                    <div><label style="font-size:11px">CATEGORY</label><input id="q-category"></div>
-                    <div><label style="font-size:11px">AMOUNT (₹)</label><input id="q-amount" type="number"></div>
-                    <div id="q-info" style="font-size:11px; color:var(--txt-muted)"></div>
-                    <button class="btn btn-primary" onclick="quickAddSubmit()">Add Transaction</button>
-                </div>
+                <canvas id="revenueChart" style="max-height: 400px; width: 100%;"></canvas>
             </div>
         </div>
     </div>
@@ -179,7 +157,7 @@
         </div>
         <div class="card">
             <table>
-                <thead><tr><th>Vendor Name</th><th>Item (Qty)</th><th>Category</th><th>Amount</th><th>Status</th></tr></thead>
+                <thead><tr><th>Vendor Name</th><th>Item (Qty)</th><th>Category</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody id="bill-body"></tbody>
             </table>
         </div>
@@ -205,7 +183,6 @@
 </div>
 
 <script>
-// IMPORTANT: Paste your actual deployed Google Apps Script URL here
 const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
 let allBills = [];
@@ -241,7 +218,6 @@ async function loadData() {
         const bData = await bRes.json();
         const vData = await vRes.json();
         
-        // Storing original index to prevent bugs when filtering
         allBills = bData.data.slice(1).map((row, index) => ({ originalIndex: index + 2, data: row }));
         allVendors = vData.data.slice(1);
         
@@ -261,11 +237,10 @@ function updateDashboard() {
     allBills.forEach(r => {
         const row = r.data;
         const amt = Number(row[4]) || 0;
-        const category = row[3] || "Other"; // Assuming category is at index 3
+        const category = row[3] || "Other"; 
         
         if(row[5] === "Paid") paid += amt; else pending += amt;
         
-        // Sum category spends
         if(!categoryData[category]) categoryData[category] = 0;
         categoryData[category] += amt;
     });
@@ -282,7 +257,7 @@ function updateChart(data) {
     const labels = Object.keys(data);
     const values = Object.values(data);
 
-    if(spendChart) spendChart.destroy(); // Destroy previous chart
+    if(spendChart) spendChart.destroy();
 
     spendChart = new Chart(ctx, {
         type: 'bar',
@@ -297,6 +272,7 @@ function updateChart(data) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } }
         }
@@ -304,7 +280,7 @@ function updateChart(data) {
 }
 
 function populateVendors() {
-    const selects = [document.getElementById('f-vendor'), document.getElementById('m-vendor'), document.getElementById('q-vendor')];
+    const selects = [document.getElementById('m-vendor')];
     selects.forEach(sel => {
         if(!sel) return;
         sel.innerHTML = '<option value="">Choose Vendor...</option>';
@@ -314,24 +290,21 @@ function populateVendors() {
     });
 }
 
-function autoFill(prefix) {
-    const vName = document.getElementById(`${prefix}-vendor`).value;
+function autoFillModal() {
+    const vName = document.getElementById('m-vendor').value;
     const v = allVendors.find(x => x[0] === vName);
     if(v) {
-        document.getElementById(`${prefix}-item`).value = v[1] || '';
-        document.getElementById(`${prefix}-category`).value = v[2] || '';
-        document.getElementById(`${prefix}-info`).textContent = `Bank: ${v[3]} | Acc: ${v[4]} | IFSC: ${v[5]}`;
+        document.getElementById('m-item').value = v[1] || '';
+        document.getElementById('m-category').value = v[2] || '';
+        document.getElementById('m-info').textContent = `Bank: ${v[3]} | Acc: ${v[4]} | IFSC: ${v[5]}`;
     }
 }
-function autoFillQuick() { autoFill('q'); }
-function autoFillModal() { autoFill('m'); }
 
 // ── RENDERING TABLES ──
 function renderBills() {
     const searchTerm = document.getElementById('searchBills').value.toLowerCase();
     const tbody = document.getElementById('bill-body');
     
-    // Filter logic
     const filtered = allBills.filter(r => {
         const row = r.data;
         const text = (row[1] + " " + row[2] + " " + row[3]).toLowerCase();
@@ -341,7 +314,7 @@ function renderBills() {
     tbody.innerHTML = filtered.map(r => {
         const row = r.data;
         const oIndex = r.originalIndex;
-        const qty = row[9] || 1; // Assuming we append Quantity at index 9, or it's mixed in Item
+        const qty = row[9] || 1; 
         return `
         <tr>
             <td style="font-weight:600">${row[1]}</td>
@@ -353,6 +326,9 @@ function renderBills() {
                     <option ${row[5]==='Pending'?'selected':''}>Pending</option>
                     <option ${row[5]==='Paid'?'selected':''}>Paid</option>
                 </select>
+            </td>
+            <td>
+                <button class="btn btn-delete" onclick="deleteBill(${oIndex})">🗑️ Delete</button>
             </td>
         </tr>`;
     }).join('');
@@ -375,38 +351,51 @@ function renderVendors() {
 }
 
 // ── ACTIONS ──
-function quickAddSubmit() { processAddBill('q'); }
-function addBill() { processAddBill('m'); }
-
-async function processAddBill(prefix) {
-    const vName = document.getElementById(`${prefix}-vendor`).value;
-    const item = document.getElementById(`${prefix}-item`).value;
-    const cat = document.getElementById(`${prefix}-category`).value;
-    const qty = document.getElementById(`${prefix}-qty`).value || 1;
-    const amt = document.getElementById(`${prefix}-amount`).value;
+function addBill() {
+    const vName = document.getElementById(`m-vendor`).value;
+    const item = document.getElementById(`m-item`).value;
+    const cat = document.getElementById(`m-category`).value;
+    const qty = document.getElementById(`m-qty`).value || 1;
+    const amt = document.getElementById(`m-amount`).value;
     
     if(!vName || !amt) return alert("Missing Vendor or Amount!");
 
     const vInfo = allVendors.find(x => x[0] === vName) || ["","","","","",""];
     
-    // Structure: [Date, Vendor, Item, Category, Amount, Status, Bank, Acc, IFSC, Quantity]
     const rowData = [new Date().toLocaleDateString(), vName, item, cat, amt, "Pending", vInfo[3], vInfo[4], vInfo[5], qty];
     
-    // Add to local state immediately
     allBills.push({ originalIndex: allBills.length + 2, data: rowData });
     updateDashboard();
     renderBills();
     
     closeModal('billModal');
-    
-    // Reset Inputs
-    document.getElementById(`${prefix}-amount`).value = "";
-    document.getElementById(`${prefix}-qty`).value = "1";
+    document.getElementById(`m-amount`).value = "";
+    document.getElementById(`m-qty`).value = "1";
 
-    // Send to Google Sheets
+    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row: rowData }) });
+}
+
+// Delete Bill Functionality
+async function deleteBill(originalIndex) {
+    if(!confirm("Are you sure you want to delete this bill? This cannot be undone.")) return;
+    
+    // Remove locally so UI updates instantly
+    allBills = allBills.filter(b => b.originalIndex !== originalIndex);
+    updateDashboard();
+    renderBills();
+
+    // Call backend to delete row
     try {
-        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row: rowData }) });
-    } catch(e) { console.error("Error saving bill", e); }
+        await fetch(API_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "deleteBill", rowIndex: originalIndex }) 
+        });
+        
+        // Reload data after deleting to get fresh Row Indices from Google Sheet
+        loadData(); 
+    } catch(e) {
+        console.error("Error deleting bill", e);
+    }
 }
 
 async function addVendor() {
@@ -425,30 +414,23 @@ async function addVendor() {
     renderVendors();
     closeModal('vendorModal');
 
-    // NOTE: You need an "addVendor" block in your Google Apps Script doPost() to save this permanently
     try {
         await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addVendor", row: newVendor }) });
     } catch(e) { console.error("Error saving vendor", e); }
 }
 
-// Fixed Status Bug: Uses Original Index and updates local state so it doesn't revert
 function updateStatus(originalIndex, status, el) {
     el.className = "status-badge " + (status === 'Paid' ? 'st-paid' : 'st-pending');
-    
-    // Find item and update local state
     let target = allBills.find(b => b.originalIndex === originalIndex);
     if(target) target.data[5] = status; 
     
-    updateDashboard(); // Updates sums and chart immediately
-    
-    // Save to server
+    updateDashboard(); 
     fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateStatus", rowIndex: originalIndex, status: status }) });
 }
 
 function toggleTheme() {
     const theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", theme);
-    // Refresh chart to adapt colors if needed (optional)
 }
 
 loadData();
