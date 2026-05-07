@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillBox Finance | Vendor Integrated</title>
+<title>SkillBox Finance | Multi-Tab</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-base: #f4f5f9; --bg-surface: #ffffff; --bg-sunken: #eef0f6; --bg-hover: #f0f1f7; --txt-primary: #0d0e14; --txt-secondary: #5a5f7a; --txt-muted: #9297b0; --border: #e3e5ef; --border-strong: #c8cbe0; --accent: #4f46e5; --accent-soft: #eeecfd; --accent-text: #3730a3; --green: #16a34a; --green-soft: #f0fdf4; --green-text: #14532d; --red: #dc2626; --red-soft: #fef2f2; --red-text: #7f1d1d; --amber: #d97706; --amber-soft: #fffbeb; --amber-text: #78350f; --shadow-sm: 0 1px 3px rgba(0,0,0,.06); --radius-md: 12px; --nav-width: 220px;
+    --bg-base: #f4f5f9; --bg-surface: #ffffff; --bg-sunken: #eef0f6; --bg-hover: #f0f1f7; --txt-primary: #0d0e14; --txt-secondary: #5a5f7a; --txt-muted: #9297b0; --border: #e3e5ef; --accent: #4f46e5; --accent-soft: #eeecfd; --accent-text: #3730a3; --green: #16a34a; --green-soft: #f0fdf4; --green-text: #14532d; --red: #dc2626; --radius-md: 12px; --nav-width: 220px;
   }
   [data-theme="dark"] {
-    --bg-base: #0c0e16; --bg-surface: #131720; --bg-sunken: #0f1219; --bg-hover: #1a1f2e; --txt-primary: #e6e8f4; --txt-secondary: #7e86a8; --txt-muted: #40486a; --border: #1e2437; --border-strong: #2a3048; --accent: #818cf8; --accent-soft: #1e1b4b; --accent-text: #c7d2fe; --green: #4ade80; --green-text: #bbf7d0; --red: #f87171; --red-text: #fecaca;
+    --bg-base: #0c0e16; --bg-surface: #131720; --bg-sunken: #0f1219; --bg-hover: #1a1f2e; --txt-primary: #e6e8f4; --txt-secondary: #7e86a8; --txt-muted: #40486a; --border: #1e2437; --accent: #818cf8; --accent-soft: #1e1b4b; --accent-text: #c7d2fe;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg-base); color: var(--txt-primary); min-height: 100vh; transition: 0.2s ease; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg-base); color: var(--txt-primary); min-height: 100vh; }
   .layout { display: grid; grid-template-columns: var(--nav-width) 1fr; min-height: 100vh; }
   
   /* Sidebar */
@@ -22,30 +22,29 @@
   .logo-mark { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
   .nav-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; font-size: 14px; color: var(--txt-secondary); cursor: pointer; transition: 0.2s; margin-bottom: 4px; }
   .nav-item.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
-  .nav-item:hover:not(.active) { background: var(--bg-hover); }
 
   /* Main */
-  .main { padding: 30px; display: flex; flex-direction: column; gap: 25px; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; }
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-  .stat-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
+  .main { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 10px; }
+  .stat-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .stat-value { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; margin-top: 8px; }
   
-  /* Table & Forms */
-  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+  /* Table */
+  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--txt-muted); padding: 12px 20px; background: var(--bg-sunken); }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--txt-muted); padding: 14px 20px; background: var(--bg-sunken); }
   td { padding: 14px 20px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
   
-  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
-  input, select { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-sunken); color: var(--txt-primary); outline: none; width: 100%; }
-  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
+  /* Form */
+  .form-card { padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+  input, select { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-sunken); color: var(--txt-primary); width: 100%; outline: none; }
+  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
   .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { opacity: 0.9; }
 
-  .status-select { border: none; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; }
-  .pending { background: var(--accent-soft); color: var(--accent-text); }
-  .paid { background: var(--green-soft); color: var(--green-text); }
+  .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; appearance: none; border: none; }
+  .st-pending { background: #eeecfd; color: #3730a3; }
+  .st-paid { background: #f0fdf4; color: #14532d; }
 </style>
 </head>
 <body>
@@ -54,65 +53,65 @@
   <aside class="sidebar">
     <div class="logo">
       <div class="logo-mark">S</div>
-      <div><div style="font-weight:600">SkillBox</div><div style="font-size:11px; color:var(--txt-muted)">Finance Hub</div></div>
+      <div style="font-weight:600">SkillBox<br><span style="font-size:11px; color:var(--txt-muted)">Finance</span></div>
     </div>
-    <div class="nav-item active" id="nav-dash" onclick="switchView('dash')">Dashboard</div>
-    <div class="nav-item" id="nav-vendors" onclick="switchView('vendors')">Vendor Master</div>
+    <div class="nav-item active" id="n-dash" onclick="switchTab('dash')">Dashboard</div>
+    <div class="nav-item" id="n-bills" onclick="switchTab('bills')">Bills / Transactions</div>
+    <div class="nav-item" id="n-vend" onclick="switchTab('vend')">Vendor Master</div>
     <div style="margin-top:auto">
         <button class="btn" style="width:100%; background:var(--bg-sunken)" onclick="toggleTheme()">Theme Toggle</button>
     </div>
   </aside>
 
   <main class="main">
-    <div id="dash-view">
-      <div class="topbar">
-        <div><h1 class="page-title">Payments</h1><p id="clock" class="page-subtitle"></p></div>
-        <button class="btn btn-primary" onclick="loadData()">Sync Sheets</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card"><div>Pending</div><div class="stat-value" id="c-pending" style="color:var(--accent)">₹0</div></div>
-        <div class="stat-card"><div>Cleared</div><div class="stat-value" id="c-paid" style="color:var(--green)">₹0</div></div>
-        <div class="stat-card"><div>Count</div><div class="stat-value" id="c-count">0</div></div>
-        <div class="stat-card"><div>Sync Status</div><div class="stat-value" style="font-size:14px; color:var(--green)">Online</div></div>
-      </div>
-
-      <div class="card" style="margin-top:20px">
-        <table>
-          <thead><tr><th>Vendor Name</th><th>Product/Item</th><th>Amount</th><th>Status</th></tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-
-      <div class="card" style="margin-top:25px">
-        <div style="padding:15px 20px; border-bottom:1px solid var(--border); font-weight:600">Add New Payment</div>
-        <div class="form-grid">
-          <div><label style="font-size:11px">VENDOR</label>
-            <select id="f-vendor" onchange="autoFillVendor()"></select>
-          </div>
-          <div><label style="font-size:11px">PRODUCT/ITEM</label><input id="f-item"></div>
-          <div><label style="font-size:11px">CATEGORY</label><input id="f-category"></div>
-          <div><label style="font-size:11px">AMOUNT (₹)</label><input id="f-amount" type="number"></div>
-          <div><label style="font-size:11px">STATUS</label>
-            <select id="f-status"><option>Pending</option><option>Paid</option></select>
-          </div>
-          <div style="display:flex; align-items:flex-end">
-            <button class="btn btn-primary" style="width:100%" onclick="addPayment()">Add to Sheet</button>
-          </div>
+    
+    <div id="v-dash">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <h1 style="font-size:22px">Financial Summary</h1>
+            <button class="btn btn-primary" onclick="loadData()">Sync Sheets</button>
         </div>
-        <div id="v-preview" style="padding:0 20px 15px; font-size:11px; color:var(--txt-muted); display:none"></div>
-      </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card"><div>Total Pending</div><div class="stat-value" id="s-pending" style="color:var(--accent)">₹0</div></div>
+            <div class="stat-card"><div>Total Cleared</div><div class="stat-value" id="s-paid" style="color:var(--green)">₹0</div></div>
+            <div class="stat-card"><div>Invoice Count</div><div class="stat-value" id="s-count">0</div></div>
+            <div class="stat-card"><div>Last Updated</div><div class="stat-value" id="s-time" style="font-size:14px; color:var(--txt-muted)">-</div></div>
+        </div>
+
+        <div class="form-card" style="margin-top:10px">
+            <h3 style="font-size:16px">Quick Add Bill</h3>
+            <div class="form-grid">
+                <div><label style="font-size:11px">VENDOR</label><select id="f-vendor" onchange="autoFill()"></select></div>
+                <div><label style="font-size:11px">ITEM/PRODUCT</label><input id="f-item"></div>
+                <div><label style="font-size:11px">AMOUNT (₹)</label><input id="f-amount" type="number"></div>
+                <div style="display:flex; align-items:flex-end">
+                    <button class="btn btn-primary" style="width:100%" onclick="addBill()">Add Transaction</button>
+                </div>
+                <div id="v-info" style="grid-column: span 3; font-size:11px; color:var(--txt-muted)"></div>
+            </div>
+        </div>
     </div>
 
-    <div id="vendors-view" style="display:none">
-        <h1 class="page-title">Vendor Master Data</h1>
-        <div class="card" style="margin-top:20px">
+    <div id="v-bills" style="display:none">
+        <h1 style="font-size:22px; margin-bottom:15px">Transactions (Bills Sheet)</h1>
+        <div class="card">
             <table>
-                <thead><tr><th>Vendor</th><th>Product</th><th>Category</th><th>Bank Details</th></tr></thead>
-                <tbody id="v-tbody"></tbody>
+                <thead><tr><th>Vendor Name</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody id="bill-body"></tbody>
             </table>
         </div>
     </div>
+
+    <div id="v-vend" style="display:none">
+        <h1 style="font-size:22px; margin-bottom:15px">Vendor Directory</h1>
+        <div class="card">
+            <table>
+                <thead><tr><th>Vendor Name</th><th>Category</th><th>Bank Name</th><th>Account Info</th></tr></thead>
+                <tbody id="vend-body"></tbody>
+            </table>
+        </div>
+    </div>
+
   </main>
 </div>
 
@@ -121,27 +120,57 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8q
 
 let allBills = [];
 let allVendors = [];
-let isDark = false;
 
-// ── DATA FETCH ──
+// ── TAB SWITCHING ──
+function switchTab(tab) {
+    const views = ['v-dash', 'v-bills', 'v-vend'];
+    const navs = ['n-dash', 'n-bills', 'n-vend'];
+    
+    views.forEach(v => document.getElementById(v).style.display = 'none');
+    navs.forEach(n => document.getElementById(n).classList.remove('active'));
+    
+    document.getElementById('v-' + tab).style.display = 'block';
+    document.getElementById('n-' + tab).classList.add('active');
+    
+    if(tab === 'bills') renderBills();
+    if(tab === 'vend') renderVendors();
+}
+
+// ── FETCH DATA ──
 async function loadData() {
+    document.getElementById('s-time').textContent = "Syncing...";
     try {
         const [bRes, vRes] = await Promise.all([
             fetch(API_URL + "?action=getBills"),
             fetch(API_URL + "?action=getVendors")
         ]);
-        const bJson = await bRes.json();
-        const vJson = await vRes.json();
+        const bData = await bRes.json();
+        const vData = await vRes.json();
         
-        allBills = bJson.data.slice(1);
-        allVendors = vJson.data.slice(1);
+        allBills = bData.data.slice(1);
+        allVendors = vData.data.slice(1);
         
-        populateVendorList();
-        renderBills();
-    } catch (e) { console.error("Sync Failed", e); }
+        updateSummary();
+        populateVendors();
+        document.getElementById('s-time').textContent = new Date().toLocaleTimeString();
+    } catch(e) { 
+        alert("Sync Failed!"); 
+        console.error(e);
+    }
 }
 
-function populateVendorList() {
+function updateSummary() {
+    let pending = 0, paid = 0;
+    allBills.forEach(r => {
+        const amt = Number(r[4]) || 0;
+        if(r[5] === "Paid") paid += amt; else pending += amt;
+    });
+    document.getElementById('s-pending').textContent = '₹' + pending.toLocaleString('en-IN');
+    document.getElementById('s-paid').textContent = '₹' + paid.toLocaleString('en-IN');
+    document.getElementById('s-count').textContent = allBills.length;
+}
+
+function populateVendors() {
     const sel = document.getElementById('f-vendor');
     sel.innerHTML = '<option value="">Choose Vendor</option>';
     allVendors.forEach(v => {
@@ -149,102 +178,69 @@ function populateVendorList() {
     });
 }
 
-function autoFillVendor() {
-    const name = document.getElementById('f-vendor').value;
-    const v = allVendors.find(x => x[0] === name);
-    const prev = document.getElementById('v-preview');
+function autoFill() {
+    const v = allVendors.find(x => x[0] === document.getElementById('f-vendor').value);
     if(v) {
-        document.getElementById('f-item').value = v[1] || ""; // Product
-        document.getElementById('f-category').value = v[2] || ""; // Category
-        prev.style.display = "block";
-        prev.textContent = `Bank: ${v[3]} | Account: ${v[4]} | IFSC: ${v[5]}`;
+        document.getElementById('f-item').value = v[1]; // Product/Item
+        document.getElementById('v-info').textContent = `Bank: ${v[3]} | Acc: ${v[4]} | IFSC: ${v[5]}`;
     }
 }
 
-// ── RENDERING ──
+// ── RENDERING TABLES ──
 function renderBills() {
-    const tbody = document.getElementById('tbody');
-    let pending = 0, paid = 0;
-    
-    tbody.innerHTML = allBills.map((row, i) => {
-        const amt = Number(row[4]) || 0;
-        const st = row[5] || "Pending";
-        if(st === "Pending") pending += amt; else paid += amt;
-
-        return `<tr>
-            <td style="font-weight:600">${row[1]}</td>
-            <td>${row[2]}</td>
-            <td style="font-family:DM Mono">₹${amt.toLocaleString('en-IN')}</td>
+    document.getElementById('bill-body').innerHTML = allBills.map((r, i) => `
+        <tr>
+            <td style="font-weight:600">${r[1]}</td>
+            <td>${r[2]}</td>
+            <td style="font-family:DM Mono">₹${(Number(r[4])||0).toLocaleString('en-IN')}</td>
             <td>
-                <select class="status-select ${st.toLowerCase()}" onchange="updateStatus(${i+2}, this.value, this)">
-                    <option ${st==='Pending'?'selected':''}>Pending</option>
-                    <option ${st==='Paid'?'selected':''}>Paid</option>
+                <select class="status-badge ${r[5]==='Paid'?'st-paid':'st-pending'}" onchange="updateStatus(${i+2}, this.value, this)">
+                    <option ${r[5]==='Pending'?'selected':''}>Pending</option>
+                    <option ${r[5]==='Paid'?'selected':''}>Paid</option>
                 </select>
             </td>
-        </tr>`;
-    }).join('');
-
-    document.getElementById('c-pending').textContent = '₹' + pending.toLocaleString('en-IN');
-    document.getElementById('c-paid').textContent = '₹' + paid.toLocaleString('en-IN');
-    document.getElementById('c-count').textContent = allBills.length;
+        </tr>
+    `).join('');
 }
 
 function renderVendors() {
-    document.getElementById('v-tbody').innerHTML = allVendors.map(v => `
+    document.getElementById('vend-body').innerHTML = allVendors.map(v => `
         <tr>
             <td style="font-weight:600">${v[0]}</td>
-            <td>${v[1]}</td>
-            <td><span style="font-size:11px; background:var(--bg-sunken); padding:2px 6px; border-radius:4px">${v[2]}</span></td>
-            <td style="font-size:12px; color:var(--txt-secondary)">${v[3]}<br>${v[4]}<br>${v[5]}</td>
+            <td><span style="font-size:11px; background:var(--bg-sunken); padding:3px 8px; border-radius:4px">${v[2]}</span></td>
+            <td>${v[3]}</td>
+            <td style="font-size:12px; color:var(--txt-secondary)">A/C: ${v[4]}<br>IFSC: ${v[5]}</td>
         </tr>
     `).join('');
 }
 
 // ── ACTIONS ──
-async function addPayment() {
-    const v = document.getElementById('f-vendor').value;
-    const it = document.getElementById('f-item').value;
-    const cat = document.getElementById('f-category').value;
-    const am = document.getElementById('f-amount').value;
-    const st = document.getElementById('f-status').value;
+async function addBill() {
+    const vName = document.getElementById('f-vendor').value;
+    const item = document.getElementById('f-item').value;
+    const amt = document.getElementById('f-amount').value;
+    if(!vName || !amt) return alert("Missing Data");
 
-    if(!v || !am) return alert("Please select Vendor and Amount");
-
-    const vInfo = allVendors.find(x => x[0] === v) || [];
-    // Row structure for Bills Sheet: [Date, Vendor, Item, Category, Amount, Status, Bank, Acc, IFSC]
-    const row = [new Date().toLocaleDateString(), v, it, cat, am, st, vInfo[3], vInfo[4], vInfo[5]];
+    const vInfo = allVendors.find(x => x[0] === vName);
+    const row = [new Date().toLocaleDateString(), vName, item, vInfo[2], amt, "Pending", vInfo[3], vInfo[4], vInfo[5]];
     
     allBills.push(row);
-    renderBills();
-    
-    // Clear form
-    document.getElementById('f-amount').value = "";
-    
+    updateSummary();
+    alert("Bill Added! Switching to Bills tab...");
+    switchTab('bills');
+
     await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row }) });
 }
 
-function switchView(view) {
-    document.getElementById('dash-view').style.display = view === 'dash' ? 'block' : 'none';
-    document.getElementById('vendors-view').style.display = view === 'vendors' ? 'block' : 'none';
-    document.getElementById('nav-dash').classList.toggle('active', view === 'dash');
-    document.getElementById('nav-vendors').classList.toggle('active', view === 'vendors');
-    if(view === 'vendors') renderVendors();
-}
-
 function updateStatus(rowIndex, status, el) {
-    el.className = "status-select " + status.toLowerCase();
+    el.className = "status-badge " + (status === 'Paid' ? 'st-paid' : 'st-pending');
     fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateStatus", rowIndex, status }) });
 }
 
 function toggleTheme() {
-    isDark = !isDark;
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    const theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", theme);
 }
-
-// Clock
-setInterval(() => {
-    document.getElementById('clock').textContent = new Date().toLocaleString('en-IN');
-}, 1000);
 
 loadData();
 </script>
