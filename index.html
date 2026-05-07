@@ -2,55 +2,71 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Finance Dashboard</title>
+<title>Finance Debug Dashboard</title>
 
 <style>
-body { display:flex; background:#0c0c0c; color:#fff; font-family:Arial; }
-.sidebar { width:220px; background:#111; padding:20px; }
-.main { flex:1; padding:20px; }
-
-.card {
-  background:#151515;
-  padding:15px;
-  border-radius:10px;
-  display:inline-block;
-  width:23%;
-  margin:5px;
+body{
+  background:#111;
+  color:white;
+  font-family:Arial;
+  padding:20px;
 }
-.value { color:#ff7a00; font-size:22px; }
 
-table { width:100%; margin-top:20px; border-collapse:collapse; }
-td, th { padding:10px; border-bottom:1px solid #333; }
-
-button {
-  background:#ff7a00;
+button{
+  background:orange;
   border:none;
-  padding:8px 12px;
+  padding:10px;
   cursor:pointer;
+}
+
+.card{
+  background:#1c1c1c;
+  padding:20px;
+  margin:10px 0;
+  border-radius:10px;
+}
+
+table{
+  width:100%;
+  margin-top:20px;
+  border-collapse:collapse;
+}
+
+td,th{
+  border:1px solid #333;
+  padding:10px;
+}
+
+#debug{
+  background:#000;
+  color:#0f0;
+  padding:10px;
+  margin-top:20px;
+  height:250px;
+  overflow:auto;
+  border:1px solid #333;
 }
 </style>
 </head>
 
 <body>
 
-<div class="sidebar">
-  <h3>Dashboard</h3>
+<h1>Finance Dashboard DEBUG</h1>
+
+<button onclick="loadData()">Load Data</button>
+
+<div class="card">
+  Pending: <span id="pending">0</span>
 </div>
 
-<div class="main">
-
-<h2>Payments Dashboard</h2>
-<button onclick="loadData()">Refresh</button>
-
-<!-- CARDS -->
-<div>
-  <div class="card">Pending <div id="pending" class="value">0</div></div>
-  <div class="card">Paid <div id="paid" class="value">0</div></div>
-  <div class="card">Invoices <div id="count" class="value">0</div></div>
-  <div class="card">Overdue <div id="overdue" class="value">0</div></div>
+<div class="card">
+  Paid: <span id="paid">0</span>
 </div>
 
-<!-- TABLE -->
+<div class="card">
+  Invoices: <span id="count">0</span>
+</div>
+
 <table>
 <thead>
 <tr>
@@ -60,106 +76,103 @@ button {
 <th>Status</th>
 </tr>
 </thead>
+
 <tbody id="tbody"></tbody>
+
 </table>
 
-<!-- ADD FORM -->
-<h3>Add Payment</h3>
+<h3>Debug Console</h3>
 
-<form onsubmit="addBill(event)">
-<input id="vendor" placeholder="Vendor"><br><br>
-<input id="item" placeholder="Item"><br><br>
-<input id="amount" placeholder="Amount"><br><br>
-
-<select id="status">
-<option>Pending</option>
-<option>Paid</option>
-<option>Overdue</option>
-</select><br><br>
-
-<button type="submit">Add</button>
-</form>
-
-</div>
+<div id="debug"></div>
 
 <script>
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
-// LOAD DATA
-async function loadData() {
-  const res = await fetch(API_URL + "?action=getBills");
-  const data = await res.json();
+function log(msg){
 
-  let html = "";
-  let pending = 0, paid = 0, overdue = 0;
+  console.log(msg);
 
-  data.slice(1).forEach((row, i) => {
+  document.getElementById("debug").innerHTML += "<br>" + JSON.stringify(msg);
 
-    if(row[5] === "Pending") pending += Number(row[4]);
-    if(row[5] === "Paid") paid += Number(row[4]);
-    if(row[5] === "Overdue") overdue += Number(row[4]);
-
-    html += `
-    <tr>
-      <td>${row[1]}</td>
-      <td>${row[2]}</td>
-      <td>₹${row[4]}</td>
-      <td>
-        <select onchange="updateStatus(${i+2}, this.value)">
-          <option ${row[5]=='Pending'?'selected':''}>Pending</option>
-          <option ${row[5]=='Paid'?'selected':''}>Paid</option>
-          <option ${row[5]=='Overdue'?'selected':''}>Overdue</option>
-        </select>
-      </td>
-    </tr>`;
-  });
-
-  document.getElementById("tbody").innerHTML = html;
-  document.getElementById("pending").innerText = pending;
-  document.getElementById("paid").innerText = paid;
-  document.getElementById("overdue").innerText = overdue;
-  document.getElementById("count").innerText = data.length - 1;
 }
 
-// ADD BILL
-async function addBill(e) {
-  e.preventDefault();
+async function loadData(){
 
-  const row = [
-    new Date().toLocaleDateString(),
-    vendor.value,
-    item.value,
-    "",
-    amount.value,
-    status.value
-  ];
+  try {
 
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "addBill",
-      row
-    })
-  });
+    log("Loading data...");
 
-  loadData();
+    const url = API_URL + "?action=getBills";
+
+    log(url);
+
+    const response = await fetch(url);
+
+    log("Response received");
+
+    const json = await response.json();
+
+    log(json);
+
+    if(!json.success){
+
+      log("Backend Error:");
+      log(json.error || json.message);
+
+      return;
+    }
+
+    const data = json.data;
+
+    log("Rows found: " + data.length);
+
+    let html = "";
+
+    let pending = 0;
+    let paid = 0;
+
+    data.slice(1).forEach((row, i) => {
+
+      log(row);
+
+      if(row[5] === "Pending"){
+        pending += Number(row[4]);
+      }
+
+      if(row[5] === "Paid"){
+        paid += Number(row[4]);
+      }
+
+      html += `
+      <tr>
+        <td>${row[1]}</td>
+        <td>${row[2]}</td>
+        <td>${row[4]}</td>
+        <td>${row[5]}</td>
+      </tr>
+      `;
+
+    });
+
+    document.getElementById("tbody").innerHTML = html;
+
+    document.getElementById("pending").innerText = pending;
+
+    document.getElementById("paid").innerText = paid;
+
+    document.getElementById("count").innerText = data.length - 1;
+
+    log("DONE");
+
+  } catch(err){
+
+    log("FRONTEND ERROR:");
+    log(err.toString());
+
+  }
+
 }
-
-// UPDATE STATUS
-async function updateStatus(rowIndex, status) {
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "updateStatus",
-      rowIndex,
-      status
-    })
-  });
-}
-
-// INIT
-loadData();
 
 </script>
 
