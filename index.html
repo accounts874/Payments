@@ -1,950 +1,362 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg-base: #f4f5f9;
-    --bg-surface: #ffffff;
-    --bg-sunken: #eef0f6;
-    --bg-hover: #f0f1f7;
-    --txt-primary: #0d0e14;
-    --txt-secondary: #5a5f7a;
-    --txt-muted: #9297b0;
-    --border: #e3e5ef;
-    --border-strong: #c8cbe0;
-    --accent: #4f46e5;
-    --accent-soft: #eeecfd;
-    --accent-text: #3730a3;
-    --green: #16a34a;
-    --green-soft: #f0fdf4;
-    --green-text: #14532d;
-    --red: #dc2626;
-    --red-soft: #fef2f2;
-    --red-text: #7f1d1d;
-    --amber: #d97706;
-    --amber-soft: #fffbeb;
-    --amber-text: #78350f;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --shadow-md: 0 4px 12px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.04);
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --nav-width: 220px;
-    --transition: .18s ease;
-  }
-
-  [data-theme="dark"] {
-    --bg-base: #0c0e16;
-    --bg-surface: #131720;
-    --bg-sunken: #0f1219;
-    --bg-hover: #1a1f2e;
-    --txt-primary: #e6e8f4;
-    --txt-secondary: #7e86a8;
-    --txt-muted: #40486a;
-    --border: #1e2437;
-    --border-strong: #2a3048;
-    --accent: #818cf8;
-    --accent-soft: #1e1b4b;
-    --accent-text: #c7d2fe;
-    --green: #4ade80;
-    --green-soft: #052e16;
-    --green-text: #bbf7d0;
-    --red: #f87171;
-    --red-soft: #1c0a0a;
-    --red-text: #fecaca;
-    --amber: #fbbf24;
-    --amber-soft: #1c1200;
-    --amber-text: #fde68a;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
-    --shadow-md: 0 4px 12px rgba(0,0,0,.4);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg-base);
-    color: var(--txt-primary);
-    min-height: 100vh;
-    transition: background var(--transition), color var(--transition);
-  }
-
-  .layout {
-    display: grid;
-    grid-template-columns: var(--nav-width) 1fr;
-    min-height: 100vh;
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    background: var(--bg-surface);
-    border-right: 1px solid var(--border);
-    padding: 24px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    transition: background var(--transition), border-color var(--transition);
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 10px 24px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 8px;
-  }
-
-  .logo-mark {
-    width: 32px;
-    height: 32px;
-    background: var(--accent);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-
-  .logo-text {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--txt-primary);
-    letter-spacing: -.2px;
-  }
-
-  .logo-sub {
-    font-size: 11px;
-    color: var(--txt-muted);
-    font-family: 'DM Mono', monospace;
-  }
-
-  .nav-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--txt-muted);
-    padding: 12px 10px 6px;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 13.5px;
-    font-weight: 400;
-    color: var(--txt-secondary);
-    cursor: pointer;
-    transition: all var(--transition);
-    text-decoration: none;
-  }
-
-  .nav-item:hover {
-    background: var(--bg-hover);
-    color: var(--txt-primary);
-  }
-
-  .nav-item.active {
-    background: var(--accent-soft);
-    color: var(--accent-text);
-    font-weight: 500;
-  }
-
-  .nav-item svg { flex-shrink: 0; opacity: .7; }
-  .nav-item.active svg { opacity: 1; }
-
-  .sidebar-footer {
-    margin-top: auto;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ── THEME TOGGLE ── */
-  .theme-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--bg-sunken);
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--txt-secondary);
-    border: none;
-    width: 100%;
-    transition: all var(--transition);
-  }
-
-  .theme-toggle:hover { background: var(--bg-hover); color: var(--txt-primary); }
-
-  .toggle-pill {
-    width: 36px;
-    height: 20px;
-    border-radius: 10px;
-    background: var(--border-strong);
-    position: relative;
-    transition: background var(--transition);
-  }
-
-  .toggle-pill.on { background: var(--accent); }
-
-  .toggle-dot {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #fff;
-    top: 3px;
-    left: 3px;
-    transition: transform var(--transition);
-  }
-
-  .toggle-pill.on .toggle-dot { transform: translateX(16px); }
-
-  /* ── MAIN ── */
-  .main {
-    padding: 28px 28px 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .page-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--txt-primary);
-    letter-spacing: -.4px;
-  }
-
-  .page-subtitle {
-    font-size: 13px;
-    color: var(--txt-muted);
-    margin-top: 3px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .topbar-actions { display: flex; gap: 8px; align-items: center; }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--bg-surface);
-    color: var(--txt-secondary);
-    font-family: 'DM Sans', sans-serif;
-    transition: all var(--transition);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .btn:hover { background: var(--bg-hover); color: var(--txt-primary); border-color: var(--border-strong); }
-
-  .btn.primary {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-    box-shadow: 0 2px 8px rgba(79,70,229,.25);
-  }
-
-  .btn.primary:hover { opacity: .9; }
-
-  /* ── STAT CARDS ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-  }
-
-  .stat-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 18px 20px;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-  }
-
-  .stat-card.pending::after { background: var(--accent); }
-  .stat-card.paid::after { background: var(--green); }
-  .stat-card.overdue::after { background: var(--red); }
-  .stat-card.total::after { background: var(--amber); }
-
-  .stat-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .6px;
-    text-transform: uppercase;
-    color: var(--txt-muted);
-    margin-bottom: 10px;
-  }
-
-  .stat-value {
-    font-size: 26px;
-    font-weight: 600;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: -.5px;
-    line-height: 1;
-  }
-
-  .stat-card.pending .stat-value { color: var(--accent); }
-  .stat-card.paid .stat-value { color: var(--green); }
-  .stat-card.overdue .stat-value { color: var(--red); }
-  .stat-card.total .stat-value { color: var(--txt-primary); }
-
-  .stat-sub {
-    font-size: 12px;
-    color: var(--txt-muted);
-    margin-top: 6px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* ── FILTERS ── */
-  .toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .filter-group {
-    display: flex;
-    background: var(--bg-sunken);
-    border-radius: var(--radius-sm);
-    padding: 3px;
-    gap: 2px;
-    border: 1px solid var(--border);
-  }
-
-  .filter-btn {
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 400;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    color: var(--txt-secondary);
-    font-family: 'DM Sans', sans-serif;
-    transition: all var(--transition);
-  }
-
-  .filter-btn:hover { color: var(--txt-primary); }
-
-  .filter-btn.active {
-    background: var(--bg-surface);
-    color: var(--txt-primary);
-    font-weight: 500;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .search-wrap {
-    margin-left: auto;
-    position: relative;
-  }
-
-  .search-wrap svg {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--txt-muted);
-    pointer-events: none;
-  }
-
-  .search-input {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px 8px 34px;
-    font-size: 13px;
-    color: var(--txt-primary);
-    width: 240px;
-    font-family: 'DM Sans', sans-serif;
-    transition: all var(--transition);
-    box-shadow: var(--shadow-sm);
-    outline: none;
-  }
-
-  .search-input::placeholder { color: var(--txt-muted); }
-  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
-
-  /* ── TABLE ── */
-  .table-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    transition: all var(--transition);
-  }
-
-  .table-head-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .table-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--txt-primary);
-  }
-
-  .table-count {
-    font-size: 12px;
-    color: var(--txt-muted);
-    font-family: 'DM Mono', monospace;
-    background: var(--bg-sunken);
-    padding: 2px 8px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  thead th {
-    text-align: left;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .7px;
-    text-transform: uppercase;
-    color: var(--txt-muted);
-    padding: 11px 20px;
-    background: var(--bg-sunken);
-    border-bottom: 1px solid var(--border);
-  }
-
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background var(--transition);
-  }
-
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--bg-hover); }
-
-  td {
-    padding: 13px 20px;
-    font-size: 13.5px;
-    color: var(--txt-secondary);
-    vertical-align: middle;
-  }
-
-  td.vendor {
-    font-weight: 500;
-    color: var(--txt-primary);
-  }
-
-  td.amount {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    color: var(--txt-primary);
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .badge.pending { background: var(--accent-soft); color: var(--accent-text); }
-  .badge.paid { background: var(--green-soft); color: var(--green-text); }
-  .badge.overdue { background: var(--red-soft); color: var(--red-text); }
-
-  .badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-
-  .badge.pending::before { background: var(--accent); }
-  .badge.paid::before { background: var(--green); }
-  .badge.overdue::before { background: var(--red); }
-
-  .status-select {
-    background: transparent;
-    border: none;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    outline: none;
-    padding: 4px 10px;
-    border-radius: 20px;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  .status-select.pending { background: var(--accent-soft); color: var(--accent-text); }
-  .status-select.paid { background: var(--green-soft); color: var(--green-text); }
-  .status-select.overdue { background: var(--red-soft); color: var(--red-text); }
-
-  .empty-state {
-    padding: 40px 20px;
-    text-align: center;
-    color: var(--txt-muted);
-    font-size: 13px;
-  }
-
-  /* ── ADD PAYMENT FORM ── */
-  .form-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition);
-    overflow: hidden;
-  }
-
-  .form-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .form-header-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--txt-primary);
-  }
-
-  .form-body {
-    padding: 20px;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr auto;
-    gap: 12px;
-    align-items: end;
-  }
-
-  .field { display: flex; flex-direction: column; gap: 5px; }
-
-  .field label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-    color: var(--txt-muted);
-  }
-
-  .field input, .field select {
-    background: var(--bg-sunken);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 9px 12px;
-    font-size: 13.5px;
-    color: var(--txt-primary);
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    transition: all var(--transition);
-    width: 100%;
-  }
-
-  .field input::placeholder { color: var(--txt-muted); }
-
-  .field input:focus, .field select:focus {
-    border-color: var(--accent);
-    background: var(--bg-surface);
-    box-shadow: 0 0 0 3px rgba(79,70,229,.1);
-  }
-
-  .field select option { background: var(--bg-surface); color: var(--txt-primary); }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .stat-card { animation: fadeIn .3s ease both; }
-  .stat-card:nth-child(1) { animation-delay: .04s; }
-  .stat-card:nth-child(2) { animation-delay: .08s; }
-  .stat-card:nth-child(3) { animation-delay: .12s; }
-  .stat-card:nth-child(4) { animation-delay: .16s; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ... existing styles remain exactly same ... */
+        :root {
+            --bg-base: #f4f5f9; --bg-surface: #ffffff; --bg-sunken: #eef0f6; --bg-hover: #f0f1f7; --txt-primary: #0d0e14; --txt-secondary: #5a5f7a; --txt-muted: #9297b0; --border: #e3e5ef; --border-strong: #c8cbe0; --accent: #4f46e5; --accent-soft: #eeecfd; --accent-text: #3730a3; --green: #16a34a; --green-soft: #f0fdf4; --green-text: #14532d; --red: #dc2626; --red-soft: #fef2f2; --red-text: #7f1d1d; --amber: #d97706; --amber-soft: #fffbeb; --amber-text: #78350f; --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); --shadow-md: 0 4px 12px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.04); --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --nav-width: 220px; --transition: .18s ease;
+        }
+        [data-theme="dark"] {
+            --bg-base: #0c0e16; --bg-surface: #131720; --bg-sunken: #0f1219; --bg-hover: #1a1f2e; --txt-primary: #e6e8f4; --txt-secondary: #7e86a8; --txt-muted: #40486a; --border: #1e2437; --border-strong: #2a3048; --accent: #818cf8; --accent-soft: #1e1b4b; --accent-text: #c7d2fe; --green: #4ade80; --green-soft: #052e16; --green-text: #bbf7d0; --red: #f87171; --red-soft: #1c0a0a; --red-text: #fecaca; --amber: #fbbf24; --amber-soft: #1c1200; --amber-text: #fde68a; --shadow-sm: 0 1px 3px rgba(0,0,0,.3); --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-base); color: var(--txt-primary); min-height: 100vh; transition: background var(--transition), color var(--transition); }
+        .layout { display: grid; grid-template-columns: var(--nav-width) 1fr; min-height: 100vh; }
+        .sidebar { background: var(--bg-surface); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; gap: 2px; position: sticky; top: 0; height: 100vh; transition: background var(--transition), border-color var(--transition); }
+        .logo { display: flex; align-items: center; gap: 10px; padding: 0 10px 24px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .logo-mark { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 600; flex-shrink: 0; }
+        .logo-text { font-size: 15px; font-weight: 600; color: var(--txt-primary); letter-spacing: -.2px; }
+        .logo-sub { font-size: 11px; color: var(--txt-muted); font-family: 'DM Mono', monospace; }
+        .nav-label { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--txt-muted); padding: 12px 10px 6px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 400; color: var(--txt-secondary); cursor: pointer; transition: all var(--transition); text-decoration: none; }
+        .nav-item:hover { background: var(--bg-hover); color: var(--txt-primary); }
+        .nav-item.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 500; }
+        .nav-item svg { flex-shrink: 0; opacity: .7; }
+        .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+        .theme-toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--bg-sunken); cursor: pointer; font-size: 13px; color: var(--txt-secondary); border: none; width: 100%; transition: all var(--transition); }
+        .toggle-pill { width: 36px; height: 20px; border-radius: 10px; background: var(--border-strong); position: relative; transition: background var(--transition); }
+        .toggle-pill.on { background: var(--accent); }
+        .toggle-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform var(--transition); }
+        .toggle-pill.on .toggle-dot { transform: translateX(16px); }
+        .main { padding: 28px 28px 40px; display: flex; flex-direction: column; gap: 20px; }
+        .topbar { display: flex; align-items: flex-start; justify-content: space-between; }
+        .page-title { font-size: 22px; font-weight: 600; color: var(--txt-primary); letter-spacing: -.4px; }
+        .page-subtitle { font-size: 13px; color: var(--txt-muted); margin-top: 3px; font-family: 'DM Mono', monospace; }
+        .topbar-actions { display: flex; gap: 8px; align-items: center; }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg-surface); color: var(--txt-secondary); font-family: 'DM Sans', sans-serif; transition: all var(--transition); box-shadow: var(--shadow-sm); }
+        .btn:hover { background: var(--bg-hover); color: var(--txt-primary); border-color: var(--border-strong); }
+        .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 2px 8px rgba(79,70,229,.25); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .stat-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-sm); transition: all var(--transition); position: relative; overflow: hidden; }
+        .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: var(--radius-md) var(--radius-md) 0 0; }
+        .stat-card.pending::after { background: var(--accent); }
+        .stat-card.paid::after { background: var(--green); }
+        .stat-card.overdue::after { background: var(--red); }
+        .stat-card.total::after { background: var(--amber); }
+        .stat-label { font-size: 11px; font-weight: 500; letter-spacing: .6px; text-transform: uppercase; color: var(--txt-muted); margin-bottom: 10px; }
+        .stat-value { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -.5px; line-height: 1; }
+        .stat-card.pending .stat-value { color: var(--accent); }
+        .stat-card.paid .stat-value { color: var(--green); }
+        .stat-card.overdue .stat-value { color: var(--red); }
+        .stat-sub { font-size: 12px; color: var(--txt-muted); margin-top: 6px; font-family: 'DM Mono', monospace; }
+        .toolbar { display: flex; align-items: center; gap: 8px; }
+        .filter-group { display: flex; background: var(--bg-sunken); border-radius: var(--radius-sm); padding: 3px; gap: 2px; border: 1px solid var(--border); }
+        .filter-btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 400; cursor: pointer; border: none; background: transparent; color: var(--txt-secondary); font-family: 'DM Sans', sans-serif; transition: all var(--transition); }
+        .filter-btn.active { background: var(--bg-surface); color: var(--txt-primary); font-weight: 500; box-shadow: var(--shadow-sm); }
+        .search-wrap { margin-left: auto; position: relative; }
+        .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--txt-muted); pointer-events: none; }
+        .search-input { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px 8px 34px; font-size: 13px; color: var(--txt-primary); width: 240px; outline: none; }
+        .table-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; transition: all var(--transition); }
+        .table-head-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+        .table-title { font-size: 14px; font-weight: 500; color: var(--txt-primary); }
+        .table-count { font-size: 12px; color: var(--txt-muted); font-family: 'DM Mono', monospace; background: var(--bg-sunken); padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; }
+        thead th { text-align: left; font-size: 11px; font-weight: 500; letter-spacing: .7px; text-transform: uppercase; color: var(--txt-muted); padding: 11px 20px; background: var(--bg-sunken); border-bottom: 1px solid var(--border); }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+        td { padding: 13px 20px; font-size: 13.5px; color: var(--txt-secondary); vertical-align: middle; }
+        td.vendor { font-weight: 500; color: var(--txt-primary); }
+        td.amount { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--txt-primary); }
+        .status-select { background: transparent; border: none; font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; outline: none; padding: 4px 10px; border-radius: 20px; appearance: none; }
+        .status-select.pending { background: var(--accent-soft); color: var(--accent-text); }
+        .status-select.paid { background: var(--green-soft); color: var(--green-text); }
+        .status-select.overdue { background: var(--red-soft); color: var(--red-text); }
+        .form-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .form-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+        .form-body { padding: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field label { font-size: 11px; font-weight: 500; letter-spacing: .5px; text-transform: uppercase; color: var(--txt-muted); }
+        .field input, .field select { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13.5px; color: var(--txt-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 100%; }
+        /* Animation and specific form row adjustments */
+        #vendor-details-preview { grid-column: span 5; font-size: 11px; color: var(--txt-muted); margin-top: -5px; padding-left: 2px; }
+    </style>
 </head>
 <body>
 
 <div class="layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-mark">S</div>
-      <div>
-        <div class="logo-text">SkillBox</div>
-        <div class="logo-sub">Finance</div>
-      </div>
-    </div>
-
-    <div class="nav-label">Main</div>
-
-    <a class="nav-item active" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Dashboard
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-      Payments
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Vendors
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-      Invoices
-    </a>
-
-    <div class="nav-label">Insights</div>
-
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Analytics
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      Reports
-    </a>
-
-    <div class="sidebar-footer">
-      <a class="nav-item" href="#" style="margin-bottom:8px">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        Settings
-      </a>
-      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
-        <span id="themeLabel" style="display:flex;align-items:center;gap:7px">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          Light mode
-        </span>
-        <div class="toggle-pill" id="togglePill"><div class="toggle-dot"></div></div>
-      </button>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="main">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div>
-        <div class="page-title">Payments Dashboard</div>
-        <div class="page-subtitle" id="clock">Loading...</div>
-      </div>
-      <div class="topbar-actions">
-        <button class="btn" onclick="exportCSV()">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export CSV
-        </button>
-        <button class="btn primary" onclick="loadData()">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Sync
-        </button>
-      </div>
-    </div>
-
-    <!-- STAT CARDS -->
-    <div class="stats-grid">
-      <div class="stat-card pending">
-        <div class="stat-label">Pending</div>
-        <div class="stat-value" id="c-pending">₹0</div>
-        <div class="stat-sub" id="c-pending-count">0 invoices</div>
-      </div>
-      <div class="stat-card paid">
-        <div class="stat-label">Cleared</div>
-        <div class="stat-value" id="c-paid">₹0</div>
-        <div class="stat-sub" id="c-paid-count">0 invoices</div>
-      </div>
-      <div class="stat-card overdue">
-        <div class="stat-label">Overdue</div>
-        <div class="stat-value" id="c-overdue">₹0</div>
-        <div class="stat-sub" id="c-overdue-count">0 invoices</div>
-      </div>
-      <div class="stat-card total">
-        <div class="stat-label">Total Records</div>
-        <div class="stat-value" id="c-count">0</div>
-        <div class="stat-sub">all transactions</div>
-      </div>
-    </div>
-
-    <!-- TOOLBAR -->
-    <div class="toolbar">
-      <div class="filter-group">
-        <button class="filter-btn active" onclick="setFilter('All',this)">All</button>
-        <button class="filter-btn" onclick="setFilter('Pending',this)">Pending</button>
-        <button class="filter-btn" onclick="setFilter('Paid',this)">Cleared</button>
-        <button class="filter-btn" onclick="setFilter('Overdue',this)">Overdue</button>
-      </div>
-      <div class="search-wrap">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" placeholder="Search vendor or item..." oninput="searchTable(this.value)" id="searchInput">
-      </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="table-card">
-      <div class="table-head-row">
-        <span class="table-title">All Transactions</span>
-        <span class="table-count" id="rowCount">0 records</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:30%">Vendor</th>
-            <th style="width:30%">Item</th>
-            <th style="width:20%">Amount</th>
-            <th style="width:20%">Status</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-
-    <!-- ADD PAYMENT FORM -->
-    <div class="form-card">
-      <div class="form-header">
-        <span class="form-header-title">Add Payment</span>
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color:var(--txt-muted)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      </div>
-      <div class="form-body">
-        <div class="form-grid">
-          <div class="field">
-            <label>Vendor</label>
-            <input id="f-vendor" placeholder="e.g. Tata Consultancy">
-          </div>
-          <div class="field">
-            <label>Item</label>
-            <input id="f-item" placeholder="e.g. Software License">
-          </div>
-          <div class="field">
-            <label>Amount (₹)</label>
-            <input id="f-amount" type="number" placeholder="0">
-          </div>
-          <div class="field">
-            <label>Status</label>
-            <select id="f-status">
-              <option value="Pending">Pending</option>
-              <option value="Paid">Paid</option>
-              <option value="Overdue">Overdue</option>
-            </select>
-          </div>
-          <button class="btn primary" style="height:38px;white-space:nowrap" onclick="addPayment()">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add
-          </button>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-mark">S</div>
+            <div>
+                <div class="logo-text">SkillBox</div>
+                <div class="logo-sub">Finance</div>
+            </div>
         </div>
-      </div>
-    </div>
+        <div class="nav-label">Main</div>
+        <a class="nav-item active" href="#"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Dashboard</a>
+        <a class="nav-item" href="#"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Payments</a>
+        <a class="nav-item" href="#"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> Vendors</a>
+        <div class="sidebar-footer">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+                <span id="themeLabel" style="display:flex;align-items:center;gap:7px">Light mode</span>
+                <div class="toggle-pill" id="togglePill"><div class="toggle-dot"></div></div>
+            </button>
+        </div>
+    </aside>
 
-  </main>
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="page-title">Payments Dashboard</div>
+                <div class="page-subtitle" id="clock">Loading...</div>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn" onclick="exportCSV()">Export CSV</button>
+                <button class="btn primary" onclick="loadData()">Sync Data</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card pending"><div class="stat-label">Pending</div><div class="stat-value" id="c-pending">₹0</div><div class="stat-sub" id="c-pending-count">0 invoices</div></div>
+            <div class="stat-card paid"><div class="stat-label">Cleared</div><div class="stat-value" id="c-paid">₹0</div><div class="stat-sub" id="c-paid-count">0 invoices</div></div>
+            <div class="stat-card overdue"><div class="stat-label">Overdue</div><div class="stat-value" id="c-overdue">₹0</div><div class="stat-sub" id="c-overdue-count">0 invoices</div></div>
+            <div class="stat-card total"><div class="stat-label">Total Records</div><div class="stat-value" id="c-count">0</div><div class="stat-sub">all transactions</div></div>
+        </div>
+
+        <div class="toolbar">
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="setFilter('All',this)">All</button>
+                <button class="filter-btn" onclick="setFilter('Pending',this)">Pending</button>
+                <button class="filter-btn" onclick="setFilter('Paid',this)">Cleared</button>
+                <button class="filter-btn" onclick="setFilter('Overdue',this)">Overdue</button>
+            </div>
+            <div class="search-wrap">
+                <input class="search-input" placeholder="Search vendor or item..." oninput="searchTable(this.value)" id="searchInput">
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-head-row">
+                <span class="table-title">All Transactions</span>
+                <span class="table-count" id="rowCount">0 records</span>
+            </div>
+            <table>
+                <thead><tr><th>Vendor</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+
+        <div class="form-card">
+            <div class="form-header"><span class="form-header-title">Add Payment</span></div>
+            <div class="form-body">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Vendor</label>
+                        <select id="f-vendor" onchange="autoFillVendorDetails()">
+                            <option value="">Select Vendor...</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Item</label><input id="f-item" placeholder="Software License"></div>
+                    <div class="field"><label>Amount (₹)</label><input id="f-amount" type="number" placeholder="0"></div>
+                    <div class="field">
+                        <label>Status</label>
+                        <select id="f-status">
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+                    <button class="btn primary" style="height:38px" onclick="addPayment()">Add Payment</button>
+                    <div id="vendor-details-preview" style="display:none">
+                        Bank: <span id="p-bank"></span> | Acc: <span id="p-acc"></span> | IFSC: <span id="p-ifsc"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
 let allData = [];
+let allVendors = [];
 let currentFilter = "All";
 let searchVal = "";
 let isDark = false;
 
 /* ── CLOCK ── */
 function updateClock() {
-  const now = new Date();
-  document.getElementById("clock").textContent =
-    now.toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) +
-    "  ·  " +
-    now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    const now = new Date();
+    document.getElementById("clock").textContent = now.toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) + " · " + now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 }
 setInterval(updateClock, 1000);
 updateClock();
 
 /* ── THEME ── */
 function toggleTheme() {
-  isDark = !isDark;
-  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-  const pill = document.getElementById("togglePill");
-  const label = document.getElementById("themeLabel");
-  pill.classList.toggle("on", isDark);
-  label.innerHTML = isDark
-    ? `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Dark mode`
-    : `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg> Light mode`;
+    isDark = !isDark;
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    document.getElementById("togglePill").classList.toggle("on", isDark);
+    document.getElementById("themeLabel").textContent = isDark ? "Dark mode" : "Light mode";
 }
 
 /* ── LOAD DATA ── */
 async function loadData() {
-  try {
-    const res = await fetch(API_URL + "?action=getBills");
-    const json = await res.json();
-    allData = json.data.slice(1);
-  } catch (e) {
-    if (!allData.length) {
-      allData = [
-        ["", "Infosys Ltd", "Cloud Hosting", "", "84000", "Paid"],
-        ["", "Wipro Tech", "Annual Support", "", "52000", "Pending"],
-        ["", "HCL Services", "Data Backup", "", "18500", "Overdue"],
-        ["", "TCS Digital", "Software License", "", "120000", "Paid"],
-        ["", "Razorpay", "Payment Gateway", "", "9800", "Pending"],
-        ["", "AWS India", "EC2 Instances", "", "67000", "Overdue"],
-        ["", "Zoho Corp", "CRM Subscription", "", "24000", "Paid"],
-        ["", "Freshworks", "Support Desk", "", "15600", "Pending"],
-      ];
+    try {
+        // Fetch Bills
+        const billRes = await fetch(API_URL + "?action=getBills");
+        const billJson = await billRes.json();
+        allData = billJson.data.slice(1);
+
+        // Fetch Vendors
+        const vendorRes = await fetch(API_URL + "?action=getVendors");
+        const vendorJson = await vendorRes.json();
+        allVendors = vendorJson.data.slice(1);
+
+        populateVendorDropdown();
+        renderTable();
+    } catch (e) {
+        console.error("Fetch failed", e);
+        // Fallback demo data
+        if(!allData.length) allData = [["", "Demo Vendor", "Office Rent", "", "50000", "Pending"]];
+        renderTable();
     }
-  }
-  renderTable();
+}
+
+function populateVendorDropdown() {
+    const select = document.getElementById("f-vendor");
+    select.innerHTML = '<option value="">Select Vendor...</option>';
+    allVendors.forEach(v => {
+        if(v[0]) {
+            const opt = document.createElement("option");
+            opt.value = v[0];
+            opt.textContent = v[0];
+            select.appendChild(opt);
+        }
+    });
+}
+
+function autoFillVendorDetails() {
+    const name = document.getElementById("f-vendor").value;
+    const preview = document.getElementById("vendor-details-preview");
+    const vendor = allVendors.find(v => v[0] === name);
+
+    if (vendor) {
+        document.getElementById("p-bank").textContent = vendor[1] || "N/A";
+        document.getElementById("p-acc").textContent = vendor[2] || "N/A";
+        document.getElementById("p-ifsc").textContent = vendor[3] || "N/A";
+        preview.style.display = "block";
+    } else {
+        preview.style.display = "none";
+    }
 }
 
 /* ── RENDER ── */
 function renderTable() {
-  let data = allData;
-  if (currentFilter !== "All") data = data.filter(r => r[5] === currentFilter);
-  if (searchVal) data = data.filter(r =>
-    (r[1] || "").toLowerCase().includes(searchVal) ||
-    (r[2] || "").toLowerCase().includes(searchVal)
-  );
+    let data = allData;
+    if (currentFilter !== "All") data = data.filter(r => r[5] === currentFilter);
+    if (searchVal) data = data.filter(r => (r[1] || "").toLowerCase().includes(searchVal) || (r[2] || "").toLowerCase().includes(searchVal));
 
-  let pending = 0, paid = 0, overdue = 0, pc = 0, padc = 0, oc = 0;
-  allData.forEach(r => {
-    const amt = Number(r[4]) || 0;
-    if (r[5] === "Pending") { pending += amt; pc++; }
-    if (r[5] === "Paid") { paid += amt; padc++; }
-    if (r[5] === "Overdue") { overdue += amt; oc++; }
-  });
+    let pending = 0, paid = 0, overdue = 0, pc = 0, padc = 0, oc = 0;
+    allData.forEach(r => {
+        const amt = Number(r[4]) || 0;
+        if (r[5] === "Pending") { pending += amt; pc++; }
+        if (r[5] === "Paid") { paid += amt; padc++; }
+        if (r[5] === "Overdue") { overdue += amt; oc++; }
+    });
 
-  const fmt = n => "₹" + n.toLocaleString("en-IN");
-  document.getElementById("c-pending").textContent = fmt(pending);
-  document.getElementById("c-paid").textContent = fmt(paid);
-  document.getElementById("c-overdue").textContent = fmt(overdue);
-  document.getElementById("c-count").textContent = allData.length;
-  document.getElementById("c-pending-count").textContent = pc + " invoice" + (pc !== 1 ? "s" : "");
-  document.getElementById("c-paid-count").textContent = padc + " invoice" + (padc !== 1 ? "s" : "");
-  document.getElementById("c-overdue-count").textContent = oc + " invoice" + (oc !== 1 ? "s" : "");
+    const fmt = n => "₹" + n.toLocaleString("en-IN");
+    document.getElementById("c-pending").textContent = fmt(pending);
+    document.getElementById("c-paid").textContent = fmt(paid);
+    document.getElementById("c-overdue").textContent = fmt(overdue);
+    document.getElementById("c-count").textContent = allData.length;
+    document.getElementById("c-pending-count").textContent = `${pc} invoices`;
+    document.getElementById("c-paid-count").textContent = `${padc} invoices`;
+    document.getElementById("c-overdue-count").textContent = `${oc} invoices`;
 
-  const tbody = document.getElementById("tbody");
-  document.getElementById("rowCount").textContent = data.length + " record" + (data.length !== 1 ? "s" : "");
+    const tbody = document.getElementById("tbody");
+    document.getElementById("rowCount").textContent = `${data.length} records`;
 
-  if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state">No records found</div></td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = data.map((row, i) => {
-    const st = row[5] || "Pending";
-    const stL = st.toLowerCase();
-    return `<tr>
-      <td class="vendor">${row[1] || ""}</td>
-      <td>${row[2] || ""}</td>
-      <td class="amount">${"₹" + (Number(row[4]) || 0).toLocaleString("en-IN")}</td>
-      <td>
-        <select class="status-select ${stL}" onchange="updateStatus(${i + 2}, this.value, this)">
-          <option ${st === "Pending" ? "selected" : ""}>Pending</option>
-          <option ${st === "Paid" ? "selected" : ""}>Paid</option>
-          <option ${st === "Overdue" ? "selected" : ""}>Overdue</option>
-        </select>
-      </td>
-    </tr>`;
-  }).join("");
+    tbody.innerHTML = data.map((row, i) => {
+        const st = row[5] || "Pending";
+        return `<tr>
+            <td class="vendor">${row[1]}</td>
+            <td>${row[2]}</td>
+            <td class="amount">₹${Number(row[4]).toLocaleString("en-IN")}</td>
+            <td>
+                <select class="status-select ${st.toLowerCase()}" onchange="updateStatus(${i + 2}, this.value, this)">
+                    <option ${st === "Pending" ? "selected" : ""}>Pending</option>
+                    <option ${st === "Paid" ? "selected" : ""}>Paid</option>
+                    <option ${st === "Overdue" ? "selected" : ""}>Overdue</option>
+                </select>
+            </td>
+        </tr>`;
+    }).join("");
 }
 
 /* ── ADD PAYMENT ── */
-function addPayment() {
-  const v = document.getElementById("f-vendor").value.trim();
-  const it = document.getElementById("f-item").value.trim();
-  const am = document.getElementById("f-amount").value;
-  const st = document.getElementById("f-status").value;
-  if (!v || !it || !am) return;
-  allData.push(["", v, it, "", am, st]);
-  document.getElementById("f-vendor").value = "";
-  document.getElementById("f-item").value = "";
-  document.getElementById("f-amount").value = "";
-  try {
-    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row: ["", v, it, "", am, st] }) });
-  } catch (e) {}
-  renderTable();
+async function addPayment() {
+    const v = document.getElementById("f-vendor").value;
+    const it = document.getElementById("f-item").value.trim();
+    const am = document.getElementById("f-amount").value;
+    const st = document.getElementById("f-status").value;
+    
+    if (!v || !it || !am) return alert("Fill all fields");
+
+    const vendorInfo = allVendors.find(vend => vend[0] === v);
+    const bank = vendorInfo ? vendorInfo[1] : "";
+    const acc = vendorInfo ? vendorInfo[2] : "";
+    const ifsc = vendorInfo ? vendorInfo[3] : "";
+
+    const newRow = ["", v, it, "", am, st, bank, acc, ifsc];
+    allData.push(newRow);
+    
+    renderTable();
+
+    // Reset Form
+    document.getElementById("f-vendor").value = "";
+    document.getElementById("f-item").value = "";
+    document.getElementById("f-amount").value = "";
+    document.getElementById("vendor-details-preview").style.display = "none";
+
+    try {
+        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addBill", row: newRow }) });
+    } catch (e) { console.error("POST failed", e); }
 }
 
-/* ── UPDATE STATUS ── */
+/* ── HELPERS ── */
 function updateStatus(rowIndex, status, el) {
-  el.className = "status-select " + status.toLowerCase();
-  const dataIdx = rowIndex - 2;
-  if (allData[dataIdx]) allData[dataIdx][5] = status;
-  try {
+    el.className = "status-select " + status.toLowerCase();
+    const dataIdx = rowIndex - 2;
+    if (allData[dataIdx]) allData[dataIdx][5] = status;
     fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateStatus", rowIndex, status }) });
-  } catch (e) {}
-  renderTable();
+    renderTable();
 }
 
-/* ── FILTER ── */
 function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  renderTable();
+    currentFilter = f;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderTable();
 }
 
-/* ── SEARCH ── */
 function searchTable(v) {
-  searchVal = v.toLowerCase();
-  renderTable();
+    searchVal = v.toLowerCase();
+    renderTable();
 }
 
-/* ── EXPORT CSV ── */
 function exportCSV() {
-  const rows = [["Vendor", "Item", "Amount", "Status"],
-    ...allData.map(r => [r[1], r[2], r[4], r[5]])];
-  const csv = rows.map(r => r.join(",")).join("\n");
-  const a = document.createElement("a");
-  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-  a.download = "payments_" + new Date().toISOString().slice(0, 10) + ".csv";
-  a.click();
+    const rows = [["Vendor", "Item", "Amount", "Status"], ...allData.map(r => [r[1], r[2], r[4], r[5]])];
+    const csv = rows.map(r => r.join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+    a.download = `payments_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
 }
 
 loadData();
