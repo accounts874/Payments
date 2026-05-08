@@ -15,385 +15,227 @@
 </script>
 
 <style>
-/* ── RESET & BASE ── */
+/* ── BASE STYLES ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; scroll-behavior: smooth; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--txt);
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  transition: background var(--trans), color var(--trans);
-}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--txt); height: 100vh; overflow: hidden; display: flex; transition: background var(--trans), color var(--trans); }
 
-/* ── DESIGN TOKENS ── */
 :root {
-  --bg:       #0b0d17;
-  --s1:       #10121e;
-  --s2:       #141828;
-  --s3:       #191d2e;
-  --s4:       #1e2236;
-  --border:   rgba(255,255,255,0.055);
-  --border2:  rgba(255,255,255,0.10);
-  --txt:      #e4e6f0;
-  --muted:    #717899;
-  --muted2:   #3d4260;
-  
-  --purple:   #8b7cf8;
-  --purple2:  #6c5ef0;
-  --p-glow:   rgba(139,124,248,0.13);
-  --green:    #20cf78;
-  --g-soft:   rgba(32,207,120,0.10);
-  --red:      #f05555;
-  --r-soft:   rgba(240,85,85,0.10);
-  --amber:    #f0a830;
-  --a-soft:   rgba(240,168,48,0.10);
-  
-  --mono:     'DM Mono', monospace;
-  --r:        10px;
-  --r2:       14px;
-  --sidebar:  216px;
-  --trans:    .18s ease;
+  --bg: #0b0d17; --s1: #10121e; --s2: #141828; --s3: #191d2e; --s4: #1e2236;
+  --border: rgba(255,255,255,0.055); --border2: rgba(255,255,255,0.10);
+  --txt: #e4e6f0; --muted: #717899; --muted2: #3d4260;
+  --purple: #8b7cf8; --purple2: #6c5ef0; --p-glow: rgba(139,124,248,0.13);
+  --green: #20cf78; --g-soft: rgba(32,207,120,0.10);
+  --red: #f05555; --r-soft: rgba(240,85,85,0.10);
+  --amber: #f0a830; --a-soft: rgba(240,168,48,0.10);
+  --mono: 'DM Mono', monospace; --r: 10px; --r2: 14px; --sidebar: 216px; --trans: .18s ease;
 }
 
 [data-theme="light"] {
-  --bg:       #f4f5f9;
-  --s1:       #ffffff;
-  --s2:       #f8f9fc;
-  --s3:       #eef0f6;
-  --s4:       #e3e5ef;
-  --border:   rgba(0,0,0,0.08);
-  --border2:  rgba(0,0,0,0.15);
-  --txt:      #111827;
-  --muted:    #6b7280;
-  --muted2:   #9ca3af;
+  --bg: #f4f5f9; --s1: #ffffff; --s2: #f8f9fc; --s3: #eef0f6; --s4: #e3e5ef;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+  --txt: #111827; --muted: #6b7280; --muted2: #9ca3af;
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 99px; }
 
-/* ══════════════════════════════════════ SIDEBAR */
-.sidebar { width: var(--sidebar); background: var(--s1); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; z-index: 10; transition: background var(--trans), border var(--trans); }
+/* ── LAYOUT ── */
+.sidebar { width: var(--sidebar); background: var(--s1); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; z-index: 10; }
 .sb-logo { padding: 22px 18px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-.sb-mark { width: 34px; height: 34px; background: var(--purple2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.sb-mark { width: 34px; height: 34px; background: var(--purple2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; }
 .sb-name { font-size: 14px; font-weight: 600; line-height: 1.25; }
 .sb-sub  { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
 .sb-nav { flex: 1; padding: 16px 10px; overflow-y: auto; }
 .nav-section { font-size: 9.5px; font-weight: 600; letter-spacing: 1.3px; color: var(--muted2); text-transform: uppercase; padding: 0 8px 8px; margin-top: 4px; }
-.nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--r); font-size: 13px; color: var(--muted); cursor: pointer; transition: var(--trans); margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
-.nav-item i { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--r); font-size: 13px; color: var(--muted); cursor: pointer; transition: var(--trans); margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; }
+.nav-item i { font-size: 16px; width: 18px; text-align: center; }
 .nav-item:hover { background: var(--s3); color: var(--txt); }
 .nav-item.active { background: var(--p-glow); color: var(--purple); border: 1px solid rgba(139,124,248,0.18); }
 .sb-footer { padding: 14px 18px; border-top: 1px solid var(--border); }
 .sync-row { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); font-family: var(--mono); }
-.pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: blink 2s ease-in-out infinite; }
+.pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-/* ══════════════════════════════════════ MAIN */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-
-/* TOP BAR & SEARCH */
-.topbar { background: var(--s1); border-bottom: 1px solid var(--border); padding: 13px 22px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; transition: background var(--trans), border var(--trans); }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { background: var(--s1); border-bottom: 1px solid var(--border); padding: 13px 22px; display: flex; align-items: center; gap: 10px; }
 .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
 .topbar-title em { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 7px; }
 
 .search-wrap { position: relative; display: flex; align-items: center; }
-.search-wrap i.ti-search { position: absolute; left: 10px; color: var(--muted); font-size: 15px; pointer-events: none; }
-.search-input { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 75px 7px 32px; border-radius: var(--r); font-size: 12px; width: 280px; outline: none; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
+.search-wrap i.ti-search { position: absolute; left: 10px; color: var(--muted); font-size: 15px; }
+.search-input { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 75px 7px 32px; border-radius: var(--r); font-size: 12px; width: 280px; outline: none; }
 .search-input:focus { border-color: var(--purple); }
-.search-input::placeholder { color: var(--muted2); }
+.search-btn { position: absolute; right: 4px; background: var(--purple2); color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; cursor: pointer; }
 
-.search-btn { position: absolute; right: 4px; background: var(--purple2); color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--trans); font-family: 'DM Sans', sans-serif;}
-.search-btn:hover { opacity: 0.85; }
-
-.tb-btn { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 13px; border-radius: var(--r); font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); display: flex; align-items: center; gap: 6px; }
+.tb-btn { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 13px; border-radius: var(--r); font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .tb-btn:hover { border-color: var(--purple); color: var(--purple); }
 .tb-btn.primary { background: var(--purple2); border-color: var(--purple2); color: #fff; }
-.tb-btn.primary:hover { opacity: .88; }
 
 .content { flex: 1; overflow-y: auto; padding: 22px; }
 
-/* ══════════════════════════════════════ DASHBOARD CARDS & CHARTS */
+/* ── CARDS & CHARTS ── */
 .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-.card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px 18px; position: relative; overflow: hidden; cursor: pointer; transition: var(--trans); }
-.card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px 18px; position: relative; cursor: pointer; }
 .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 2px 2px 0 0; }
-.card.c-p::before { background: var(--purple); }
-.card.c-g::before { background: var(--green); }
-.card.c-a::before { background: var(--amber); }
-.card.c-r::before { background: var(--red); }
-.card-icon { position: absolute; right: 14px; top: 14px; font-size: 22px; opacity: .12; color: var(--txt); }
-.card-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
-.card-val { font-size: 23px; font-weight: 600; font-family: var(--mono); letter-spacing: -1px; }
-.card.c-p .card-val { color: var(--purple); }
-.card.c-g .card-val { color: var(--green); }
-.card.c-a .card-val { color: var(--amber); }
-.card.c-r .card-val { color: var(--red); }
+.card.c-p::before { background: var(--purple); } .card.c-g::before { background: var(--green); } .card.c-a::before { background: var(--amber); } .card.c-r::before { background: var(--red); }
+.card-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+.card-val { font-size: 23px; font-weight: 600; font-family: var(--mono); }
+.card.c-p .card-val { color: var(--purple); } .card.c-g .card-val { color: var(--green); } .card.c-a .card-val { color: var(--amber); } .card.c-r .card-val { color: var(--red); }
 .card-sub { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--mono); }
 
 .charts-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-top: 20px; }
-.chart-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px 20px; transition: var(--trans); }
-.chart-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.chart-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .9px; }
+.chart-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px 20px; }
+.chart-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; }
 .donut-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
 .donut-center { position: absolute; text-align: center; pointer-events: none; }
-.donut-center-val { font-size: 22px; font-weight: 600; font-family: var(--mono); color: var(--txt); transition: var(--trans); }
-.donut-center-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-top: 2px; }
+.donut-center-val { font-size: 22px; font-weight: 600; font-family: var(--mono); color: var(--txt); }
+.donut-center-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
 
-/* ══════════════════════════════════════ TABLE SECTION */
-.filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-.chip { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border2); background: none; color: var(--muted); cursor: pointer; transition: var(--trans); font-family: 'DM Sans', sans-serif; }
-.chip:hover { border-color: var(--purple); color: var(--purple); }
-.chip.active { background: var(--purple2); border-color: var(--purple2); color: #fff; }
-.chip.f-g.active { background: var(--green); border-color: var(--green); color: #0b0d17; }
-.chip.f-a.active { background: var(--amber); border-color: var(--amber); color: #0b0d17; }
-.chip.f-r.active { background: var(--red); border-color: var(--red); color: #fff; }
-.filter-spacer { flex: 1; }
-.sort-sel { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 6px 10px; border-radius: var(--r); font-size: 12px; outline: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
+/* ── TABLE & 3-DOTS MENU ── */
+.filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.chip { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border2); background: none; color: var(--muted); cursor: pointer; }
+.chip.active { background: var(--purple2); color: #fff; border-color: var(--purple2); }
+.sort-sel { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 6px 10px; border-radius: var(--r); font-size: 12px; outline: none; cursor: pointer; }
 
-.tbl-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; transition: var(--trans); }
+.tbl-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
 .tbl-hdr { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); }
 .tbl-title { font-size: 13px; font-weight: 600; }
-.tbl-count { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-left: 10px; }
 .tbl-total { font-size: 12px; color: var(--green); font-weight: 600; margin-left: 15px; background: var(--g-soft); padding: 3px 8px; border-radius: 6px; }
-.tbl-scroll { overflow-x: auto; }
+
 table { width: 100%; border-collapse: collapse; min-width: 720px; }
-thead tr { background: var(--s2); transition: var(--trans); }
-th { padding: 10px 14px; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
-th:hover { color: var(--txt); }
+th { padding: 10px 14px; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); background: var(--s2); cursor: pointer;}
 td { padding: 10px 14px; font-size: 12.5px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tbody tr { transition: background .1s; }
 tbody tr:hover { background: var(--s2); }
 
 .amt-cell { font-family: var(--mono); font-weight: 600; }
-.stb { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
-.stb-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.stb.pending { background: var(--p-glow); color: var(--purple); border: 1px solid rgba(139,124,248,.22); }
-.stb.pending .stb-dot { background: var(--purple); }
-.stb.paid    { background: var(--g-soft); color: var(--green);  border: 1px solid rgba(32,207,120,.22); }
-.stb.paid .stb-dot    { background: var(--green); }
-.stb.overdue { background: var(--r-soft); color: var(--red);    border: 1px solid rgba(240,85,85,.22); }
-.stb.overdue .stb-dot { background: var(--red); }
+.stb { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.stb-dot { width: 5px; height: 5px; border-radius: 50%; }
+.stb.pending { background: var(--p-glow); color: var(--purple); } .stb.pending .stb-dot { background: var(--purple); }
+.stb.paid { background: var(--g-soft); color: var(--green); } .stb.paid .stb-dot { background: var(--green); }
+.stb.overdue { background: var(--r-soft); color: var(--red); } .stb.overdue .stb-dot { background: var(--red); }
 
-.st-sel { background: transparent; border: 1px solid var(--border2); color: var(--txt); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; outline: none; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
-.del-btn { background: var(--r-soft); border: 1px solid rgba(240,85,85,.2); color: var(--red); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
-.del-btn:hover { background: rgba(240,85,85,.18); }
-.cat-pill { font-size: 11px; background: var(--s3); padding: 3px 9px; border-radius: 5px; color: var(--muted); transition: var(--trans); }
+.st-sel { background: transparent; border: 1px solid var(--border2); color: var(--txt); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; outline: none; }
+.cat-pill { font-size: 11px; background: var(--s3); padding: 3px 9px; border-radius: 5px; color: var(--muted); text-decoration: none; }
 
-/* ══════════════════════════════════════ MODALS & FORMS */
+/* Dropdown Actions */
+.action-menu { position: relative; display: inline-block; }
+.action-btn { background: none; border: none; color: var(--txt); font-size: 16px; cursor: pointer; padding: 4px; }
+.action-content { display: none; position: absolute; right: 0; background: var(--s2); min-width: 120px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 100; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.action-content.show { display: block; }
+.action-content button { background: none; border: none; padding: 10px 14px; color: var(--txt); width: 100%; text-align: left; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.action-content button:hover { background: var(--s3); }
+.action-content button.del { color: var(--red); }
+
+/* ── MODALS & FORMS ── */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
-.modal { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: var(--trans); }
+.modal { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 .modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .modal-hdr h3 { font-size: 16px; font-weight: 600; }
-.close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; transition: var(--trans); }
-.close-btn:hover { color: var(--txt); }
+.close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; }
 
-.form-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; max-width: 700px; transition: var(--trans); }
+.form-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; max-width: 700px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .fg { display: flex; flex-direction: column; gap: 5px; }
 .fg.full { grid-column: 1 / -1; }
 label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
-.fc { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 9px 12px; border-radius: var(--r); font-size: 13px; outline: none; font-family: 'DM Sans', sans-serif; width: 100%; transition: var(--trans); }
-.fc:focus { border-color: var(--purple); }
+.fc { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 9px 12px; border-radius: var(--r); font-size: 13px; outline: none; width: 100%; }
 .fc[readonly] { color: var(--muted); cursor: not-allowed; }
-.fc::placeholder { color: var(--muted2); }
-.submit-btn { background: var(--purple2); border: none; color: #fff; padding: 10px 22px; border-radius: var(--r); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); display: flex; align-items: center; gap: 7px; }
-.submit-btn:hover { opacity: .88; }
-.submit-btn:disabled { opacity: .4; cursor: not-allowed; }
+.submit-btn { background: var(--purple2); border: none; color: #fff; padding: 10px 22px; border-radius: var(--r); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; }
+.submit-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-/* VENDORS GRID */
-.vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-.vend-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; transition: var(--trans); }
-.vend-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.vend-avatar { width: 38px; height: 38px; border-radius: 10px; background: var(--p-glow); border: 1px solid rgba(139,124,248,.22); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--purple); margin-bottom: 12px; flex-shrink: 0; }
-.vend-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
-.vend-cat { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-.vend-info { font-size: 11px; color: var(--muted); font-family: var(--mono); line-height: 1.8; }
-.vend-info i { font-size: 12px; margin-right: 4px; vertical-align: -1px; }
-.sec-label { font-size: 10px; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
-.empty { text-align: center; padding: 48px 20px; color: var(--muted); }
-.empty i { font-size: 32px; margin-bottom: 10px; opacity: .25; display: block; }
+/* File Input Style */
+input[type="file"] { padding: 6px; font-size: 11px; }
+input[type="file"]::file-selector-button { background: var(--s3); color: var(--txt); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+
 .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid var(--border2); border-top-color: var(--purple); border-radius: 50%; animation: spin .65s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* TOAST */
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--s1); border: 1px solid var(--border2); border-radius: var(--r2); padding: 12px 18px; font-size: 12px; display: flex; align-items: center; gap: 8px; z-index: 9999; max-width: 290px; transform: translateY(70px); opacity: 0; transition: .28s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--s1); border: 1px solid var(--border2); border-radius: var(--r2); padding: 12px 18px; font-size: 12px; display: flex; align-items: center; gap: 8px; z-index: 9999; transform: translateY(70px); opacity: 0; transition: .3s; }
 .toast.show { transform: translateY(0); opacity: 1; }
-.toast.ok i  { color: var(--green); font-size: 16px; }
-.toast.err i { color: var(--red); font-size: 16px; }
 </style>
 </head>
 <body>
 
 <div class="modal-overlay" id="vendorModal">
   <div class="modal">
-    <div class="modal-hdr">
-      <h3>Add New Vendor</h3>
-      <button class="close-btn" onclick="closeModal('vendorModal')"><i class="ti ti-x"></i></button>
-    </div>
+    <div class="modal-hdr"><h3>Add New Vendor</h3><button class="close-btn" onclick="closeModal('vendorModal')"><i class="ti ti-x"></i></button></div>
     <div class="form-grid">
-      <div class="fg full"><label>Vendor Name</label><input id="v-name" class="fc" placeholder="e.g. Acme Corp"/></div>
-      <div class="fg"><label>Default Item</label><input id="v-item" class="fc" placeholder="e.g. Supplies"/></div>
-      <div class="fg"><label>Category</label><input id="v-cat" class="fc" placeholder="e.g. Office"/></div>
-      <div class="fg full"><label>Bank Name</label><input id="v-bank" class="fc" placeholder="e.g. HDFC"/></div>
-      <div class="fg"><label>Account Details</label><input id="v-acc" class="fc" placeholder="XXXX-1234"/></div>
-      <div class="fg"><label>IFSC Code</label><input id="v-ifsc" class="fc" placeholder="HDFC0001234"/></div>
+      <div class="fg full"><label>Vendor Name</label><input id="v-name" class="fc"/></div>
+      <div class="fg"><label>Default Item</label><input id="v-item" class="fc"/></div>
+      <div class="fg"><label>Category</label><input id="v-cat" class="fc"/></div>
+      <div class="fg full"><label>Bank Name</label><input id="v-bank" class="fc"/></div>
+      <div class="fg"><label>Account Details</label><input id="v-acc" class="fc"/></div>
+      <div class="fg"><label>IFSC Code</label><input id="v-ifsc" class="fc"/></div>
     </div>
-    <div style="margin-top:20px; display:flex; gap:10px;">
-      <button class="submit-btn" onclick="submitVendor()"><i class="ti ti-device-floppy"></i> Save Vendor</button>
-    </div>
+    <div style="margin-top:20px;"><button class="submit-btn" onclick="submitVendor()"><i class="ti ti-device-floppy"></i> Save</button></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="utrModal">
   <div class="modal" style="max-width: 400px;">
-    <div class="modal-hdr">
-      <h3>Enter Payment Details</h3>
-      <button class="close-btn" onclick="cancelUtr()"><i class="ti ti-x"></i></button>
-    </div>
-    <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Please provide a unique UTR or Payment ID to mark this bill as paid. Once marked, this entry will be locked.</p>
+    <div class="modal-hdr"><h3>Enter Payment Details</h3><button class="close-btn" onclick="cancelUtr()"><i class="ti ti-x"></i></button></div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Please provide a unique UTR or Payment ID. This will lock the entry.</p>
+    <div class="form-grid"><div class="fg full"><label>UTR / Payment ID</label><input id="u-utr" class="fc" placeholder="e.g. UTR1234567890"/></div></div>
+    <div style="margin-top:20px;"><button class="submit-btn" onclick="submitUtr()"><i class="ti ti-check"></i> Confirm Payment</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-hdr"><h3>Edit Bill</h3><button class="close-btn" onclick="closeModal('editModal')"><i class="ti ti-x"></i></button></div>
+    <input type="hidden" id="e-idx">
     <div class="form-grid">
-      <div class="fg full">
-        <label>UTR / Payment ID</label>
-        <input id="u-utr" class="fc" placeholder="e.g. UTR1234567890"/>
-      </div>
+      <div class="fg full"><label>Vendor</label><input id="e-vendor" class="fc" readonly/></div>
+      <div class="fg"><label>Item</label><input id="e-item" class="fc"/></div>
+      <div class="fg"><label>Category</label><input id="e-cat" class="fc"/></div>
+      <div class="fg"><label>Quantity</label><input id="e-qty" type="number" class="fc"/></div>
+      <div class="fg"><label>Amount (₹)</label><input id="e-amt" type="number" class="fc"/></div>
+      <div class="fg full"><label>Date</label><input id="e-date" type="date" class="fc"/></div>
     </div>
-    <div style="margin-top:20px; display:flex; gap:10px;">
-      <button class="submit-btn" onclick="submitUtr()"><i class="ti ti-check"></i> Confirm Payment</button>
-    </div>
+    <div style="margin-top:20px;"><button class="submit-btn" onclick="submitEdit()"><i class="ti ti-device-floppy"></i> Update Bill</button></div>
   </div>
 </div>
 
 <aside class="sidebar">
-  <div class="sb-logo">
-    <div class="sb-mark">S</div>
-    <div>
-      <div class="sb-name">SkillBox</div>
-      <div class="sb-sub">Finance Pro</div>
-    </div>
-  </div>
-
+  <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
   <nav class="sb-nav">
     <div class="nav-section">Workspace</div>
-    <button class="nav-item active" id="n-dash" onclick="nav('dash',this)">
-      <i class="ti ti-layout-dashboard"></i> Dashboard
-    </button>
-    <button class="nav-item" id="n-bills" onclick="nav('bills',this)">
-      <i class="ti ti-receipt"></i> Bills
-    </button>
-    <button class="nav-item" id="n-add" onclick="nav('add',this)">
-      <i class="ti ti-circle-plus"></i> Add Payment
-    </button>
-    <button class="nav-item" id="n-vend" onclick="nav('vend',this)">
-      <i class="ti ti-building-store"></i> Vendors
-    </button>
-
+    <button class="nav-item active" id="n-dash" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-item" id="n-bills" onclick="nav('bills',this)"><i class="ti ti-receipt"></i> Bills</button>
+    <button class="nav-item" id="n-add" onclick="nav('add',this)"><i class="ti ti-circle-plus"></i> Add Payment</button>
+    <button class="nav-item" id="n-vend" onclick="nav('vend',this)"><i class="ti ti-building-store"></i> Vendors</button>
     <div class="nav-section" style="margin-top:20px">Actions</div>
-    <button class="nav-item" onclick="loadData()">
-      <i class="ti ti-refresh"></i> Sync Data
-    </button>
+    <button class="nav-item" onclick="loadData()"><i class="ti ti-refresh"></i> Sync Data</button>
   </nav>
-
-  <div class="sb-footer">
-    <div class="sync-row">
-      <div class="pulse"></div>
-      <span id="syncTxt">Connecting…</span>
-    </div>
-  </div>
+  <div class="sb-footer"><div class="sync-row"><div class="pulse"></div><span id="syncTxt">Connecting…</span></div></div>
 </aside>
 
 <div class="main">
-
   <header class="topbar">
     <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
-    
     <div class="search-wrap">
       <i class="ti ti-search"></i>
-      <input class="search-input" id="searchQ" placeholder="Search vendor, item, bank…" onkeypress="if(event.key === 'Enter') executeSearch()"/>
+      <input class="search-input" id="searchQ" placeholder="Search vendor, item..." onkeypress="if(event.key === 'Enter') executeSearch()"/>
       <button class="search-btn" onclick="executeSearch()">Search</button>
     </div>
-    
-    <button class="tb-btn" onclick="toggleTheme()" title="Switch Light/Dark Mode">
-      <i class="ti ti-moon" id="themeIcon"></i>
-    </button>
-    
+    <button class="tb-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
     <button class="tb-btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
-    <button class="tb-btn primary" onclick="nav('add',document.getElementById('n-add'))">
-      <i class="ti ti-plus"></i> Add Bill
-    </button>
   </header>
 
-  <div class="content" id="content">
+  <div class="content">
 
     <div id="v-dash">
       <div class="sec-label">Summary</div>
       <div class="cards-grid">
-        <div class="card c-p" onclick="nav('bills',document.getElementById('n-bills'));setFilter('all')">
-          <i class="ti ti-receipt card-icon" aria-hidden="true"></i>
-          <div class="card-label">Total Invoices</div>
-          <div class="card-val" id="cd-count">0</div>
-          <div class="card-sub" id="cd-total">₹0 total value</div>
-        </div>
-        <div class="card c-a" onclick="nav('bills',document.getElementById('n-bills'));setFilter('pending')">
-          <i class="ti ti-clock card-icon" aria-hidden="true"></i>
-          <div class="card-label">Pending</div>
-          <div class="card-val" id="cd-pending">₹0</div>
-          <div class="card-sub" id="cd-pending-n">0 bills</div>
-        </div>
-        <div class="card c-g" onclick="nav('bills',document.getElementById('n-bills'));setFilter('paid')">
-          <i class="ti ti-check card-icon" aria-hidden="true"></i>
-          <div class="card-label">Cleared</div>
-          <div class="card-val" id="cd-paid">₹0</div>
-          <div class="card-sub" id="cd-paid-n">0 bills</div>
-        </div>
-        <div class="card c-r" onclick="nav('bills',document.getElementById('n-bills'));setFilter('overdue')">
-          <i class="ti ti-alert-triangle card-icon" aria-hidden="true"></i>
-          <div class="card-label">Overdue</div>
-          <div class="card-val" id="cd-overdue">₹0</div>
-          <div class="card-sub" id="cd-overdue-n">0 bills</div>
-        </div>
+        <div class="card c-p" onclick="nav('bills',document.getElementById('n-bills'));setFilter('all')"><div class="card-label">Total Invoices</div><div class="card-val" id="cd-count">0</div><div class="card-sub" id="cd-total">₹0 value</div></div>
+        <div class="card c-a" onclick="nav('bills',document.getElementById('n-bills'));setFilter('pending')"><div class="card-label">Pending</div><div class="card-val" id="cd-pending">₹0</div><div class="card-sub" id="cd-pending-n">0 bills</div></div>
+        <div class="card c-g" onclick="nav('bills',document.getElementById('n-bills'));setFilter('paid')"><div class="card-label">Cleared</div><div class="card-val" id="cd-paid">₹0</div><div class="card-sub" id="cd-paid-n">0 bills</div></div>
+        <div class="card c-r" onclick="nav('bills',document.getElementById('n-bills'));setFilter('overdue')"><div class="card-label">Overdue</div><div class="card-val" id="cd-overdue">₹0</div><div class="card-sub" id="cd-overdue-n">0 bills</div></div>
       </div>
-
       <div class="charts-row">
-        <div class="chart-card">
-          <div class="chart-hdr">
-            <div class="chart-title">Category-wise Spend</div>
-          </div>
-          <div style="position:relative;height:240px">
-            <canvas id="catChart"></canvas>
-          </div>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-hdr">
-            <div class="chart-title">Paid vs Unpaid Bills</div>
-          </div>
-          <div style="display:flex;gap:16px;margin-bottom:14px;font-size:12px;color:var(--muted)">
-            <span style="display:flex;align-items:center;gap:5px">
-              <span style="width:10px;height:10px;border-radius:2px;background:#20cf78;display:inline-block"></span>
-              <span id="leg-paid">Paid — 0</span>
-            </span>
-            <span style="display:flex;align-items:center;gap:5px">
-              <span style="width:10px;height:10px;border-radius:2px;background:#f0a830;display:inline-block"></span>
-              <span id="leg-pending">Pending — 0</span>
-            </span>
-            <span style="display:flex;align-items:center;gap:5px">
-              <span style="width:10px;height:10px;border-radius:2px;background:#f05555;display:inline-block"></span>
-              <span id="leg-overdue">Overdue — 0</span>
-            </span>
-          </div>
-          <div class="donut-wrap" style="height:190px;position:relative;display:flex;align-items:center;justify-content:center">
-            <canvas id="statusChart"></canvas>
-            <div class="donut-center" id="donutCenter">
-              <div class="donut-center-val" id="donut-val">0</div>
-              <div class="donut-center-lbl">Total Bills</div>
-            </div>
-          </div>
-        </div>
+        <div class="chart-card"><div class="chart-hdr">Category-wise Spend</div><div style="height:240px"><canvas id="catChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-hdr">Paid vs Unpaid Bills</div><div style="height:190px; display:flex; justify-content:center"><canvas id="statusChart"></canvas></div></div>
       </div>
     </div>
 
@@ -406,39 +248,29 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
         <div class="filter-spacer"></div>
         <select class="sort-sel" id="sortSel" onchange="applyFilters()">
           <option value="">Sort by…</option>
-          <option value="amt-d">Amount ↓</option>
-          <option value="amt-a">Amount ↑</option>
-          <option value="date-d">Date ↓</option>
-          <option value="date-a">Date ↑</option>
+          <option value="amt-d">Amount ↓</option><option value="amt-a">Amount ↑</option>
+          <option value="date-d">Date ↓</option><option value="date-a">Date ↑</option>
         </select>
       </div>
       <div class="tbl-card">
         <div class="tbl-hdr">
-          <div>
-            <span class="tbl-title">Transactions</span>
-            <span class="tbl-count" id="billCount">— rows</span>
-            <span class="tbl-total" id="filteredTotal">Filtered Total: ₹0</span>
-          </div>
+          <div><span class="tbl-title">Transactions</span><span class="tbl-count" id="billCount">— rows</span><span class="tbl-total" id="filteredTotal">Filtered Total: ₹0</span></div>
         </div>
         <div class="tbl-scroll">
           <table>
             <thead>
               <tr>
-                <th onclick="sortCol('Vendor Name')">Vendor <i class="ti ti-selector" style="font-size:11px"></i></th>
+                <th onclick="sortCol('Vendor Name')">Vendor</th>
                 <th onclick="sortCol('Item')">Item</th>
                 <th onclick="sortCol('Category')">Category</th>
-                <th onclick="sortCol('Amount')">Amount <i class="ti ti-selector" style="font-size:11px"></i></th>
-                <th onclick="sortCol('Date')">Date <i class="ti ti-selector" style="font-size:11px"></i></th>
+                <th onclick="sortCol('Amount')">Amount</th>
+                <th onclick="sortCol('Date')">Date</th>
                 <th>Status</th>
-                <th>Bank</th>
+                <th>Invoice</th>
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody id="billBody">
-              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">
-                <span class="spinner"></span>Loading bills…
-              </td></tr>
-            </tbody>
+            <tbody id="billBody"></tbody>
           </table>
         </div>
       </div>
@@ -451,54 +283,25 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
           <div class="fg">
             <label>Vendor</label>
             <div style="display:flex; gap:8px;">
-              <select id="f-vendor" class="fc" onchange="fillVendor()">
-                <option value="">— Select vendor —</option>
-              </select>
-              <button class="tb-btn" onclick="openModal('vendorModal')" style="padding: 0 12px;" title="Add New Vendor">
-                <i class="ti ti-plus"></i>
-              </button>
+              <select id="f-vendor" class="fc" onchange="fillVendor()"><option value="">— Select vendor —</option></select>
+              <button class="tb-btn" onclick="openModal('vendorModal')" style="padding: 0 12px;"><i class="ti ti-plus"></i></button>
             </div>
           </div>
-          <div class="fg">
-            <label>Item / Product</label>
-            <input id="f-item" class="fc" type="text" placeholder="e.g. Software License"/>
+          <div class="fg"><label>Item / Product</label><input id="f-item" class="fc"/></div>
+          <div class="fg"><label>Category</label><input id="f-category" class="fc"/></div>
+          <div class="fg"><label>Quantity</label><input id="f-qty" type="number" class="fc" value="1"/></div>
+          <div class="fg"><label>Amount (₹)</label><input id="f-amount" type="number" class="fc"/></div>
+          <div class="fg"><label>Date</label><input id="f-date" type="date" class="fc"/></div>
+          
+          <div class="fg full" style="margin-top: 10px;">
+            <label>Upload Invoice (Optional)</label>
+            <input type="file" id="f-invoice" class="fc" accept="image/*,.pdf"/>
           </div>
-          <div class="fg">
-            <label>Category</label>
-            <input id="f-category" class="fc" type="text" placeholder="e.g. Software"/>
-          </div>
-          <div class="fg">
-            <label>Amount (₹)</label>
-            <input id="f-amount" class="fc" type="number" placeholder="0"/>
-          </div>
-          <div class="fg">
-            <label>Date</label>
-            <input id="f-date" class="fc" type="date"/>
-          </div>
-          <div class="fg">
-            <label>Status</label>
-            <select id="f-status" class="fc" disabled title="New entries begin as Pending. You can mark as Paid later with UTR.">
-              <option selected>Pending</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label>Bank Name</label>
-            <input id="f-bank" class="fc" readonly placeholder="Auto-filled from vendor"/>
-          </div>
-          <div class="fg">
-            <label>Account Details</label>
-            <input id="f-account" class="fc" readonly placeholder="Auto-filled from vendor"/>
-          </div>
-          <div class="fg full">
-            <label>IFSC Code</label>
-            <input id="f-ifsc" class="fc" readonly placeholder="Auto-filled from vendor"/>
-          </div>
+
+          <div class="fg" style="display:none;"><input id="f-bank"/><input id="f-account"/><input id="f-ifsc"/></div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
-          <button class="submit-btn" id="submitBtn" onclick="submitBill()">
-            <i class="ti ti-send"></i> Submit Entry
-          </button>
-          <span class="form-msg" id="formMsg"></span>
+          <button class="submit-btn" id="submitBtn" onclick="submitBill()"><i class="ti ti-send"></i> Submit Entry</button>
         </div>
       </div>
     </div>
@@ -506,581 +309,276 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
     <div id="v-vend" style="display:none">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <div class="sec-label" style="margin-bottom:0;">Vendor Directory</div>
-        <button class="tb-btn primary" onclick="openModal('vendorModal')">
-          <i class="ti ti-plus"></i> Add Vendor
-        </button>
+        <button class="tb-btn primary" onclick="openModal('vendorModal')"><i class="ti ti-plus"></i> Add Vendor</button>
       </div>
-      <div class="vend-grid" id="vendGrid">
-        <div class="empty"><i class="ti ti-building-store"></i><p>No vendors loaded</p></div>
-      </div>
+      <div class="vend-grid" id="vendGrid"></div>
     </div>
 
-  </div></div><div class="toast" id="toast">
-  <i class="ti ti-check" style="font-size:16px"></i>
-  <span id="toastMsg"></span>
+  </div>
 </div>
 
+<div class="toast" id="toast"><i class="ti ti-check" style="font-size:16px"></i><span id="toastMsg"></span></div>
+
 <script>
-// ══════════════════════════════════════
-// THEME TOGGLE LOGIC
-// ══════════════════════════════════════
+// ── THEME TOGGLE ──
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('finance_theme', next);
-  updateThemeIcon(next);
+  document.getElementById('themeIcon').className = next === 'light' ? 'ti ti-sun' : 'ti ti-moon';
   if(catChartInst) renderCatChart();
 }
+document.getElementById('themeIcon').className = savedTheme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
 
-function updateThemeIcon(theme) {
-  const icon = document.getElementById('themeIcon');
-  icon.className = theme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
-}
-updateThemeIcon(savedTheme);
-
-
-// ══════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════
+// ── CONFIG ──
 const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
-
 let bills = [], vendors = [], vendorMap = {};
 let activeFilter = 'all', sortDir = {};
-let pendingUtrChange = null; // Stores row info when modal opens
+let pendingUtrChange = null;
 let catChartInst = null, statusChartInst = null;
 const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34d39a','#fbbf24'];
 
 function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
 function norm(s){ return String(s||'').toLowerCase().trim(); }
 
-// ══════════════════════════════════════
-// GLOBAL SEARCH EXECUTION
-// ══════════════════════════════════════
-function executeSearch() {
-  applyFilters();
-  renderVendors();
+window.onclick = function(event) {
+  if (!event.target.matches('.action-btn')) {
+    document.querySelectorAll('.action-content.show').forEach(el => el.classList.remove('show'));
+  }
+}
+function toggleMenu(idx) {
+  document.getElementById("menu-" + idx).classList.toggle("show");
 }
 
-// ══════════════════════════════════════
-// MODALS
-// ══════════════════════════════════════
+function executeSearch() { applyFilters(); renderVendors(); }
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-// ══════════════════════════════════════
-// NAV
-// ══════════════════════════════════════
 function nav(page, btn){
-  ['dash','bills','add','vend'].forEach(p=>{
-    document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none';
-    if (document.getElementById('n-'+p)) document.getElementById('n-'+p).classList.remove('active');
-  });
+  ['dash','bills','add','vend'].forEach(p => document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none');
+  document.querySelectorAll('.sb-nav .nav-item').forEach(el => el.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  const titles = {
-    dash:  ['Dashboard','Overview'],
-    bills: ['Bills','Transactions'],
-    add:   ['Add Payment','New Bill'],
-    vend:  ['Vendors','Directory']
-  };
+  const titles = { dash:['Dashboard','Overview'], bills:['Bills','Transactions'], add:['Add Payment','New Bill'], vend:['Vendors','Directory'] };
   document.getElementById('pgTitle').childNodes[0].textContent = titles[page][0] + ' ';
   document.getElementById('pgSub').textContent = titles[page][1];
-  
   if(page === 'bills') applyFilters();
-  if(page === 'vend')  renderVendors();
+  if(page === 'vend') renderVendors();
 }
 
-// ══════════════════════════════════════
-// LOAD DATA
-// ══════════════════════════════════════
 async function loadData(){
   setSyncState('loading');
   try {
-    const [bRes, vRes] = await Promise.all([
-      fetch(API + '?action=getBills'),
-      fetch(API + '?action=getVendors')
-    ]);
-    const bData = await bRes.json();
-    const vData = await vRes.json();
+    const [bRes, vRes] = await Promise.all([ fetch(API + '?action=getBills'), fetch(API + '?action=getVendors') ]);
+    const bData = await bRes.json(); const vData = await vRes.json();
 
     bills = (bData.data || []).slice(1).map((row, i) => ({
-      _idx: i + 2,
-      'Date':            row[0] || '',
-      'Vendor Name':     row[1] || '',
-      'Item':            row[2] || '',
-      'Category':        row[3] || '',
-      'Amount':          row[4] || 0,
-      'Status':          row[5] || 'Pending',
-      'Bank Name':       row[6] || '',
-      'Account Details': row[7] || '',
-      'IFSC Code':       row[8] || '',
-      'Qty':             row[9] || 1,
-      'UTR':             row[10] || '' // The new UTR column mapped
+      _idx: i + 2, 'Date': row[0]||'', 'Vendor Name': row[1]||'', 'Item': row[2]||'', 'Category': row[3]||'', 'Amount': row[4]||0, 'Status': row[5]||'Pending',
+      'Bank Name': row[6]||'', 'Account Details': row[7]||'', 'IFSC Code': row[8]||'', 'Qty': row[9]||1, 'UTR': row[10]||'', 'InvoiceURL': row[11]||''
     }));
-    vendors = (vData.data || []).slice(1).map(r => ({
-      'Vendor Name':     r[0] || '',
-      'Item':            r[1] || '',
-      'Category':        r[2] || '',
-      'Bank Name':       r[3] || '',
-      'Account Details': r[4] || '',
-      'IFSC Code':       r[5] || ''
-    }));
-
-    buildVendorMap();
-    refresh();
-    setSyncState('ok');
-    toast('Data synced successfully', 'ok');
-  } catch(e) {
-    setSyncState('demo');
-    loadDemo();
-  }
+    vendors = (vData.data || []).slice(1).map(r => ({ 'Vendor Name': r[0]||'', 'Item': r[1]||'', 'Category': r[2]||'', 'Bank Name': r[3]||'', 'Account Details': r[4]||'', 'IFSC Code': r[5]||'' }));
+    
+    buildVendorMap(); refresh(); setSyncState('ok');
+  } catch(e) { setSyncState('demo'); }
 }
 
-function loadDemo(){
-  bills = [
-    {_idx:2,'Vendor Name':'TechCorp Ltd','Item':'Software','Category':'Software','Amount':45000,'Date':'2024-05-01','Status':'Paid','Bank Name':'HDFC','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1, 'UTR':'UTR849202'},
-    {_idx:3,'Vendor Name':'QuickShip','Item':'Delivery','Category':'Logistics','Amount':12500,'Date':'2024-05-10','Status':'Pending','Bank Name':'ICICI','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678','Qty':1, 'UTR':''},
-  ];
-  vendors = [
-    {'Vendor Name':'TechCorp Ltd','Item':'Software License','Category':'Software','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234'},
-    {'Vendor Name':'QuickShip','Item':'Delivery Services','Category':'Logistics','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678'},
-  ];
-  buildVendorMap();
-  refresh();
-}
-
-function buildVendorMap(){
-  vendorMap = {};
-  vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; });
-}
-
-function refresh(){
-  updateCards();
-  renderCharts();
-  renderVendorDropdown();
-  executeSearch();
-}
+function buildVendorMap(){ vendorMap = {}; vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; }); }
+function refresh(){ updateCards(); renderCharts(); renderVendorDropdown(); executeSearch(); }
 
 function updateCards(){
-  const pending = bills.filter(b => norm(b.Status) === 'pending');
-  const paid    = bills.filter(b => norm(b.Status) === 'paid');
-  const overdue = bills.filter(b => norm(b.Status) === 'overdue');
+  const p = bills.filter(b => norm(b.Status) === 'pending'), d = bills.filter(b => norm(b.Status) === 'paid'), o = bills.filter(b => norm(b.Status) === 'overdue');
   const sum = arr => arr.reduce((a,b) => a + Number(b.Amount||0), 0);
-  const total = sum(bills);
-
-  document.getElementById('cd-count').textContent    = bills.length;
-  document.getElementById('cd-total').textContent    = fmt(total) + ' total value';
-  document.getElementById('cd-pending').textContent  = fmt(sum(pending));
-  document.getElementById('cd-pending-n').textContent= pending.length + ' bill' + (pending.length!==1?'s':'');
-  document.getElementById('cd-paid').textContent     = fmt(sum(paid));
-  document.getElementById('cd-paid-n').textContent   = paid.length + ' bill' + (paid.length!==1?'s':'');
-  document.getElementById('cd-overdue').textContent  = fmt(sum(overdue));
-  document.getElementById('cd-overdue-n').textContent= overdue.length + ' bill' + (overdue.length!==1?'s':'');
+  document.getElementById('cd-count').textContent = bills.length; document.getElementById('cd-total').textContent = fmt(sum(bills)) + ' value';
+  document.getElementById('cd-pending').textContent = fmt(sum(p)); document.getElementById('cd-paid').textContent = fmt(sum(d)); document.getElementById('cd-overdue').textContent = fmt(sum(o));
 }
 
 function renderCharts(){
-  renderCatChart();
-  renderStatusChart();
-}
-
-function renderCatChart(){
-  const catMap = {};
-  bills.forEach(b => {
-    const c = b.Category || 'Other';
-    catMap[c] = (catMap[c]||0) + Number(b.Amount||0);
-  });
-  const labels = Object.keys(catMap);
-  const values = Object.values(catMap);
-
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  const axisColor = isLight ? '#6b7280' : '#717899';
-  const gridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)';
-
+  const catMap = {}; bills.forEach(b => { const c = b.Category || 'Other'; catMap[c] = (catMap[c]||0) + Number(b.Amount||0); });
   if(catChartInst) catChartInst.destroy();
-  const ctx = document.getElementById('catChart').getContext('2d');
-  catChartInst = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Spend (₹)',
-        data: values,
-        backgroundColor: COLORS,
-        borderRadius: 7,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: axisColor, font: { size: 10, family: 'DM Sans' } }, grid: { color: gridColor } },
-        y: { ticks: { color: axisColor, font: { size: 10, family: 'DM Mono' }, callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid: { color: gridColor } }
-      }
-    }
-  });
-}
+  catChartInst = new Chart(document.getElementById('catChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(catMap), datasets: [{ data: Object.values(catMap), backgroundColor: COLORS, borderRadius: 7 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
 
-function renderStatusChart(){
-  const paid    = bills.filter(b => norm(b.Status) === 'paid').length;
-  const pending = bills.filter(b => norm(b.Status) === 'pending').length;
-  const overdue = bills.filter(b => norm(b.Status) === 'overdue').length;
-  const total   = bills.length;
-
-  document.getElementById('leg-paid').textContent    = 'Paid — ' + paid;
-  document.getElementById('leg-pending').textContent = 'Pending — ' + pending;
-  document.getElementById('leg-overdue').textContent = 'Overdue — ' + overdue;
-  document.getElementById('donut-val').textContent   = total;
-
+  const pd = bills.filter(b => norm(b.Status) === 'paid').length, pn = bills.filter(b => norm(b.Status) === 'pending').length, ov = bills.filter(b => norm(b.Status) === 'overdue').length;
   if(statusChartInst) statusChartInst.destroy();
-  const ctx = document.getElementById('statusChart').getContext('2d');
-  statusChartInst = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Paid','Pending','Overdue'],
-      datasets: [{
-        data: [paid, pending, overdue],
-        backgroundColor: ['#20cf78','#f0a830','#f05555'],
-        borderColor:     ['#20cf78','#f0a830','#f05555'],
-        borderWidth: 2, hoverOffset: 8
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
-  });
+  statusChartInst = new Chart(document.getElementById('statusChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Paid','Pending','Overdue'], datasets: [{ data: [pd, pn, ov], backgroundColor: ['#20cf78','#f0a830','#f05555'], borderWidth:0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } } });
 }
 
 function setFilter(f, btn){
-  activeFilter = f;
-  document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  else {
-    const map = { all:0, pending:1, paid:2, overdue:3 };
-    const chips = document.querySelectorAll('.chip');
-    if(map[f] !== undefined && chips[map[f]]) chips[map[f]].classList.add('active');
-  }
+  activeFilter = f; document.querySelectorAll('.chip').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active');
   applyFilters();
 }
 
 function applyFilters(){
-  const q    = (document.getElementById('searchQ').value || '').toLowerCase();
-  const sort = document.getElementById('sortSel') ? document.getElementById('sortSel').value : '';
-
-  let filtered = bills.filter(b => {
-    const sm = activeFilter === 'all' || norm(b.Status) === activeFilter;
-    const qm = !q || Object.values(b).some(v => String(v).toLowerCase().includes(q));
-    return sm && qm;
-  });
-
-  if(sort === 'amt-d') filtered.sort((a,b) => Number(b.Amount) - Number(a.Amount));
-  if(sort === 'amt-a') filtered.sort((a,b) => Number(a.Amount) - Number(b.Amount));
-  if(sort === 'date-d') filtered.sort((a,b) => new Date(b.Date) - new Date(a.Date));
-  if(sort === 'date-a') filtered.sort((a,b) => new Date(a.Date) - new Date(b.Date));
-
-  // Update Dynamic Filtered Total 
-  const filteredTotal = filtered.reduce((sum, b) => sum + Number(b.Amount || 0), 0);
-  document.getElementById('filteredTotal').textContent = 'Filtered Total: ' + fmt(filteredTotal);
-
+  const q = (document.getElementById('searchQ').value || '').toLowerCase(), sort = document.getElementById('sortSel').value;
+  let filtered = bills.filter(b => (activeFilter === 'all' || norm(b.Status) === activeFilter) && (!q || Object.values(b).some(v => String(v).toLowerCase().includes(q))));
+  if(sort === 'amt-d') filtered.sort((a,b) => Number(b.Amount) - Number(a.Amount)); if(sort === 'amt-a') filtered.sort((a,b) => Number(a.Amount) - Number(b.Amount));
+  document.getElementById('filteredTotal').textContent = 'Filtered Total: ' + fmt(filtered.reduce((s, b) => s + Number(b.Amount || 0), 0));
   renderBillsTable(filtered);
-}
-
-function sortCol(key){
-  sortDir[key] = !sortDir[key];
-  bills.sort((a,b) => {
-    const av = a[key]||'', bv = b[key]||'';
-    const na = isNaN(av) ? null : Number(av);
-    const nb = isNaN(bv) ? null : Number(bv);
-    if(na!==null && nb!==null) return sortDir[key] ? na-nb : nb-na;
-    return sortDir[key]
-      ? String(av).localeCompare(String(bv))
-      : String(bv).localeCompare(String(av));
-  });
-  applyFilters();
 }
 
 function renderBillsTable(rows){
   const body = document.getElementById('billBody');
-  const cnt  = document.getElementById('billCount');
-  cnt.textContent = rows.length + ' row' + (rows.length!==1?'s':'');
-
-  if(!rows.length){
-    body.innerHTML = `<tr><td colspan="8"><div class="empty"><i class="ti ti-search"></i><p>No matching records</p></div></td></tr>`;
-    return;
-  }
-
+  if(!rows.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
+  
   body.innerHTML = rows.map(b => {
-    const st = norm(b.Status);
-    const isPaid = st === 'paid';
+    const st = norm(b.Status); const isPaid = st === 'paid';
     
-    // UI Logic: If Paid, lock the status and show UTR. Else show Dropdown.
-    const statusHtml = isPaid 
-      ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div>
-         <div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
-      : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">
-          ${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}
-         </select>`;
+    const statusHtml = isPaid ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div><div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
+      : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}</select>`;
 
-    // UI Logic: If Paid, hide Delete button.
-    const actionHtml = isPaid
-      ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
-      : `<button class="del-btn" onclick="deleteBill(${b._idx})"><i class="ti ti-trash"></i></button>`;
+    const invHtml = b.InvoiceURL 
+      ? `<a href="${b.InvoiceURL}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`
+      : `<span class="cat-pill">Pending</span>`;
+
+    const actionHtml = isPaid ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
+      : `<div class="action-menu">
+          <button class="action-btn" onclick="toggleMenu(${b._idx})">⋮</button>
+          <div id="menu-${b._idx}" class="action-content">
+            <button onclick="openEdit(${b._idx})"><i class="ti ti-edit"></i> Edit</button>
+            <button class="del" onclick="deleteBill(${b._idx})"><i class="ti ti-trash"></i> Delete</button>
+          </div>
+         </div>`;
 
     return `<tr>
       <td style="font-weight:600">${b['Vendor Name']||'—'}</td>
-      <td>${b.Item||'—'}</td>
+      <td>${b.Item||'—'} <span style="color:var(--muted); font-size:11px">(x${b.Qty||1})</span></td>
       <td><span class="cat-pill">${b.Category||'—'}</span></td>
       <td class="amt-cell">${fmt(b.Amount)}</td>
-      <td style="color:var(--muted);font-family:var(--mono);font-size:11px">${b.Date||'—'}</td>
+      <td style="color:var(--muted);font-size:11px">${b.Date||'—'}</td>
       <td>${statusHtml}</td>
-      <td style="font-size:11px;color:var(--muted)">${b['Bank Name']||'—'}</td>
+      <td>${invHtml}</td>
       <td>${actionHtml}</td>
     </tr>`;
   }).join('');
 }
 
-// ══════════════════════════════════════
-// STATUS CHANGE & UTR LOGIC
-// ══════════════════════════════════════
 function initChangeStatus(idx, status, selectEl){
-  if (norm(status) === 'paid') {
-    pendingUtrChange = { idx, selectEl };
-    document.getElementById('u-utr').value = '';
-    openModal('utrModal');
-  } else {
-    // Process Overdue / Pending directly without UTR
-    executeStatusChange(idx, status, '');
-  }
+  if (norm(status) === 'paid') { pendingUtrChange = { idx, selectEl }; document.getElementById('u-utr').value = ''; openModal('utrModal'); }
+  else executeStatusChange(idx, status, '');
 }
-
-function cancelUtr() {
-  if(pendingUtrChange) {
-    // Revert dropdown UI back to original state (assuming it was not paid)
-    const b = bills.find(x => x._idx === pendingUtrChange.idx);
-    pendingUtrChange.selectEl.value = b ? b.Status : 'Pending'; 
-    pendingUtrChange = null;
-  }
-  closeModal('utrModal');
-}
-
+function cancelUtr() { if(pendingUtrChange) pendingUtrChange.selectEl.value = 'Pending'; closeModal('utrModal'); }
 function submitUtr() {
   const utr = document.getElementById('u-utr').value.trim();
   if(!utr) return toast('UTR / Payment ID is required!', 'err');
-  
-  // Unique Verification
-  if(bills.some(b => norm(b.UTR) === norm(utr))) {
-    return toast('Duplicate UTR! This ID already exists.', 'err');
-  }
-
-  const { idx } = pendingUtrChange;
+  if(bills.some(b => norm(b.UTR) === norm(utr))) return toast('Duplicate UTR exists.', 'err');
+  executeStatusChange(pendingUtrChange.idx, 'Paid', utr);
   closeModal('utrModal');
-  pendingUtrChange = null;
-
-  executeStatusChange(idx, 'Paid', utr);
+}
+async function executeStatusChange(idx, status, utr){
+  const b = bills.find(x => x._idx === idx); if(b) { b.Status = status; if(utr) b.UTR = utr; }
+  updateCards(); renderStatusChart(); applyFilters(); toast('Status updated', 'ok');
+  try { await fetch(API, { method:'POST', body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status: status, utr: utr }) }); } catch(e){}
 }
 
-async function executeStatusChange(idx, status, utr){
+function openEdit(idx) {
   const b = bills.find(x => x._idx === idx);
-  if(b) {
-    b.Status = status;
-    if(utr) b.UTR = utr;
-  }
+  if(!b) return;
+  document.getElementById('e-idx').value = b._idx;
+  document.getElementById('e-vendor').value = b['Vendor Name'];
+  document.getElementById('e-item').value = b.Item;
+  document.getElementById('e-cat').value = b.Category;
+  document.getElementById('e-qty').value = b.Qty;
+  document.getElementById('e-amt').value = b.Amount;
+  document.getElementById('e-date').value = b.Date;
+  document.querySelectorAll('.action-content').forEach(el => el.classList.remove('show'));
+  openModal('editModal');
+}
+
+async function submitEdit() {
+  const idx = Number(document.getElementById('e-idx').value);
+  const b = bills.find(x => x._idx === idx);
   
-  updateCards();
-  renderStatusChart();
-  applyFilters(); // Re-renders table to lock/unlock row
-  
-  toast('Status updated to ' + status, 'ok');
-  
-  try {
-    await fetch(API, { 
-      method:'POST', 
-      body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status: status, utr: utr }) 
-    });
-  } catch(e){}
+  b.Item = document.getElementById('e-item').value;
+  b.Category = document.getElementById('e-cat').value;
+  b.Qty = document.getElementById('e-qty').value;
+  b.Amount = document.getElementById('e-amt').value;
+  b.Date = document.getElementById('e-date').value;
+
+  closeModal('editModal'); applyFilters(); updateCards(); renderCharts(); toast('Bill Updated!', 'ok');
+  const row = [b.Date, b['Vendor Name'], b.Item, b.Category, b.Amount, b.Status, b['Bank Name'], b['Account Details'], b['IFSC Code'], b.Qty, b.UTR, b.InvoiceURL];
+  fetch(API, { method:'POST', body: JSON.stringify({ action:'editBill', rowIndex: idx, row: row }) });
 }
 
 async function deleteBill(idx){
-  if(!confirm('Delete this pending bill? This cannot be undone.')) return;
-  bills = bills.filter(b => b._idx !== idx);
-  updateCards(); renderCharts(); applyFilters();
-  toast('Bill deleted', 'ok');
-  try {
-    await fetch(API, { method:'POST', body: JSON.stringify({ action:'deleteBill', rowIndex:idx }) });
-    loadData();
-  } catch(e){}
+  if(!confirm('Delete this bill? This cannot be undone.')) return;
+  bills = bills.filter(b => b._idx !== idx); applyFilters(); updateCards(); renderCharts(); toast('Bill deleted', 'ok');
+  fetch(API, { method:'POST', body: JSON.stringify({ action:'deleteBill', rowIndex:idx }) });
 }
 
-// ══════════════════════════════════════
-// ADD PAYMENT FORM
-// ══════════════════════════════════════
 function renderVendorDropdown(){
-  const sel = document.getElementById('f-vendor');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— Select vendor —</option>';
-  Object.keys(vendorMap).forEach(name => {
-    const o = document.createElement('option');
-    o.value = name; o.textContent = name;
-    sel.appendChild(o);
-  });
-  if(cur) sel.value = cur;
+  const sel = document.getElementById('f-vendor'); sel.innerHTML = '<option value="">— Select vendor —</option>';
+  Object.keys(vendorMap).forEach(name => sel.appendChild(new Option(name, name)));
 }
-
 function fillVendor(){
   const v = vendorMap[document.getElementById('f-vendor').value] || {};
-  document.getElementById('f-bank').value    = v['Bank Name'] || '';
-  document.getElementById('f-account').value = v['Account Details'] || '';
-  document.getElementById('f-ifsc').value    = v['IFSC Code'] || '';
-  document.getElementById('f-category').value= v['Category'] || '';
+  document.getElementById('f-bank').value = v['Bank Name']||''; document.getElementById('f-account').value = v['Account Details']||''; document.getElementById('f-ifsc').value = v['IFSC Code']||''; document.getElementById('f-category').value = v['Category']||'';
 }
 
-async function submitBill(){
-  const btn = document.getElementById('submitBtn');
-  const msg = document.getElementById('formMsg');
-  const vendor = document.getElementById('f-vendor').value;
-  const amount = document.getElementById('f-amount').value;
+function submitBill(){
+  const btn = document.getElementById('submitBtn'), msg = document.getElementById('formMsg');
+  const vendor = document.getElementById('f-vendor').value, amount = document.getElementById('f-amount').value;
+  if(!vendor || !amount) { toast('Vendor and Amount required', 'err'); return; }
 
-  if(!vendor || !amount){
-    msg.className='form-msg err'; msg.textContent='Vendor and Amount are required.'; return;
-  }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Processing...';
+  
+  const fileInput = document.getElementById('f-invoice');
+  let fileData = "", fileName = "", mimeType = "";
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Submitting…';
-  msg.textContent = '';
+  const sendRequest = async () => {
+    const newBill = {
+      _idx: bills.length + 2, 'Date': document.getElementById('f-date').value, 'Vendor Name': vendor,
+      'Item': document.getElementById('f-item').value, 'Category': document.getElementById('f-category').value,
+      'Amount': Number(amount), 'Status': 'Pending', 'Bank Name': document.getElementById('f-bank').value,
+      'Account Details': document.getElementById('f-account').value, 'IFSC Code': document.getElementById('f-ifsc').value,
+      'Qty': document.getElementById('f-qty').value || 1, 'UTR': '', 'InvoiceURL': ''
+    };
 
-  const newBill = {
-    _idx:              bills.length + 2,
-    'Date':            document.getElementById('f-date').value,
-    'Vendor Name':     vendor,
-    'Item':            document.getElementById('f-item').value,
-    'Category':        document.getElementById('f-category').value,
-    'Amount':          Number(amount),
-    'Status':          'Pending', // Enforced Pending State natively
-    'Bank Name':       document.getElementById('f-bank').value,
-    'Account Details': document.getElementById('f-account').value,
-    'IFSC Code':       document.getElementById('f-ifsc').value,
-    'Qty': 1,
-    'UTR': ''
+    bills.push(newBill); applyFilters(); updateCards(); renderCharts();
+    toast('Bill sent for processing!', 'ok');
+    
+    ['f-vendor','f-item','f-category','f-amount','f-invoice'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-qty').value = "1";
+    btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
+
+    try {
+      await fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'addBill',
+          row: [newBill.Date, newBill['Vendor Name'], newBill.Item, newBill.Category, newBill.Amount, newBill.Status, newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR],
+          fileData: fileData, fileName: fileName, mimeType: mimeType
+        })
+      });
+      loadData(); 
+    } catch(e){ toast('Error saving to sheet', 'err'); }
   };
 
-  bills.push(newBill);
-  updateCards(); renderCharts(); applyFilters();
-  msg.className='form-msg ok'; msg.textContent='✓ Bill added!';
-  toast('Bill added successfully', 'ok');
-  
-  ['f-vendor','f-item','f-category','f-amount','f-bank','f-account','f-ifsc'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('f-date').value   = new Date().toISOString().slice(0,10);
-  document.getElementById('f-status').value = 'Pending';
-  
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
-
-  try {
-    // Array order: Date, Vendor, Item, Category, Amount, Status, Bank, Acc, IFSC, Qty, UTR
-    await fetch(API, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'addBill',
-        row: [newBill.Date, newBill['Vendor Name'], newBill.Item,
-              newBill.Category, newBill.Amount, newBill.Status,
-              newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR]
-      })
-    });
-  } catch(e){}
+  if(fileInput.files.length > 0) {
+    const file = fileInput.files[0]; fileName = file.name; mimeType = file.type;
+    const reader = new FileReader();
+    reader.onload = function(e) { fileData = e.target.result.split(',')[1]; sendRequest(); };
+    reader.readAsDataURL(file);
+  } else { sendRequest(); }
 }
 
-// ══════════════════════════════════════
-// VENDORS PAGE
-// ══════════════════════════════════════
 function renderVendors(){
-  const q    = (document.getElementById('searchQ').value || '').toLowerCase();
-  const grid = document.getElementById('vendGrid');
-  const list = vendors.filter(v =>
-    !q || Object.values(v).some(x => String(x).toLowerCase().includes(q))
-  );
-  if(!list.length){
-    grid.innerHTML = `<div class="empty"><i class="ti ti-building-store"></i><p>No vendors found</p></div>`;
-    return;
-  }
-  grid.innerHTML = list.map(v => `
+  const q = document.getElementById('searchQ').value.toLowerCase();
+  const list = vendors.filter(v => !q || Object.values(v).some(x => String(x).toLowerCase().includes(q)));
+  document.getElementById('vendGrid').innerHTML = list.length ? list.map(v => `
     <div class="vend-card">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div>
-        <div>
-          <div class="vend-name">${v['Vendor Name']||'—'}</div>
-          <div class="vend-cat">${v.Category||'—'}</div>
-        </div>
-      </div>
-      <div class="vend-info">
-        <div><i class="ti ti-building-bank"></i>${v['Bank Name']||'—'}</div>
-        <div><i class="ti ti-credit-card"></i>${v['Account Details']||'—'}</div>
-        <div><i class="ti ti-code"></i>${v['IFSC Code']||'—'}</div>
-      </div>
-    </div>
-  `).join('');
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div><div><div class="vend-name">${v['Vendor Name']||'—'}</div><div class="vend-cat">${v.Category||'—'}</div></div></div>
+      <div class="vend-info"><div><i class="ti ti-building-bank"></i>${v['Bank Name']||'—'}</div><div><i class="ti ti-credit-card"></i>${v['Account Details']||'—'}</div><div><i class="ti ti-code"></i>${v['IFSC Code']||'—'}</div></div>
+    </div>`).join('') : `<div class="empty">No vendors found</div>`;
 }
 
 async function submitVendor() {
-  const name = document.getElementById('v-name').value.trim();
-  const item = document.getElementById('v-item').value.trim();
-  const cat = document.getElementById('v-cat').value.trim();
-  const bank = document.getElementById('v-bank').value.trim();
-  const acc = document.getElementById('v-acc').value.trim();
-  const ifsc = document.getElementById('v-ifsc').value.trim();
-
-  if (!name) { toast('Vendor name is required', 'err'); return; }
-
-  const newV = {
-    'Vendor Name': name, 'Item': item, 'Category': cat,
-    'Bank Name': bank, 'Account Details': acc, 'IFSC Code': ifsc
-  };
-
-  vendors.push(newV);
-  buildVendorMap();
-  renderVendorDropdown();
-  renderVendors();
-
-  closeModal('vendorModal');
-  toast('Vendor added successfully', 'ok');
-
-  ['v-name','v-item','v-cat','v-bank','v-acc','v-ifsc'].forEach(id => document.getElementById(id).value = '');
-
-  try {
-    await fetch(API, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'addVendor',
-        row: [name, item, cat, bank, acc, ifsc]
-      })
-    });
-  } catch(e) {}
+  const name = document.getElementById('v-name').value;
+  if (!name) return toast('Vendor name required', 'err');
+  const newV = { 'Vendor Name': name, 'Item': document.getElementById('v-item').value, 'Category': document.getElementById('v-cat').value, 'Bank Name': document.getElementById('v-bank').value, 'Account Details': document.getElementById('v-acc').value, 'IFSC Code': document.getElementById('v-ifsc').value };
+  vendors.push(newV); buildVendorMap(); renderVendorDropdown(); renderVendors(); closeModal('vendorModal'); toast('Vendor added', 'ok');
+  fetch(API, { method: 'POST', body: JSON.stringify({ action: 'addVendor', row: [newV['Vendor Name'], newV.Item, newV.Category, newV['Bank Name'], newV['Account Details'], newV['IFSC Code']] }) });
 }
 
-function setSyncState(s){
-  const el = document.getElementById('syncTxt');
-  const dot = document.querySelector('.pulse');
-  if(s === 'ok'){
-    dot.style.background = '#20cf78';
-    el.textContent = 'Synced ' + new Date().toLocaleTimeString();
-  } else if(s === 'loading'){
-    dot.style.background = '#f0a830';
-    el.textContent = 'Syncing…';
-  } else {
-    dot.style.background = '#f05555';
-    el.textContent = 'Demo mode';
-  }
-}
-
-let toastTimer;
-function toast(msg, type='ok'){
-  const el = document.getElementById('toast');
-  const m  = document.getElementById('toastMsg');
-  const ic = el.querySelector('i');
-  ic.className = type === 'ok' ? 'ti ti-check' : 'ti ti-x';
-  m.textContent = msg;
-  el.className  = 'toast ' + type + ' show';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = 'toast'; }, 2800);
-}
+function setSyncState(s){ document.querySelector('.pulse').style.background = s==='ok'?'#20cf78':s==='loading'?'#f0a830':'#f05555'; document.getElementById('syncTxt').textContent = s==='ok'?'Synced '+new Date().toLocaleTimeString():s==='loading'?'Syncing…':'Demo mode'; }
+let toastTimer; function toast(msg, type='ok'){ const el = document.getElementById('toast'); el.querySelector('i').className = type==='ok'?'ti ti-check':'ti ti-x'; document.getElementById('toastMsg').textContent = msg; el.className='toast '+type+' show'; clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.className='toast', 2800); }
 
 document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
 loadData();
