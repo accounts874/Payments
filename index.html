@@ -421,13 +421,17 @@ function renderBillsTable(rows){
   body.innerHTML = rows.map(b => {
     const st = norm(b.Status); const isPaid = st === 'paid';
     
+    // Status Logic
     const statusHtml = isPaid ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div><div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
       : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}</select>`;
 
-    const invHtml = b.InvoiceURL 
-      ? `<a href="${b.InvoiceURL}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`
-      : `<span class="cat-pill">Pending</span>`;
+    // FIX: Strict Invoice Logic (Check if it starts with http)
+    const invUrl = (b.InvoiceURL || '').toString().trim();
+    const invHtml = invUrl.startsWith('http') 
+      ? `<a href="${invUrl}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`
+      : `<span class="cat-pill" style="opacity: 0.5;">No File</span>`;
 
+    // Action Menu Logic
     const actionHtml = isPaid ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
       : `<div class="action-menu">
           <button class="action-btn" onclick="toggleMenu(${b._idx})">⋮</button>
