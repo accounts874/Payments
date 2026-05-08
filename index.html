@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-<!-- THEME PERSISTENCE SCRIPT (Runs immediately to prevent flashing) -->
 <script>
   const savedTheme = localStorage.getItem('finance_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
@@ -29,7 +28,7 @@ body {
   transition: background var(--trans), color var(--trans);
 }
 
-/* ── DESIGN TOKENS (DARK MODE DEFAULT) ── */
+/* ── DESIGN TOKENS ── */
 :root {
   --bg:       #0b0d17;
   --s1:       #10121e;
@@ -59,7 +58,6 @@ body {
   --trans:    .18s ease;
 }
 
-/* ── LIGHT MODE OVERRIDES ── */
 [data-theme="light"] {
   --bg:       #f4f5f9;
   --s1:       #ffffff;
@@ -73,66 +71,52 @@ body {
   --muted2:   #9ca3af;
 }
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 99px; }
 
-/* ══════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════ */
-.sidebar {
-  width: var(--sidebar);
-  background: var(--s1);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; padding: 0; flex-shrink: 0; z-index: 10;
-  transition: background var(--trans), border var(--trans);
-}
-
+/* ══════════════════════════════════════ SIDEBAR */
+.sidebar { width: var(--sidebar); background: var(--s1); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; z-index: 10; transition: background var(--trans), border var(--trans); }
 .sb-logo { padding: 22px 18px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
 .sb-mark { width: 34px; height: 34px; background: var(--purple2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
 .sb-name { font-size: 14px; font-weight: 600; line-height: 1.25; }
 .sb-sub  { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
-
 .sb-nav { flex: 1; padding: 16px 10px; overflow-y: auto; }
 .nav-section { font-size: 9.5px; font-weight: 600; letter-spacing: 1.3px; color: var(--muted2); text-transform: uppercase; padding: 0 8px 8px; margin-top: 4px; }
 .nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--r); font-size: 13px; color: var(--muted); cursor: pointer; transition: var(--trans); margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
 .nav-item i { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
 .nav-item:hover { background: var(--s3); color: var(--txt); }
 .nav-item.active { background: var(--p-glow); color: var(--purple); border: 1px solid rgba(139,124,248,0.18); }
-
 .sb-footer { padding: 14px 18px; border-top: 1px solid var(--border); }
 .sync-row { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); font-family: var(--mono); }
 .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-/* ══════════════════════════════════════
-   MAIN
-══════════════════════════════════════ */
+/* ══════════════════════════════════════ MAIN */
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
-/* TOP BAR */
+/* TOP BAR & SEARCH */
 .topbar { background: var(--s1); border-bottom: 1px solid var(--border); padding: 13px 22px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; transition: background var(--trans), border var(--trans); }
 .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
 .topbar-title em { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 7px; }
 
-.search-wrap { position: relative; }
-.search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
-.search-input { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 12px 7px 32px; border-radius: var(--r); font-size: 12px; width: 205px; outline: none; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-wrap i.ti-search { position: absolute; left: 10px; color: var(--muted); font-size: 15px; pointer-events: none; }
+.search-input { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 75px 7px 32px; border-radius: var(--r); font-size: 12px; width: 280px; outline: none; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
 .search-input:focus { border-color: var(--purple); }
 .search-input::placeholder { color: var(--muted2); }
+
+.search-btn { position: absolute; right: 4px; background: var(--purple2); color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--trans); font-family: 'DM Sans', sans-serif;}
+.search-btn:hover { opacity: 0.85; }
 
 .tb-btn { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 7px 13px; border-radius: var(--r); font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); display: flex; align-items: center; gap: 6px; }
 .tb-btn:hover { border-color: var(--purple); color: var(--purple); }
 .tb-btn.primary { background: var(--purple2); border-color: var(--purple2); color: #fff; }
 .tb-btn.primary:hover { opacity: .88; }
 
-/* CONTENT AREA */
 .content { flex: 1; overflow-y: auto; padding: 22px; }
 
-/* ══════════════════════════════════════
-   SUMMARY CARDS
-══════════════════════════════════════ */
+/* ══════════════════════════════════════ DASHBOARD CARDS & CHARTS */
 .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
 .card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px 18px; position: relative; overflow: hidden; cursor: pointer; transition: var(--trans); }
 .card:hover { border-color: var(--border2); transform: translateY(-2px); }
@@ -150,9 +134,6 @@ body {
 .card.c-r .card-val { color: var(--red); }
 .card-sub { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--mono); }
 
-/* ══════════════════════════════════════
-   CHART AREA
-══════════════════════════════════════ */
 .charts-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-top: 20px; }
 .chart-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px 20px; transition: var(--trans); }
 .chart-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -162,9 +143,7 @@ body {
 .donut-center-val { font-size: 22px; font-weight: 600; font-family: var(--mono); color: var(--txt); transition: var(--trans); }
 .donut-center-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-top: 2px; }
 
-/* ══════════════════════════════════════
-   FILTER ROW
-══════════════════════════════════════ */
+/* ══════════════════════════════════════ TABLE SECTION */
 .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
 .chip { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border2); background: none; color: var(--muted); cursor: pointer; transition: var(--trans); font-family: 'DM Sans', sans-serif; }
 .chip:hover { border-color: var(--purple); color: var(--purple); }
@@ -175,9 +154,6 @@ body {
 .filter-spacer { flex: 1; }
 .sort-sel { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 6px 10px; border-radius: var(--r); font-size: 12px; outline: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); }
 
-/* ══════════════════════════════════════
-   TABLE
-══════════════════════════════════════ */
 .tbl-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; transition: var(--trans); }
 .tbl-hdr { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); }
 .tbl-title { font-size: 13px; font-weight: 600; }
@@ -191,7 +167,6 @@ td { padding: 10px 14px; font-size: 12.5px; border-bottom: 1px solid var(--borde
 tr:last-child td { border-bottom: none; }
 tbody tr { transition: background .1s; }
 tbody tr:hover { background: var(--s2); }
-
 .amt-cell { font-family: var(--mono); font-weight: 600; }
 .stb { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
 .stb-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -207,9 +182,7 @@ tbody tr:hover { background: var(--s2); }
 .del-btn:hover { background: rgba(240,85,85,.18); }
 .cat-pill { font-size: 11px; background: var(--s3); padding: 3px 9px; border-radius: 5px; color: var(--muted); transition: var(--trans); }
 
-/* ══════════════════════════════════════
-   MODAL & FORMS
-══════════════════════════════════════ */
+/* ══════════════════════════════════════ MODALS & FORMS */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
 .modal { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 24px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: var(--trans); }
 .modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -229,9 +202,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
 .submit-btn { background: var(--purple2); border: none; color: #fff; padding: 10px 22px; border-radius: var(--r); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: var(--trans); display: flex; align-items: center; gap: 7px; }
 .submit-btn:hover { opacity: .88; }
 .submit-btn:disabled { opacity: .4; cursor: not-allowed; }
-.form-msg { font-size: 12px; font-family: var(--mono); }
-.form-msg.ok  { color: var(--green); }
-.form-msg.err { color: var(--red); }
 
 /* VENDORS GRID */
 .vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
@@ -257,7 +227,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
 </head>
 <body>
 
-<!-- ══════════════════════════════════════ MODAL: ADD VENDOR -->
 <div class="modal-overlay" id="vendorModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -278,7 +247,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
   </div>
 </div>
 
-<!-- ══════════════════════════════════════ SIDEBAR -->
 <aside class="sidebar">
   <div class="sb-logo">
     <div class="sb-mark">S</div>
@@ -317,18 +285,17 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
   </div>
 </aside>
 
-<!-- ══════════════════════════════════════ MAIN -->
 <div class="main">
 
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
+    
     <div class="search-wrap">
       <i class="ti ti-search"></i>
-      <input class="search-input" id="searchQ" placeholder="Search vendor, item, bank…" oninput="applyFilters()"/>
+      <input class="search-input" id="searchQ" placeholder="Search vendor, item, bank…" onkeypress="if(event.key === 'Enter') executeSearch()"/>
+      <button class="search-btn" onclick="executeSearch()">Search</button>
     </div>
     
-    <!-- THEME TOGGLE BUTTON ADDED HERE -->
     <button class="tb-btn" onclick="toggleTheme()" title="Switch Light/Dark Mode">
       <i class="ti ti-moon" id="themeIcon"></i>
     </button>
@@ -339,10 +306,8 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
     </button>
   </header>
 
-  <!-- CONTENT -->
   <div class="content" id="content">
 
-    <!-- ── DASHBOARD ── -->
     <div id="v-dash">
       <div class="sec-label">Summary</div>
       <div class="cards-grid">
@@ -373,22 +338,19 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
 
       <div class="charts-row">
-        <!-- Category Bar Chart -->
         <div class="chart-card">
           <div class="chart-hdr">
             <div class="chart-title">Category-wise Spend</div>
           </div>
           <div style="position:relative;height:240px">
-            <canvas id="catChart" role="img" aria-label="Bar chart showing spending by category">Category-wise spend breakdown.</canvas>
+            <canvas id="catChart"></canvas>
           </div>
         </div>
 
-        <!-- Paid / Unpaid Donut -->
         <div class="chart-card">
           <div class="chart-hdr">
             <div class="chart-title">Paid vs Unpaid Bills</div>
           </div>
-          <!-- Custom legend above -->
           <div style="display:flex;gap:16px;margin-bottom:14px;font-size:12px;color:var(--muted)">
             <span style="display:flex;align-items:center;gap:5px">
               <span style="width:10px;height:10px;border-radius:2px;background:#20cf78;display:inline-block"></span>
@@ -404,7 +366,7 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
             </span>
           </div>
           <div class="donut-wrap" style="height:190px;position:relative;display:flex;align-items:center;justify-content:center">
-            <canvas id="statusChart" role="img" aria-label="Doughnut chart showing paid vs unpaid vs overdue bill counts">Paid vs unpaid bills.</canvas>
+            <canvas id="statusChart"></canvas>
             <div class="donut-center" id="donutCenter">
               <div class="donut-center-val" id="donut-val">0</div>
               <div class="donut-center-lbl">Total Bills</div>
@@ -414,7 +376,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-    <!-- ── BILLS ── -->
     <div id="v-bills" style="display:none">
       <div class="filter-row">
         <button class="chip active" onclick="setFilter('all',this)">All</button>
@@ -459,7 +420,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-    <!-- ── ADD PAYMENT ── -->
     <div id="v-add" style="display:none">
       <div class="sec-label">New Payment</div>
       <div class="form-card">
@@ -521,7 +481,6 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-    <!-- ── VENDORS ── -->
     <div id="v-vend" style="display:none">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <div class="sec-label" style="margin-bottom:0;">Vendor Directory</div>
@@ -534,11 +493,7 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-
-<!-- TOAST -->
-<div class="toast" id="toast">
+  </div></div><div class="toast" id="toast">
   <i class="ti ti-check" style="font-size:16px"></i>
   <span id="toastMsg"></span>
 </div>
@@ -551,10 +506,9 @@ function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('finance_theme', next); // Saves your choice!
+  localStorage.setItem('finance_theme', next);
   updateThemeIcon(next);
   
-  // Re-render chart text colors dynamically
   if(catChartInst) renderCatChart();
 }
 
@@ -566,35 +520,34 @@ function updateThemeIcon(theme) {
     icon.className = 'ti ti-moon';
   }
 }
-// Set initial icon on load
 updateThemeIcon(savedTheme);
 
 
 // ══════════════════════════════════════
-// CONFIG — Replace with your Apps Script Web App URL
+// CONFIG
 // ══════════════════════════════════════
 const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 
-// ── STATE ──
 let bills = [], vendors = [], vendorMap = {};
 let activeFilter = 'all', sortDir = {};
 let catChartInst = null, statusChartInst = null;
-
 const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34d39a','#fbbf24'];
 
-// ── HELPERS ──
 function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
 function norm(s){ return String(s||'').toLowerCase().trim(); }
 
 // ══════════════════════════════════════
-// MODALS
+// GLOBAL SEARCH EXECUTION
 // ══════════════════════════════════════
+function executeSearch() {
+  // This forces both the Bills table and the Vendors table to filter based on the search input
+  applyFilters();
+  renderVendors();
+}
+
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-// ══════════════════════════════════════
-// NAV
-// ══════════════════════════════════════
 function nav(page, btn){
   ['dash','bills','add','vend'].forEach(p=>{
     document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none';
@@ -609,13 +562,11 @@ function nav(page, btn){
   };
   document.getElementById('pgTitle').childNodes[0].textContent = titles[page][0] + ' ';
   document.getElementById('pgSub').textContent = titles[page][1];
+  
   if(page === 'bills') applyFilters();
   if(page === 'vend')  renderVendors();
 }
 
-// ══════════════════════════════════════
-// LOAD DATA
-// ══════════════════════════════════════
 async function loadData(){
   setSyncState('loading');
   try {
@@ -626,7 +577,6 @@ async function loadData(){
     const bData = await bRes.json();
     const vData = await vRes.json();
 
-    // Map array rows to objects
     bills = (bData.data || []).slice(1).map((row, i) => ({
       _idx: i + 2,
       'Date':            row[0] || '',
@@ -666,17 +616,12 @@ function loadDemo(){
     {_idx:4,'Vendor Name':'CloudBase','Item':'Hosting','Category':'Infrastructure','Amount':8200,'Date':'2024-04-28','Status':'Overdue','Bank Name':'SBI','Account Details':'XXXX-9012','IFSC Code':'SBIN0009012','Qty':1},
     {_idx:5,'Vendor Name':'DesignStudio','Item':'Brand Assets','Category':'Design','Amount':32000,'Date':'2024-05-15','Status':'Pending','Bank Name':'Axis Bank','Account Details':'XXXX-3456','IFSC Code':'UTIB0003456','Qty':1},
     {_idx:6,'Vendor Name':'TechCorp Ltd','Item':'Annual Support','Category':'Software','Amount':18000,'Date':'2024-05-03','Status':'Paid','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1},
-    {_idx:7,'Vendor Name':'OfficePro','Item':'Stationery','Category':'Office','Amount':3400,'Date':'2024-04-20','Status':'Overdue','Bank Name':'Kotak Bank','Account Details':'XXXX-7890','IFSC Code':'KKBK0007890','Qty':1},
-    {_idx:8,'Vendor Name':'QuickShip','Item':'Courier Batch','Category':'Logistics','Amount':6800,'Date':'2024-05-18','Status':'Paid','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678','Qty':3},
-    {_idx:9,'Vendor Name':'SaaSPlatform','Item':'CRM License','Category':'Software','Amount':22000,'Date':'2024-05-12','Status':'Pending','Bank Name':'Axis Bank','Account Details':'XXXX-6543','IFSC Code':'UTIB0006543','Qty':1},
   ];
   vendors = [
     {'Vendor Name':'TechCorp Ltd','Item':'Software License','Category':'Software','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234'},
     {'Vendor Name':'QuickShip','Item':'Delivery Services','Category':'Logistics','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678'},
     {'Vendor Name':'CloudBase','Item':'Hosting','Category':'Infrastructure','Bank Name':'SBI','Account Details':'XXXX-9012','IFSC Code':'SBIN0009012'},
     {'Vendor Name':'DesignStudio','Item':'Brand Assets','Category':'Design','Bank Name':'Axis Bank','Account Details':'XXXX-3456','IFSC Code':'UTIB0003456'},
-    {'Vendor Name':'OfficePro','Item':'Stationery','Category':'Office','Bank Name':'Kotak Bank','Account Details':'XXXX-7890','IFSC Code':'KKBK0007890'},
-    {'Vendor Name':'SaaSPlatform','Item':'CRM License','Category':'Software','Bank Name':'Axis Bank','Account Details':'XXXX-6543','IFSC Code':'UTIB0006543'},
   ];
   buildVendorMap();
   refresh();
@@ -691,13 +636,9 @@ function refresh(){
   updateCards();
   renderCharts();
   renderVendorDropdown();
-  applyFilters();
-  renderVendors();
+  executeSearch();
 }
 
-// ══════════════════════════════════════
-// CARDS
-// ══════════════════════════════════════
 function updateCards(){
   const pending = bills.filter(b => norm(b.Status) === 'pending');
   const paid    = bills.filter(b => norm(b.Status) === 'paid');
@@ -715,9 +656,6 @@ function updateCards(){
   document.getElementById('cd-overdue-n').textContent= overdue.length + ' bill' + (overdue.length!==1?'s':'');
 }
 
-// ══════════════════════════════════════
-// CHARTS
-// ══════════════════════════════════════
 function renderCharts(){
   renderCatChart();
   renderStatusChart();
@@ -732,7 +670,6 @@ function renderCatChart(){
   const labels = Object.keys(catMap);
   const values = Object.values(catMap);
 
-  // Use dynamic colors based on current theme
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   const axisColor = isLight ? '#6b7280' : '#717899';
   const gridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)';
@@ -756,17 +693,8 @@ function renderCatChart(){
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: {
-          ticks: { color: axisColor, font: { size: 10, family: 'DM Sans' } },
-          grid:  { color: gridColor }
-        },
-        y: {
-          ticks: {
-            color: axisColor, font: { size: 10, family: 'DM Mono' },
-            callback: v => '₹' + Number(v).toLocaleString('en-IN')
-          },
-          grid: { color: gridColor }
-        }
+        x: { ticks: { color: axisColor, font: { size: 10, family: 'DM Sans' } }, grid: { color: gridColor } },
+        y: { ticks: { color: axisColor, font: { size: 10, family: 'DM Mono' }, callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid: { color: gridColor } }
       }
     }
   });
@@ -797,25 +725,10 @@ function renderStatusChart(){
         hoverOffset: 8
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '72%',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' bill' + (ctx.parsed!==1?'s':'')
-          }
-        }
-      }
-    }
+    options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
   });
 }
 
-// ══════════════════════════════════════
-// BILLS TABLE
-// ══════════════════════════════════════
 function setFilter(f, btn){
   activeFilter = f;
   document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
@@ -872,7 +785,6 @@ function renderBillsTable(rows){
 
   body.innerHTML = rows.map(b => {
     const st  = norm(b.Status);
-    const stHtml = `<span class="stb ${st}"><span class="stb-dot"></span>${b.Status||'—'}</span>`;
     return `<tr>
       <td style="font-weight:600">${b['Vendor Name']||'—'}</td>
       <td>${b.Item||'—'}</td>
@@ -881,16 +793,12 @@ function renderBillsTable(rows){
       <td style="color:var(--muted);font-family:var(--mono);font-size:11px">${b.Date||'—'}</td>
       <td>
         <select class="st-sel" onchange="changeStatus(${b._idx}, this.value)">
-          ${['Pending','Paid','Overdue'].map(o =>
-            `<option${norm(o)===st?' selected':''}>${o}</option>`
-          ).join('')}
+          ${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}
         </select>
       </td>
       <td style="font-size:11px;color:var(--muted)">${b['Bank Name']||'—'}</td>
       <td>
-        <button class="del-btn" onclick="deleteBill(${b._idx})">
-          <i class="ti ti-trash"></i>
-        </button>
+        <button class="del-btn" onclick="deleteBill(${b._idx})"><i class="ti ti-trash"></i></button>
       </td>
     </tr>`;
   }).join('');
@@ -910,9 +818,7 @@ async function changeStatus(idx, status){
 async function deleteBill(idx){
   if(!confirm('Delete this bill? This cannot be undone.')) return;
   bills = bills.filter(b => b._idx !== idx);
-  updateCards();
-  renderCharts();
-  applyFilters();
+  updateCards(); renderCharts(); applyFilters();
   toast('Bill deleted', 'ok');
   try {
     await fetch(API, { method:'POST', body: JSON.stringify({ action:'deleteBill', rowIndex:idx }) });
@@ -920,9 +826,6 @@ async function deleteBill(idx){
   } catch(e){}
 }
 
-// ══════════════════════════════════════
-// ADD PAYMENT FORM
-// ══════════════════════════════════════
 function renderVendorDropdown(){
   const sel = document.getElementById('f-vendor');
   const cur = sel.value;
@@ -975,7 +878,13 @@ async function submitBill(){
   updateCards(); renderCharts(); applyFilters();
   msg.className='form-msg ok'; msg.textContent='✓ Bill added!';
   toast('Bill added successfully', 'ok');
-  resetForm();
+  
+  ['f-vendor','f-item','f-category','f-amount','f-bank','f-account','f-ifsc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-date').value   = new Date().toISOString().slice(0,10);
+  document.getElementById('f-status').value = 'Pending';
+  
   btn.disabled = false;
   btn.innerHTML = '<i class="ti ti-send"></i> Submit Payment';
 
@@ -992,17 +901,6 @@ async function submitBill(){
   } catch(e){}
 }
 
-function resetForm(){
-  ['f-vendor','f-item','f-category','f-amount','f-bank','f-account','f-ifsc'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('f-date').value   = new Date().toISOString().slice(0,10);
-  document.getElementById('f-status').value = 'Pending';
-}
-
-// ══════════════════════════════════════
-// VENDORS PAGE
-// ══════════════════════════════════════
 function renderVendors(){
   const q    = (document.getElementById('searchQ').value || '').toLowerCase();
   const grid = document.getElementById('vendGrid');
@@ -1067,9 +965,6 @@ async function submitVendor() {
   } catch(e) {}
 }
 
-// ══════════════════════════════════════
-// SYNC STATE
-// ══════════════════════════════════════
 function setSyncState(s){
   const el = document.getElementById('syncTxt');
   const dot = document.querySelector('.pulse');
@@ -1085,9 +980,6 @@ function setSyncState(s){
   }
 }
 
-// ══════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════
 let toastTimer;
 function toast(msg, type='ok'){
   const el = document.getElementById('toast');
@@ -1100,9 +992,6 @@ function toast(msg, type='ok'){
   toastTimer = setTimeout(() => { el.className = 'toast'; }, 2800);
 }
 
-// ══════════════════════════════════════
-// INIT
-// ══════════════════════════════════════
 document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
 loadData();
 </script>
