@@ -155,7 +155,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 .toast { position: fixed; bottom: 20px; right: 20px; background: var(--s1); border: 1px solid var(--border2); border-radius: var(--r2); padding: 12px 18px; font-size: 12px; display: flex; align-items: center; gap: 8px; z-index: 9999; transform: translateY(70px); opacity: 0; transition: .3s; }
 .toast.show { transform: translateY(0); opacity: 1; }
 
-/* ── VENDORS GRID (FIXED) ── */
+/* VENDORS GRID */
 .vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 .vend-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px; transition: var(--trans); }
 .vend-card:hover { border-color: var(--border2); transform: translateY(-2px); }
@@ -167,7 +167,6 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 .sec-label { font-size: 10px; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
 .empty { text-align: center; padding: 48px 20px; color: var(--muted); grid-column: 1 / -1; }
 .empty i { font-size: 32px; margin-bottom: 10px; opacity: .25; display: block; }
-
 </style>
 </head>
 <body>
@@ -309,8 +308,9 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
           <div class="fg"><label>Date</label><input id="f-date" type="date" class="fc"/></div>
           
           <div class="fg full" style="margin-top: 10px;">
-            <label>Upload Invoice (Optional)</label>
-            <input type="file" id="f-invoice" class="fc" accept="image/*,.pdf"/>
+            <label>Upload Invoice(s) (Optional)</label>
+            <input type="file" id="f-invoice" class="fc" accept="image/*,.pdf" multiple/>
+            <span style="font-size:10px; color:var(--muted); margin-top:4px;">You can select multiple files at once.</span>
           </div>
 
           <div class="fg" style="display:none;"><input id="f-bank"/><input id="f-account"/><input id="f-ifsc"/></div>
@@ -335,7 +335,6 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 <div class="toast" id="toast"><i class="ti ti-check" style="font-size:16px"></i><span id="toastMsg"></span></div>
 
 <script>
-// Register DataLabels Plugin for Charts
 Chart.register(ChartDataLabels);
 
 // ── THEME TOGGLE ──
@@ -349,7 +348,7 @@ function toggleTheme() {
 document.getElementById('themeIcon').className = savedTheme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
 
 // ── CONFIG ──
-const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
+const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // AAPKA APPS SCRIPT URL YAHAN HAI
 let bills = [], vendors = [], vendorMap = {};
 let activeFilter = 'all', sortDir = {};
 let pendingUtrChange = null;
@@ -402,60 +401,22 @@ async function loadData(){
 function buildVendorMap(){ vendorMap = {}; vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; }); }
 function refresh(){ updateCards(); renderCharts(); renderVendorDropdown(); executeSearch(); }
 
-// ── FIXED CARDS COUNT ──
 function updateCards(){
-  const p = bills.filter(b => norm(b.Status) === 'pending');
-  const d = bills.filter(b => norm(b.Status) === 'paid');
-  const o = bills.filter(b => norm(b.Status) === 'overdue');
+  const p = bills.filter(b => norm(b.Status) === 'pending'), d = bills.filter(b => norm(b.Status) === 'paid'), o = bills.filter(b => norm(b.Status) === 'overdue');
   const sum = arr => arr.reduce((a,b) => a + Number(b.Amount||0), 0);
-  
-  document.getElementById('cd-count').textContent = bills.length; 
-  document.getElementById('cd-total').textContent = fmt(sum(bills)) + ' value';
-  
-  document.getElementById('cd-pending').textContent = fmt(sum(p)); 
-  document.getElementById('cd-pending-n').textContent = p.length + ' bills';
-  
-  document.getElementById('cd-paid').textContent = fmt(sum(d)); 
-  document.getElementById('cd-paid-n').textContent = d.length + ' bills';
-  
-  document.getElementById('cd-overdue').textContent = fmt(sum(o));
-  document.getElementById('cd-overdue-n').textContent = o.length + ' bills';
+  document.getElementById('cd-count').textContent = bills.length; document.getElementById('cd-total').textContent = fmt(sum(bills)) + ' value';
+  document.getElementById('cd-pending').textContent = fmt(sum(p)); document.getElementById('cd-pending-n').textContent = p.length + ' bills';
+  document.getElementById('cd-paid').textContent = fmt(sum(d)); document.getElementById('cd-paid-n').textContent = d.length + ' bills';
+  document.getElementById('cd-overdue').textContent = fmt(sum(o)); document.getElementById('cd-overdue-n').textContent = o.length + ' bills';
 }
 
 function renderCharts(){
   const catMap = {}; bills.forEach(b => { const c = b.Category || 'Other'; catMap[c] = (catMap[c]||0) + Number(b.Amount||0); });
   if(catChartInst) catChartInst.destroy();
-  
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  
   catChartInst = new Chart(document.getElementById('catChart').getContext('2d'), { 
-    type: 'bar', 
-    data: { 
-      labels: Object.keys(catMap), 
-      datasets: [{ data: Object.values(catMap), backgroundColor: COLORS, borderRadius: 7 }] 
-    }, 
-    options: { 
-      responsive: true, maintainAspectRatio: false, 
-      plugins: { 
-        legend: { display: false },
-        datalabels: { // Fixed Graph Labels
-          color: isLight ? '#111' : '#fff',
-          anchor: 'end',
-          align: 'top',
-          font: { weight: 'bold', size: 10, family: 'DM Mono' },
-          formatter: function(val) {
-            if(val >= 100000) return '₹' + (val/100000).toFixed(1) + 'L';
-            if(val >= 1000) return '₹' + (val/1000).toFixed(1) + 'K';
-            return '₹' + val;
-          }
-        }
-      },
-      layout: { padding: { top: 20 } },
-      scales: {
-        x: { ticks: { color: isLight ? '#6b7280' : '#717899' }, grid: { display: false } },
-        y: { ticks: { color: isLight ? '#6b7280' : '#717899', callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid: { color: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)' } }
-      }
-    } 
+    type: 'bar', data: { labels: Object.keys(catMap), datasets: [{ data: Object.values(catMap), backgroundColor: COLORS, borderRadius: 7 }] }, 
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: isLight ? '#111' : '#fff', anchor: 'end', align: 'top', font: { weight: 'bold', size: 10, family: 'DM Mono' }, formatter: function(val) { if(val >= 100000) return '₹' + (val/100000).toFixed(1) + 'L'; if(val >= 1000) return '₹' + (val/1000).toFixed(1) + 'K'; return '₹' + val; } } }, layout: { padding: { top: 20 } }, scales: { x: { ticks: { color: isLight ? '#6b7280' : '#717899' }, grid: { display: false } }, y: { ticks: { color: isLight ? '#6b7280' : '#717899', callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid: { color: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)' } } } } 
   });
 
   const pd = bills.filter(b => norm(b.Status) === 'paid').length, pn = bills.filter(b => norm(b.Status) === 'pending').length, ov = bills.filter(b => norm(b.Status) === 'overdue').length;
@@ -476,6 +437,17 @@ function applyFilters(){
   renderBillsTable(filtered);
 }
 
+function sortCol(key){
+  sortDir[key] = !sortDir[key];
+  bills.sort((a,b) => {
+    const av = a[key]||'', bv = b[key]||'';
+    const na = isNaN(av) ? null : Number(av); const nb = isNaN(bv) ? null : Number(bv);
+    if(na!==null && nb!==null) return sortDir[key] ? na-nb : nb-na;
+    return sortDir[key] ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+  });
+  applyFilters();
+}
+
 function renderBillsTable(rows){
   const body = document.getElementById('billBody');
   if(!rows.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
@@ -486,13 +458,18 @@ function renderBillsTable(rows){
     const statusHtml = isPaid ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div><div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
       : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}</select>`;
 
-    // STRICT INVOICE VIEW CHECK
-    const invUrl = (b.InvoiceURL ? String(b.InvoiceURL) : "").trim();
-    const hasInvoice = invUrl.length > 10 && invUrl.startsWith('http'); 
+    // STRICT MULTIPLE INVOICE LOGIC
+    const invUrlsStr = (b.InvoiceURL ? String(b.InvoiceURL) : "").trim();
+    const invUrls = invUrlsStr.split(',').map(u => u.trim()).filter(u => u.startsWith('http'));
     
-    const invHtml = hasInvoice 
-      ? `<a href="${invUrl}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`
-      : `<span class="cat-pill" style="opacity: 0.5;">No File</span>`;
+    let invHtml = `<span class="cat-pill" style="opacity: 0.5;">No File</span>`;
+    if (invUrls.length === 1) {
+      invHtml = `<a href="${invUrls[0]}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`;
+    } else if (invUrls.length > 1) {
+      invHtml = invUrls.map((url, i) => 
+        `<a href="${url}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none; margin-right: 4px; padding: 3px 6px;">${i+1}</a>`
+      ).join('');
+    }
 
     const actionHtml = isPaid ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
       : `<div class="action-menu">
@@ -578,7 +555,8 @@ function fillVendor(){
   document.getElementById('f-bank').value = v['Bank Name']||''; document.getElementById('f-account').value = v['Account Details']||''; document.getElementById('f-ifsc').value = v['IFSC Code']||''; document.getElementById('f-category').value = v['Category']||'';
 }
 
-function submitBill(){
+// ── MULTIPLE FILE UPLOAD LOGIC ──
+async function submitBill(){
   const btn = document.getElementById('submitBtn'), msg = document.getElementById('formMsg');
   const vendor = document.getElementById('f-vendor').value, amount = document.getElementById('f-amount').value;
   if(!vendor || !amount) { toast('Vendor and Amount required', 'err'); return; }
@@ -586,15 +564,33 @@ function submitBill(){
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Processing...';
   
   const fileInput = document.getElementById('f-invoice');
-  let fileData = "", fileName = "", mimeType = "";
 
-  const sendRequest = async () => {
+  // Read all selected files
+  const readMultipleFiles = async () => {
+    if (fileInput.files.length === 0) return [];
+    const filePromises = Array.from(fileInput.files).map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve({
+          base64: e.target.result.split(',')[1],
+          fileName: file.name,
+          mimeType: file.type
+        });
+        reader.readAsDataURL(file);
+      });
+    });
+    return Promise.all(filePromises);
+  };
+
+  try {
+    const uploadedFiles = await readMultipleFiles();
+
     const newBill = {
       _idx: bills.length + 2, 'Date': document.getElementById('f-date').value, 'Vendor Name': vendor,
       'Item': document.getElementById('f-item').value, 'Category': document.getElementById('f-category').value,
       'Amount': Number(amount), 'Status': 'Pending', 'Bank Name': document.getElementById('f-bank').value,
       'Account Details': document.getElementById('f-account').value, 'IFSC Code': document.getElementById('f-ifsc').value,
-      'Qty': document.getElementById('f-qty').value || 1, 'UTR': '', 'InvoiceURL': ''
+      'Qty': document.getElementById('f-qty').value || 1, 'UTR': '', 'InvoiceURL': '' 
     };
 
     bills.push(newBill); applyFilters(); updateCards(); renderCharts();
@@ -604,52 +600,30 @@ function submitBill(){
     document.getElementById('f-qty').value = "1";
     btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
 
-    try {
-      await fetch(API, {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'addBill',
-          row: [newBill.Date, newBill['Vendor Name'], newBill.Item, newBill.Category, newBill.Amount, newBill.Status, newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR],
-          fileData: fileData, fileName: fileName, mimeType: mimeType
-        })
-      });
-      loadData(); 
-    } catch(e){ toast('Error saving to sheet', 'err'); }
-  };
-
-  if(fileInput.files.length > 0) {
-    const file = fileInput.files[0]; fileName = file.name; mimeType = file.type;
-    const reader = new FileReader();
-    reader.onload = function(e) { fileData = e.target.result.split(',')[1]; sendRequest(); };
-    reader.readAsDataURL(file);
-  } else { sendRequest(); }
+    await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'addBill',
+        row: [newBill.Date, newBill['Vendor Name'], newBill.Item, newBill.Category, newBill.Amount, newBill.Status, newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR],
+        files: uploadedFiles // Sends the array of files to Google Apps Script
+      })
+    });
+    
+    loadData(); // Re-fetch from sheet to get real URLs
+  } catch(e) {
+    toast('Error saving to sheet', 'err');
+    btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
+  }
 }
 
-// ── FIXED VENDOR RENDERER ──
 function renderVendors(){
   const q = document.getElementById('searchQ').value.toLowerCase();
   const list = vendors.filter(v => !q || Object.values(v).some(x => String(x).toLowerCase().includes(q)));
-  
-  if(!list.length){
-    document.getElementById('vendGrid').innerHTML = `<div class="empty"><i class="ti ti-building-store"></i><p>No vendors found</p></div>`;
-    return;
-  }
-  
-  document.getElementById('vendGrid').innerHTML = list.map(v => `
+  document.getElementById('vendGrid').innerHTML = list.length ? list.map(v => `
     <div class="vend-card">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
-        <div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div>
-        <div>
-          <div class="vend-name">${v['Vendor Name']||'—'}</div>
-          <div class="vend-cat">${v.Category||'—'}</div>
-        </div>
-      </div>
-      <div class="vend-info">
-        <div><i class="ti ti-building-bank"></i> ${v['Bank Name']||'—'}</div>
-        <div><i class="ti ti-credit-card"></i> ${v['Account Details']||'—'}</div>
-        <div><i class="ti ti-code"></i> ${v['IFSC Code']||'—'}</div>
-      </div>
-    </div>`).join('');
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px"><div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div><div><div class="vend-name">${v['Vendor Name']||'—'}</div><div class="vend-cat">${v.Category||'—'}</div></div></div>
+      <div class="vend-info"><div><i class="ti ti-building-bank"></i> ${v['Bank Name']||'—'}</div><div><i class="ti ti-credit-card"></i> ${v['Account Details']||'—'}</div><div><i class="ti ti-code"></i> ${v['IFSC Code']||'—'}</div></div>
+    </div>`).join('') : `<div class="empty">No vendors found</div>`;
 }
 
 async function submitVendor() {
