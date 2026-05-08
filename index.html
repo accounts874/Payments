@@ -157,7 +157,8 @@ body {
 .tbl-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; transition: var(--trans); }
 .tbl-hdr { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); }
 .tbl-title { font-size: 13px; font-weight: 600; }
-.tbl-count { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.tbl-count { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-left: 10px; }
+.tbl-total { font-size: 12px; color: var(--green); font-weight: 600; margin-left: 15px; background: var(--g-soft); padding: 3px 8px; border-radius: 6px; }
 .tbl-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 720px; }
 thead tr { background: var(--s2); transition: var(--trans); }
@@ -167,6 +168,7 @@ td { padding: 10px 14px; font-size: 12.5px; border-bottom: 1px solid var(--borde
 tr:last-child td { border-bottom: none; }
 tbody tr { transition: background .1s; }
 tbody tr:hover { background: var(--s2); }
+
 .amt-cell { font-family: var(--mono); font-weight: 600; }
 .stb { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
 .stb-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -243,6 +245,25 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
     </div>
     <div style="margin-top:20px; display:flex; gap:10px;">
       <button class="submit-btn" onclick="submitVendor()"><i class="ti ti-device-floppy"></i> Save Vendor</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="utrModal">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal-hdr">
+      <h3>Enter Payment Details</h3>
+      <button class="close-btn" onclick="cancelUtr()"><i class="ti ti-x"></i></button>
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Please provide a unique UTR or Payment ID to mark this bill as paid. Once marked, this entry will be locked.</p>
+    <div class="form-grid">
+      <div class="fg full">
+        <label>UTR / Payment ID</label>
+        <input id="u-utr" class="fc" placeholder="e.g. UTR1234567890"/>
+      </div>
+    </div>
+    <div style="margin-top:20px; display:flex; gap:10px;">
+      <button class="submit-btn" onclick="submitUtr()"><i class="ti ti-check"></i> Confirm Payment</button>
     </div>
   </div>
 </div>
@@ -393,8 +414,11 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
       </div>
       <div class="tbl-card">
         <div class="tbl-hdr">
-          <span class="tbl-title">Transactions</span>
-          <span class="tbl-count" id="billCount">— rows</span>
+          <div>
+            <span class="tbl-title">Transactions</span>
+            <span class="tbl-count" id="billCount">— rows</span>
+            <span class="tbl-total" id="filteredTotal">Filtered Total: ₹0</span>
+          </div>
         </div>
         <div class="tbl-scroll">
           <table>
@@ -407,7 +431,7 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
                 <th onclick="sortCol('Date')">Date <i class="ti ti-selector" style="font-size:11px"></i></th>
                 <th>Status</th>
                 <th>Bank</th>
-                <th></th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="billBody">
@@ -453,10 +477,8 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
           </div>
           <div class="fg">
             <label>Status</label>
-            <select id="f-status" class="fc">
-              <option>Pending</option>
-              <option>Paid</option>
-              <option>Overdue</option>
+            <select id="f-status" class="fc" disabled title="New entries begin as Pending. You can mark as Paid later with UTR.">
+              <option selected>Pending</option>
             </select>
           </div>
           <div class="fg">
@@ -474,7 +496,7 @@ label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: 
         </div>
         <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
           <button class="submit-btn" id="submitBtn" onclick="submitBill()">
-            <i class="ti ti-send"></i> Submit Payment
+            <i class="ti ti-send"></i> Submit Entry
           </button>
           <span class="form-msg" id="formMsg"></span>
         </div>
@@ -508,17 +530,12 @@ function toggleTheme() {
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('finance_theme', next);
   updateThemeIcon(next);
-  
   if(catChartInst) renderCatChart();
 }
 
 function updateThemeIcon(theme) {
   const icon = document.getElementById('themeIcon');
-  if (theme === 'light') {
-    icon.className = 'ti ti-sun';
-  } else {
-    icon.className = 'ti ti-moon';
-  }
+  icon.className = theme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
 }
 updateThemeIcon(savedTheme);
 
@@ -530,6 +547,7 @@ const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587
 
 let bills = [], vendors = [], vendorMap = {};
 let activeFilter = 'all', sortDir = {};
+let pendingUtrChange = null; // Stores row info when modal opens
 let catChartInst = null, statusChartInst = null;
 const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34d39a','#fbbf24'];
 
@@ -540,18 +558,23 @@ function norm(s){ return String(s||'').toLowerCase().trim(); }
 // GLOBAL SEARCH EXECUTION
 // ══════════════════════════════════════
 function executeSearch() {
-  // This forces both the Bills table and the Vendors table to filter based on the search input
   applyFilters();
   renderVendors();
 }
 
+// ══════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+// ══════════════════════════════════════
+// NAV
+// ══════════════════════════════════════
 function nav(page, btn){
   ['dash','bills','add','vend'].forEach(p=>{
     document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none';
-    document.getElementById('n-'+p).classList.remove('active');
+    if (document.getElementById('n-'+p)) document.getElementById('n-'+p).classList.remove('active');
   });
   if(btn) btn.classList.add('active');
   const titles = {
@@ -567,6 +590,9 @@ function nav(page, btn){
   if(page === 'vend')  renderVendors();
 }
 
+// ══════════════════════════════════════
+// LOAD DATA
+// ══════════════════════════════════════
 async function loadData(){
   setSyncState('loading');
   try {
@@ -588,7 +614,8 @@ async function loadData(){
       'Bank Name':       row[6] || '',
       'Account Details': row[7] || '',
       'IFSC Code':       row[8] || '',
-      'Qty':             row[9] || 1
+      'Qty':             row[9] || 1,
+      'UTR':             row[10] || '' // The new UTR column mapped
     }));
     vendors = (vData.data || []).slice(1).map(r => ({
       'Vendor Name':     r[0] || '',
@@ -611,17 +638,12 @@ async function loadData(){
 
 function loadDemo(){
   bills = [
-    {_idx:2,'Vendor Name':'TechCorp Ltd','Item':'Software License','Category':'Software','Amount':45000,'Date':'2024-05-01','Status':'Paid','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1},
-    {_idx:3,'Vendor Name':'QuickShip','Item':'Delivery Services','Category':'Logistics','Amount':12500,'Date':'2024-05-10','Status':'Pending','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678','Qty':1},
-    {_idx:4,'Vendor Name':'CloudBase','Item':'Hosting','Category':'Infrastructure','Amount':8200,'Date':'2024-04-28','Status':'Overdue','Bank Name':'SBI','Account Details':'XXXX-9012','IFSC Code':'SBIN0009012','Qty':1},
-    {_idx:5,'Vendor Name':'DesignStudio','Item':'Brand Assets','Category':'Design','Amount':32000,'Date':'2024-05-15','Status':'Pending','Bank Name':'Axis Bank','Account Details':'XXXX-3456','IFSC Code':'UTIB0003456','Qty':1},
-    {_idx:6,'Vendor Name':'TechCorp Ltd','Item':'Annual Support','Category':'Software','Amount':18000,'Date':'2024-05-03','Status':'Paid','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1},
+    {_idx:2,'Vendor Name':'TechCorp Ltd','Item':'Software','Category':'Software','Amount':45000,'Date':'2024-05-01','Status':'Paid','Bank Name':'HDFC','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234','Qty':1, 'UTR':'UTR849202'},
+    {_idx:3,'Vendor Name':'QuickShip','Item':'Delivery','Category':'Logistics','Amount':12500,'Date':'2024-05-10','Status':'Pending','Bank Name':'ICICI','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678','Qty':1, 'UTR':''},
   ];
   vendors = [
     {'Vendor Name':'TechCorp Ltd','Item':'Software License','Category':'Software','Bank Name':'HDFC Bank','Account Details':'XXXX-1234','IFSC Code':'HDFC0001234'},
     {'Vendor Name':'QuickShip','Item':'Delivery Services','Category':'Logistics','Bank Name':'ICICI Bank','Account Details':'XXXX-5678','IFSC Code':'ICIC0005678'},
-    {'Vendor Name':'CloudBase','Item':'Hosting','Category':'Infrastructure','Bank Name':'SBI','Account Details':'XXXX-9012','IFSC Code':'SBIN0009012'},
-    {'Vendor Name':'DesignStudio','Item':'Brand Assets','Category':'Design','Bank Name':'Axis Bank','Account Details':'XXXX-3456','IFSC Code':'UTIB0003456'},
   ];
   buildVendorMap();
   refresh();
@@ -689,9 +711,7 @@ function renderCatChart(){
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { color: axisColor, font: { size: 10, family: 'DM Sans' } }, grid: { color: gridColor } },
         y: { ticks: { color: axisColor, font: { size: 10, family: 'DM Mono' }, callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid: { color: gridColor } }
@@ -721,8 +741,7 @@ function renderStatusChart(){
         data: [paid, pending, overdue],
         backgroundColor: ['#20cf78','#f0a830','#f05555'],
         borderColor:     ['#20cf78','#f0a830','#f05555'],
-        borderWidth: 2,
-        hoverOffset: 8
+        borderWidth: 2, hoverOffset: 8
       }]
     },
     options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
@@ -756,6 +775,10 @@ function applyFilters(){
   if(sort === 'date-d') filtered.sort((a,b) => new Date(b.Date) - new Date(a.Date));
   if(sort === 'date-a') filtered.sort((a,b) => new Date(a.Date) - new Date(b.Date));
 
+  // Update Dynamic Filtered Total 
+  const filteredTotal = filtered.reduce((sum, b) => sum + Number(b.Amount || 0), 0);
+  document.getElementById('filteredTotal').textContent = 'Filtered Total: ' + fmt(filteredTotal);
+
   renderBillsTable(filtered);
 }
 
@@ -784,39 +807,98 @@ function renderBillsTable(rows){
   }
 
   body.innerHTML = rows.map(b => {
-    const st  = norm(b.Status);
+    const st = norm(b.Status);
+    const isPaid = st === 'paid';
+    
+    // UI Logic: If Paid, lock the status and show UTR. Else show Dropdown.
+    const statusHtml = isPaid 
+      ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div>
+         <div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
+      : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">
+          ${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}
+         </select>`;
+
+    // UI Logic: If Paid, hide Delete button.
+    const actionHtml = isPaid
+      ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
+      : `<button class="del-btn" onclick="deleteBill(${b._idx})"><i class="ti ti-trash"></i></button>`;
+
     return `<tr>
       <td style="font-weight:600">${b['Vendor Name']||'—'}</td>
       <td>${b.Item||'—'}</td>
       <td><span class="cat-pill">${b.Category||'—'}</span></td>
       <td class="amt-cell">${fmt(b.Amount)}</td>
       <td style="color:var(--muted);font-family:var(--mono);font-size:11px">${b.Date||'—'}</td>
-      <td>
-        <select class="st-sel" onchange="changeStatus(${b._idx}, this.value)">
-          ${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}
-        </select>
-      </td>
+      <td>${statusHtml}</td>
       <td style="font-size:11px;color:var(--muted)">${b['Bank Name']||'—'}</td>
-      <td>
-        <button class="del-btn" onclick="deleteBill(${b._idx})"><i class="ti ti-trash"></i></button>
-      </td>
+      <td>${actionHtml}</td>
     </tr>`;
   }).join('');
 }
 
-async function changeStatus(idx, status){
+// ══════════════════════════════════════
+// STATUS CHANGE & UTR LOGIC
+// ══════════════════════════════════════
+function initChangeStatus(idx, status, selectEl){
+  if (norm(status) === 'paid') {
+    pendingUtrChange = { idx, selectEl };
+    document.getElementById('u-utr').value = '';
+    openModal('utrModal');
+  } else {
+    // Process Overdue / Pending directly without UTR
+    executeStatusChange(idx, status, '');
+  }
+}
+
+function cancelUtr() {
+  if(pendingUtrChange) {
+    // Revert dropdown UI back to original state (assuming it was not paid)
+    const b = bills.find(x => x._idx === pendingUtrChange.idx);
+    pendingUtrChange.selectEl.value = b ? b.Status : 'Pending'; 
+    pendingUtrChange = null;
+  }
+  closeModal('utrModal');
+}
+
+function submitUtr() {
+  const utr = document.getElementById('u-utr').value.trim();
+  if(!utr) return toast('UTR / Payment ID is required!', 'err');
+  
+  // Unique Verification
+  if(bills.some(b => norm(b.UTR) === norm(utr))) {
+    return toast('Duplicate UTR! This ID already exists.', 'err');
+  }
+
+  const { idx } = pendingUtrChange;
+  closeModal('utrModal');
+  pendingUtrChange = null;
+
+  executeStatusChange(idx, 'Paid', utr);
+}
+
+async function executeStatusChange(idx, status, utr){
   const b = bills.find(x => x._idx === idx);
-  if(b) b.Status = status;
+  if(b) {
+    b.Status = status;
+    if(utr) b.UTR = utr;
+  }
+  
   updateCards();
   renderStatusChart();
-  toast('Status updated → ' + status, 'ok');
+  applyFilters(); // Re-renders table to lock/unlock row
+  
+  toast('Status updated to ' + status, 'ok');
+  
   try {
-    await fetch(API, { method:'POST', body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status }) });
+    await fetch(API, { 
+      method:'POST', 
+      body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status: status, utr: utr }) 
+    });
   } catch(e){}
 }
 
 async function deleteBill(idx){
-  if(!confirm('Delete this bill? This cannot be undone.')) return;
+  if(!confirm('Delete this pending bill? This cannot be undone.')) return;
   bills = bills.filter(b => b._idx !== idx);
   updateCards(); renderCharts(); applyFilters();
   toast('Bill deleted', 'ok');
@@ -826,6 +908,9 @@ async function deleteBill(idx){
   } catch(e){}
 }
 
+// ══════════════════════════════════════
+// ADD PAYMENT FORM
+// ══════════════════════════════════════
 function renderVendorDropdown(){
   const sel = document.getElementById('f-vendor');
   const cur = sel.value;
@@ -867,11 +952,12 @@ async function submitBill(){
     'Item':            document.getElementById('f-item').value,
     'Category':        document.getElementById('f-category').value,
     'Amount':          Number(amount),
-    'Status':          document.getElementById('f-status').value,
+    'Status':          'Pending', // Enforced Pending State natively
     'Bank Name':       document.getElementById('f-bank').value,
     'Account Details': document.getElementById('f-account').value,
     'IFSC Code':       document.getElementById('f-ifsc').value,
-    'Qty': 1
+    'Qty': 1,
+    'UTR': ''
   };
 
   bills.push(newBill);
@@ -886,21 +972,25 @@ async function submitBill(){
   document.getElementById('f-status').value = 'Pending';
   
   btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-send"></i> Submit Payment';
+  btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
 
   try {
+    // Array order: Date, Vendor, Item, Category, Amount, Status, Bank, Acc, IFSC, Qty, UTR
     await fetch(API, {
       method: 'POST',
       body: JSON.stringify({
         action: 'addBill',
         row: [newBill.Date, newBill['Vendor Name'], newBill.Item,
               newBill.Category, newBill.Amount, newBill.Status,
-              newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty]
+              newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR]
       })
     });
   } catch(e){}
 }
 
+// ══════════════════════════════════════
+// VENDORS PAGE
+// ══════════════════════════════════════
 function renderVendors(){
   const q    = (document.getElementById('searchQ').value || '').toLowerCase();
   const grid = document.getElementById('vendGrid');
