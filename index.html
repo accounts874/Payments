@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
 <script>
   const savedTheme = localStorage.getItem('finance_theme') || 'dark';
@@ -15,7 +16,7 @@
 </script>
 
 <style>
-/* ── BASE STYLES ── */
+/* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; scroll-behavior: smooth; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--txt); height: 100vh; overflow: hidden; display: flex; transition: background var(--trans), color var(--trans); }
@@ -153,6 +154,20 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 @keyframes spin { to { transform: rotate(360deg); } }
 .toast { position: fixed; bottom: 20px; right: 20px; background: var(--s1); border: 1px solid var(--border2); border-radius: var(--r2); padding: 12px 18px; font-size: 12px; display: flex; align-items: center; gap: 8px; z-index: 9999; transform: translateY(70px); opacity: 0; transition: .3s; }
 .toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── VENDORS GRID (FIXED) ── */
+.vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.vend-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px; transition: var(--trans); }
+.vend-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.vend-avatar { width: 42px; height: 42px; border-radius: 12px; background: var(--p-glow); border: 1px solid rgba(139,124,248,.22); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--purple); flex-shrink: 0; }
+.vend-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.vend-cat { font-size: 11px; color: var(--muted); margin-bottom: 14px; background: var(--s2); padding: 3px 8px; border-radius: 4px; display: inline-block;}
+.vend-info { font-size: 12px; color: var(--muted); font-family: var(--mono); line-height: 2; }
+.vend-info i { font-size: 14px; margin-right: 6px; vertical-align: -2px; }
+.sec-label { font-size: 10px; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+.empty { text-align: center; padding: 48px 20px; color: var(--muted); grid-column: 1 / -1; }
+.empty i { font-size: 32px; margin-bottom: 10px; opacity: .25; display: block; }
+
 </style>
 </head>
 <body>
@@ -320,6 +335,9 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 <div class="toast" id="toast"><i class="ti ti-check" style="font-size:16px"></i><span id="toastMsg"></span></div>
 
 <script>
+// Register DataLabels Plugin for Charts
+Chart.register(ChartDataLabels);
+
 // ── THEME TOGGLE ──
 function toggleTheme() {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -331,7 +349,7 @@ function toggleTheme() {
 document.getElementById('themeIcon').className = savedTheme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
 
 // ── CONFIG ──
-const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // AAPKA APPS SCRIPT URL YAHAN HAI
+const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec";
 let bills = [], vendors = [], vendorMap = {};
 let activeFilter = 'all', sortDir = {};
 let pendingUtrChange = null;
@@ -341,7 +359,6 @@ const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34
 function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
 function norm(s){ return String(s||'').toLowerCase().trim(); }
 
-// Close menus when clicking outside
 window.onclick = function(event) {
   if (!event.target.matches('.action-btn')) {
     document.querySelectorAll('.action-content.show').forEach(el => el.classList.remove('show'));
@@ -385,21 +402,65 @@ async function loadData(){
 function buildVendorMap(){ vendorMap = {}; vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; }); }
 function refresh(){ updateCards(); renderCharts(); renderVendorDropdown(); executeSearch(); }
 
+// ── FIXED CARDS COUNT ──
 function updateCards(){
-  const p = bills.filter(b => norm(b.Status) === 'pending'), d = bills.filter(b => norm(b.Status) === 'paid'), o = bills.filter(b => norm(b.Status) === 'overdue');
+  const p = bills.filter(b => norm(b.Status) === 'pending');
+  const d = bills.filter(b => norm(b.Status) === 'paid');
+  const o = bills.filter(b => norm(b.Status) === 'overdue');
   const sum = arr => arr.reduce((a,b) => a + Number(b.Amount||0), 0);
-  document.getElementById('cd-count').textContent = bills.length; document.getElementById('cd-total').textContent = fmt(sum(bills)) + ' value';
-  document.getElementById('cd-pending').textContent = fmt(sum(p)); document.getElementById('cd-paid').textContent = fmt(sum(d)); document.getElementById('cd-overdue').textContent = fmt(sum(o));
+  
+  document.getElementById('cd-count').textContent = bills.length; 
+  document.getElementById('cd-total').textContent = fmt(sum(bills)) + ' value';
+  
+  document.getElementById('cd-pending').textContent = fmt(sum(p)); 
+  document.getElementById('cd-pending-n').textContent = p.length + ' bills';
+  
+  document.getElementById('cd-paid').textContent = fmt(sum(d)); 
+  document.getElementById('cd-paid-n').textContent = d.length + ' bills';
+  
+  document.getElementById('cd-overdue').textContent = fmt(sum(o));
+  document.getElementById('cd-overdue-n').textContent = o.length + ' bills';
 }
 
 function renderCharts(){
   const catMap = {}; bills.forEach(b => { const c = b.Category || 'Other'; catMap[c] = (catMap[c]||0) + Number(b.Amount||0); });
   if(catChartInst) catChartInst.destroy();
-  catChartInst = new Chart(document.getElementById('catChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(catMap), datasets: [{ data: Object.values(catMap), backgroundColor: COLORS, borderRadius: 7 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+  
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  
+  catChartInst = new Chart(document.getElementById('catChart').getContext('2d'), { 
+    type: 'bar', 
+    data: { 
+      labels: Object.keys(catMap), 
+      datasets: [{ data: Object.values(catMap), backgroundColor: COLORS, borderRadius: 7 }] 
+    }, 
+    options: { 
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { 
+        legend: { display: false },
+        datalabels: { // Fixed Graph Labels
+          color: isLight ? '#111' : '#fff',
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold', size: 10, family: 'DM Mono' },
+          formatter: function(val) {
+            if(val >= 100000) return '₹' + (val/100000).toFixed(1) + 'L';
+            if(val >= 1000) return '₹' + (val/1000).toFixed(1) + 'K';
+            return '₹' + val;
+          }
+        }
+      },
+      layout: { padding: { top: 20 } },
+      scales: {
+        x: { ticks: { color: isLight ? '#6b7280' : '#717899' }, grid: { display: false } },
+        y: { ticks: { color: isLight ? '#6b7280' : '#717899', callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid: { color: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)' } }
+      }
+    } 
+  });
 
   const pd = bills.filter(b => norm(b.Status) === 'paid').length, pn = bills.filter(b => norm(b.Status) === 'pending').length, ov = bills.filter(b => norm(b.Status) === 'overdue').length;
   if(statusChartInst) statusChartInst.destroy();
-  statusChartInst = new Chart(document.getElementById('statusChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Paid','Pending','Overdue'], datasets: [{ data: [pd, pn, ov], backgroundColor: ['#20cf78','#f0a830','#f05555'], borderWidth:0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } } });
+  statusChartInst = new Chart(document.getElementById('statusChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Paid','Pending','Overdue'], datasets: [{ data: [pd, pn, ov], backgroundColor: ['#20cf78','#f0a830','#f05555'], borderWidth:0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false }, datalabels: { display: false } } } });
 }
 
 function setFilter(f, btn){
@@ -415,27 +476,24 @@ function applyFilters(){
   renderBillsTable(filtered);
 }
 
-// ── FIXED INVOICE VIEW BUTTON LOGIC ──
 function renderBillsTable(rows){
   const body = document.getElementById('billBody');
   if(!rows.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No records found</td></tr>`;
   
   body.innerHTML = rows.map(b => {
-    const st = norm(b.Status); 
-    const isPaid = st === 'paid';
+    const st = norm(b.Status); const isPaid = st === 'paid';
     
-    // Status
     const statusHtml = isPaid ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div><div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
       : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}</select>`;
 
-    // Invoice Logic STRICT CHECK
-    const invUrl = (b.InvoiceURL || '').toString().trim();
-    const hasInvoice = invUrl.indexOf('http') === 0; // Check if URL really starts with http
+    // STRICT INVOICE VIEW CHECK
+    const invUrl = (b.InvoiceURL ? String(b.InvoiceURL) : "").trim();
+    const hasInvoice = invUrl.length > 10 && invUrl.startsWith('http'); 
+    
     const invHtml = hasInvoice 
       ? `<a href="${invUrl}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`
       : `<span class="cat-pill" style="opacity: 0.5;">No File</span>`;
 
-    // Action Menu (Locked if Paid)
     const actionHtml = isPaid ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
       : `<div class="action-menu">
           <button class="action-btn" onclick="toggleMenu(${b._idx})">⋮</button>
@@ -458,7 +516,6 @@ function renderBillsTable(rows){
   }).join('');
 }
 
-// ── UTR & STATUS ──
 function initChangeStatus(idx, status, selectEl){
   if (norm(status) === 'paid') { pendingUtrChange = { idx, selectEl }; document.getElementById('u-utr').value = ''; openModal('utrModal'); }
   else executeStatusChange(idx, status, '');
@@ -477,7 +534,6 @@ async function executeStatusChange(idx, status, utr){
   try { await fetch(API, { method:'POST', body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status: status, utr: utr }) }); } catch(e){}
 }
 
-// ── EDIT & DELETE BILL ──
 function openEdit(idx) {
   const b = bills.find(x => x._idx === idx);
   if(!b) return;
@@ -488,7 +544,6 @@ function openEdit(idx) {
   document.getElementById('e-qty').value = b.Qty;
   document.getElementById('e-amt').value = b.Amount;
   document.getElementById('e-date').value = b.Date;
-  
   document.querySelectorAll('.action-content').forEach(el => el.classList.remove('show'));
   openModal('editModal');
 }
@@ -514,7 +569,6 @@ async function deleteBill(idx){
   fetch(API, { method:'POST', body: JSON.stringify({ action:'deleteBill', rowIndex:idx }) });
 }
 
-// ── ADD PAYMENT WITH INVOICE ──
 function renderVendorDropdown(){
   const sel = document.getElementById('f-vendor'); sel.innerHTML = '<option value="">— Select vendor —</option>';
   Object.keys(vendorMap).forEach(name => sel.appendChild(new Option(name, name)));
@@ -571,19 +625,35 @@ function submitBill(){
   } else { sendRequest(); }
 }
 
-// ── VENDORS ──
+// ── FIXED VENDOR RENDERER ──
 function renderVendors(){
   const q = document.getElementById('searchQ').value.toLowerCase();
   const list = vendors.filter(v => !q || Object.values(v).some(x => String(x).toLowerCase().includes(q)));
-  document.getElementById('vendGrid').innerHTML = list.length ? list.map(v => `
+  
+  if(!list.length){
+    document.getElementById('vendGrid').innerHTML = `<div class="empty"><i class="ti ti-building-store"></i><p>No vendors found</p></div>`;
+    return;
+  }
+  
+  document.getElementById('vendGrid').innerHTML = list.map(v => `
     <div class="vend-card">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div><div><div class="vend-name">${v['Vendor Name']||'—'}</div><div class="vend-cat">${v.Category||'—'}</div></div></div>
-      <div class="vend-info"><div><i class="ti ti-building-bank"></i>${v['Bank Name']||'—'}</div><div><i class="ti ti-credit-card"></i>${v['Account Details']||'—'}</div><div><i class="ti ti-code"></i>${v['IFSC Code']||'—'}</div></div>
-    </div>`).join('') : `<div class="empty">No vendors found</div>`;
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div class="vend-avatar">${(v['Vendor Name']||'?').slice(0,1).toUpperCase()}</div>
+        <div>
+          <div class="vend-name">${v['Vendor Name']||'—'}</div>
+          <div class="vend-cat">${v.Category||'—'}</div>
+        </div>
+      </div>
+      <div class="vend-info">
+        <div><i class="ti ti-building-bank"></i> ${v['Bank Name']||'—'}</div>
+        <div><i class="ti ti-credit-card"></i> ${v['Account Details']||'—'}</div>
+        <div><i class="ti ti-code"></i> ${v['IFSC Code']||'—'}</div>
+      </div>
+    </div>`).join('');
 }
 
 async function submitVendor() {
-  const name = document.getElementById('v-name').value;
+  const name = document.getElementById('v-name').value.trim();
   if (!name) return toast('Vendor name required', 'err');
   const newV = { 'Vendor Name': name, 'Item': document.getElementById('v-item').value, 'Category': document.getElementById('v-cat').value, 'Bank Name': document.getElementById('v-bank').value, 'Account Details': document.getElementById('v-acc').value, 'IFSC Code': document.getElementById('v-ifsc').value };
   vendors.push(newV); buildVendorMap(); renderVendorDropdown(); renderVendors(); closeModal('vendorModal'); toast('Vendor added', 'ok');
