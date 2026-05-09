@@ -19,7 +19,7 @@
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--txt); height: 100vh; overflow: hidden; display: flex; transition: background var(--trans), color var(--trans); }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--txt); height: 100vh; overflow: hidden; display: block; transition: background var(--trans), color var(--trans); }
 
 :root {
   --bg: #0b0d17; --s1: #10121e; --s2: #141828; --s3: #191d2e; --s4: #1e2236;
@@ -42,8 +42,15 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 99px; }
 
+/* ── APP WRAPPER & LOGIN SCREEN ── */
+#app-wrapper { display: none; width: 100%; height: 100%; }
+#login-screen { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; flex-direction: column; }
+.login-box { background: var(--s1); border: 1px solid var(--border); padding: 40px; border-radius: var(--r2); text-align: center; width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+#pin-input { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 14px; border-radius: var(--r); font-size: 22px; font-weight: bold; outline: none; width: 100%; text-align: center; letter-spacing: 12px; margin-bottom: 20px; font-family: var(--mono); }
+#pin-input:focus { border-color: var(--purple); }
+
 /* ── LAYOUT ── */
-.sidebar { width: var(--sidebar); background: var(--s1); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; z-index: 10; }
+.sidebar { width: var(--sidebar); background: var(--s1); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; flex-shrink: 0; z-index: 10; height: 100%; }
 .sb-logo { padding: 22px 18px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
 .sb-mark { width: 34px; height: 34px; background: var(--purple2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; }
 .sb-name { font-size: 14px; font-weight: 600; line-height: 1.25; }
@@ -59,7 +66,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; height: 100%; }
 .topbar { background: var(--s1); border-bottom: 1px solid var(--border); padding: 13px 22px; display: flex; align-items: center; gap: 10px; }
 .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
 .topbar-title em { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 7px; }
@@ -100,10 +107,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .chip.active { background: var(--purple2); color: #fff; border-color: var(--purple2); }
 .sort-sel { background: var(--s2); border: 1px solid var(--border2); color: var(--txt); padding: 6px 10px; border-radius: var(--r); font-size: 12px; outline: none; cursor: pointer; }
 
-.tbl-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
+.tbl-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); }
 .tbl-hdr { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); }
 .tbl-title { font-size: 13px; font-weight: 600; }
 .tbl-total { font-size: 12px; color: var(--green); font-weight: 600; margin-left: 15px; background: var(--g-soft); padding: 3px 8px; border-radius: 6px; }
+
+/* FIX: Table minimum height for dropdowns */
+.tbl-scroll { min-height: 220px; padding-bottom: 20px; }
 
 table { width: 100%; border-collapse: collapse; min-width: 720px; }
 th { padding: 10px 14px; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); background: var(--s2); cursor: pointer;}
@@ -167,176 +177,234 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 .sec-label { font-size: 10px; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
 .empty { text-align: center; padding: 48px 20px; color: var(--muted); grid-column: 1 / -1; }
 .empty i { font-size: 32px; margin-bottom: 10px; opacity: .25; display: block; }
-  .tbl-scroll { min-height: 180px; padding-bottom: 20px; }
 </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="vendorModal">
-  <div class="modal">
-    <div class="modal-hdr"><h3>Add New Vendor</h3><button class="close-btn" onclick="closeModal('vendorModal')"><i class="ti ti-x"></i></button></div>
-    <div class="form-grid">
-      <div class="fg full"><label>Vendor Name</label><input id="v-name" class="fc"/></div>
-      <div class="fg"><label>Default Item</label><input id="v-item" class="fc"/></div>
-      <div class="fg"><label>Category</label><input id="v-cat" class="fc"/></div>
-      <div class="fg full"><label>Bank Name</label><input id="v-bank" class="fc"/></div>
-      <div class="fg"><label>Account Details</label><input id="v-acc" class="fc"/></div>
-      <div class="fg"><label>IFSC Code</label><input id="v-ifsc" class="fc"/></div>
-    </div>
-    <div style="margin-top:20px;"><button class="submit-btn" onclick="submitVendor()"><i class="ti ti-device-floppy"></i> Save</button></div>
+<div id="login-screen">
+  <div class="login-box">
+    <div class="sb-mark" style="margin: 0 auto 15px; width: 54px; height: 54px; font-size: 24px;">S</div>
+    <h2 style="margin-bottom: 5px; font-size: 20px;">SkillBox Finance</h2>
+    <p style="font-size: 12px; color: var(--muted); margin-bottom: 25px;">Enter your Security PIN to unlock</p>
+    
+    <input type="password" id="pin-input" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') submitLogin()"/>
+    
+    <button class="submit-btn" style="width: 100%; justify-content: center; padding: 12px;" onclick="submitLogin()">
+      <i class="ti ti-lock-open"></i> Unlock Dashboard
+    </button>
   </div>
 </div>
 
-<div class="modal-overlay" id="utrModal">
-  <div class="modal" style="max-width: 400px;">
-    <div class="modal-hdr"><h3>Enter Payment Details</h3><button class="close-btn" onclick="cancelUtr()"><i class="ti ti-x"></i></button></div>
-    <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Please provide a unique UTR or Payment ID. This will lock the entry.</p>
-    <div class="form-grid"><div class="fg full"><label>UTR / Payment ID</label><input id="u-utr" class="fc" placeholder="e.g. UTR1234567890"/></div></div>
-    <div style="margin-top:20px;"><button class="submit-btn" onclick="submitUtr()"><i class="ti ti-check"></i> Confirm Payment</button></div>
+<div id="app-wrapper">
+
+  <div class="modal-overlay" id="vendorModal">
+    <div class="modal">
+      <div class="modal-hdr"><h3>Add New Vendor</h3><button class="close-btn" onclick="closeModal('vendorModal')"><i class="ti ti-x"></i></button></div>
+      <div class="form-grid">
+        <div class="fg full"><label>Vendor Name</label><input id="v-name" class="fc"/></div>
+        <div class="fg"><label>Default Item</label><input id="v-item" class="fc"/></div>
+        <div class="fg"><label>Category</label><input id="v-cat" class="fc"/></div>
+        <div class="fg full"><label>Bank Name</label><input id="v-bank" class="fc"/></div>
+        <div class="fg"><label>Account Details</label><input id="v-acc" class="fc"/></div>
+        <div class="fg"><label>IFSC Code</label><input id="v-ifsc" class="fc"/></div>
+      </div>
+      <div style="margin-top:20px;"><button class="submit-btn" onclick="submitVendor()"><i class="ti ti-device-floppy"></i> Save</button></div>
+    </div>
   </div>
-</div>
 
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-hdr"><h3>Edit Bill</h3><button class="close-btn" onclick="closeModal('editModal')"><i class="ti ti-x"></i></button></div>
-    <input type="hidden" id="e-idx">
-    <div class="form-grid">
-      <div class="fg full"><label>Vendor</label><input id="e-vendor" class="fc" readonly/></div>
-      <div class="fg"><label>Item</label><input id="e-item" class="fc"/></div>
-      <div class="fg"><label>Category</label><input id="e-cat" class="fc"/></div>
-      <div class="fg"><label>Quantity</label><input id="e-qty" type="number" class="fc"/></div>
-      <div class="fg"><label>Amount (₹)</label><input id="e-amt" type="number" class="fc"/></div>
-      <div class="fg full"><label>Date</label><input id="e-date" type="date" class="fc"/></div>
+  <div class="modal-overlay" id="utrModal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-hdr"><h3>Enter Payment Details</h3><button class="close-btn" onclick="cancelUtr()"><i class="ti ti-x"></i></button></div>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Please provide a unique UTR or Payment ID. This will lock the entry.</p>
+      <div class="form-grid"><div class="fg full"><label>UTR / Payment ID</label><input id="u-utr" class="fc" placeholder="e.g. UTR1234567890"/></div></div>
+      <div style="margin-top:20px;"><button class="submit-btn" onclick="submitUtr()"><i class="ti ti-check"></i> Confirm Payment</button></div>
     </div>
-    <div style="margin-top:20px;"><button class="submit-btn" onclick="submitEdit()"><i class="ti ti-device-floppy"></i> Update Bill</button></div>
   </div>
-</div>
 
-<aside class="sidebar">
-  <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
-  <nav class="sb-nav">
-    <div class="nav-section">Workspace</div>
-    <button class="nav-item active" id="n-dash" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
-    <button class="nav-item" id="n-bills" onclick="nav('bills',this)"><i class="ti ti-receipt"></i> Bills</button>
-    <button class="nav-item" id="n-add" onclick="nav('add',this)"><i class="ti ti-circle-plus"></i> Add Payment</button>
-    <button class="nav-item" id="n-vend" onclick="nav('vend',this)"><i class="ti ti-building-store"></i> Vendors</button>
-    <div class="nav-section" style="margin-top:20px">Actions</div>
-    <button class="nav-item" onclick="loadData()"><i class="ti ti-refresh"></i> Sync Data</button>
-  </nav>
-  <div class="sb-footer"><div class="sync-row"><div class="pulse"></div><span id="syncTxt">Connecting…</span></div></div>
-</aside>
-
-<div class="main">
-  <header class="topbar">
-    <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
-    <div class="search-wrap">
-      <i class="ti ti-search"></i>
-      <input class="search-input" id="searchQ" placeholder="Search vendor, item..." onkeypress="if(event.key === 'Enter') executeSearch()"/>
-      <button class="search-btn" onclick="executeSearch()">Search</button>
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-hdr"><h3>Edit Bill</h3><button class="close-btn" onclick="closeModal('editModal')"><i class="ti ti-x"></i></button></div>
+      <input type="hidden" id="e-idx">
+      <div class="form-grid">
+        <div class="fg full"><label>Vendor</label><input id="e-vendor" class="fc" readonly/></div>
+        <div class="fg"><label>Item</label><input id="e-item" class="fc"/></div>
+        <div class="fg"><label>Category</label><input id="e-cat" class="fc"/></div>
+        <div class="fg"><label>Quantity</label><input id="e-qty" type="number" class="fc"/></div>
+        <div class="fg"><label>Amount (₹)</label><input id="e-amt" type="number" class="fc"/></div>
+        <div class="fg full"><label>Date</label><input id="e-date" type="date" class="fc"/></div>
+      </div>
+      <div style="margin-top:20px;"><button class="submit-btn" onclick="submitEdit()"><i class="ti ti-device-floppy"></i> Update Bill</button></div>
     </div>
-    <button class="tb-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
-    <button class="tb-btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
-  </header>
+  </div>
 
-  <div class="content">
-
-    <div id="v-dash">
-      <div class="sec-label">Summary</div>
-      <div class="cards-grid">
-        <div class="card c-p" onclick="nav('bills',document.getElementById('n-bills'));setFilter('all')"><div class="card-label">Total Invoices</div><div class="card-val" id="cd-count">0</div><div class="card-sub" id="cd-total">₹0 value</div></div>
-        <div class="card c-a" onclick="nav('bills',document.getElementById('n-bills'));setFilter('pending')"><div class="card-label">Pending</div><div class="card-val" id="cd-pending">₹0</div><div class="card-sub" id="cd-pending-n">0 bills</div></div>
-        <div class="card c-g" onclick="nav('bills',document.getElementById('n-bills'));setFilter('paid')"><div class="card-label">Cleared</div><div class="card-val" id="cd-paid">₹0</div><div class="card-sub" id="cd-paid-n">0 bills</div></div>
-        <div class="card c-r" onclick="nav('bills',document.getElementById('n-bills'));setFilter('overdue')"><div class="card-label">Overdue</div><div class="card-val" id="cd-overdue">₹0</div><div class="card-sub" id="cd-overdue-n">0 bills</div></div>
-      </div>
-      <div class="charts-row">
-        <div class="chart-card"><div class="chart-hdr">Category-wise Spend</div><div style="height:240px"><canvas id="catChart"></canvas></div></div>
-        <div class="chart-card"><div class="chart-hdr">Paid vs Unpaid Bills</div><div style="height:190px; display:flex; justify-content:center"><canvas id="statusChart"></canvas></div></div>
-      </div>
+  <aside class="sidebar">
+    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
+    <nav class="sb-nav">
+      <div class="nav-section">Workspace</div>
+      <button class="nav-item active" id="n-dash" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+      <button class="nav-item" id="n-bills" onclick="nav('bills',this)"><i class="ti ti-receipt"></i> Bills</button>
+      <button class="nav-item" id="n-add" onclick="nav('add',this)"><i class="ti ti-circle-plus"></i> Add Payment</button>
+      <button class="nav-item" id="n-vend" onclick="nav('vend',this)"><i class="ti ti-building-store"></i> Vendors</button>
+      <div class="nav-section" style="margin-top:20px">Actions</div>
+      <button class="nav-item" onclick="loadData()"><i class="ti ti-refresh"></i> Sync Data</button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sync-row"><div class="pulse"></div><span id="syncTxt">Connecting…</span></div>
+      <button onclick="logout()" style="background:none; border:none; color:var(--red); font-size:11px; cursor:pointer; margin-top:14px; display:flex; align-items:center; gap:6px; font-weight:600;"><i class="ti ti-lock"></i> Lock App</button>
     </div>
+  </aside>
 
-    <div id="v-bills" style="display:none">
-      <div class="filter-row">
-        <button class="chip active" onclick="setFilter('all',this)">All</button>
-        <button class="chip f-a" onclick="setFilter('pending',this)">Pending</button>
-        <button class="chip f-g" onclick="setFilter('paid',this)">Paid</button>
-        <button class="chip f-r" onclick="setFilter('overdue',this)">Overdue</button>
-        <div class="filter-spacer"></div>
-        <select class="sort-sel" id="sortSel" onchange="applyFilters()">
-          <option value="">Sort by…</option>
-          <option value="amt-d">Amount ↓</option><option value="amt-a">Amount ↑</option>
-          <option value="date-d">Date ↓</option><option value="date-a">Date ↑</option>
-        </select>
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input class="search-input" id="searchQ" placeholder="Search vendor, item..." onkeypress="if(event.key === 'Enter') executeSearch()"/>
+        <button class="search-btn" onclick="executeSearch()">Search</button>
       </div>
-      <div class="tbl-card">
-        <div class="tbl-hdr">
-          <div><span class="tbl-title">Transactions</span><span class="tbl-count" id="billCount">— rows</span><span class="tbl-total" id="filteredTotal">Filtered Total: ₹0</span></div>
+      <button class="tb-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
+      <button class="tb-btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
+    </header>
+
+    <div class="content">
+      <div id="v-dash">
+        <div class="sec-label">Summary</div>
+        <div class="cards-grid">
+          <div class="card c-p" onclick="nav('bills',document.getElementById('n-bills'));setFilter('all')"><div class="card-label">Total Invoices</div><div class="card-val" id="cd-count">0</div><div class="card-sub" id="cd-total">₹0 value</div></div>
+          <div class="card c-a" onclick="nav('bills',document.getElementById('n-bills'));setFilter('pending')"><div class="card-label">Pending</div><div class="card-val" id="cd-pending">₹0</div><div class="card-sub" id="cd-pending-n">0 bills</div></div>
+          <div class="card c-g" onclick="nav('bills',document.getElementById('n-bills'));setFilter('paid')"><div class="card-label">Cleared</div><div class="card-val" id="cd-paid">₹0</div><div class="card-sub" id="cd-paid-n">0 bills</div></div>
+          <div class="card c-r" onclick="nav('bills',document.getElementById('n-bills'));setFilter('overdue')"><div class="card-label">Overdue</div><div class="card-val" id="cd-overdue">₹0</div><div class="card-sub" id="cd-overdue-n">0 bills</div></div>
         </div>
-        <div class="tbl-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th onclick="sortCol('Vendor Name')">Vendor</th>
-                <th onclick="sortCol('Item')">Item</th>
-                <th onclick="sortCol('Category')">Category</th>
-                <th onclick="sortCol('Amount')">Amount</th>
-                <th onclick="sortCol('Date')">Date</th>
-                <th>Status</th>
-                <th>Invoice</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="billBody"></tbody>
-          </table>
+        <div class="charts-row">
+          <div class="chart-card"><div class="chart-hdr">Category-wise Spend</div><div style="height:240px"><canvas id="catChart"></canvas></div></div>
+          <div class="chart-card"><div class="chart-hdr">Paid vs Unpaid Bills</div><div style="height:190px; display:flex; justify-content:center"><canvas id="statusChart"></canvas></div></div>
         </div>
       </div>
-    </div>
 
-    <div id="v-add" style="display:none">
-      <div class="sec-label">New Payment</div>
-      <div class="form-card">
-        <div class="form-grid">
-          <div class="fg">
-            <label>Vendor</label>
-            <div style="display:flex; gap:8px;">
-              <select id="f-vendor" class="fc" onchange="fillVendor()"><option value="">— Select vendor —</option></select>
-              <button class="tb-btn" onclick="openModal('vendorModal')" style="padding: 0 12px;"><i class="ti ti-plus"></i></button>
+      <div id="v-bills" style="display:none">
+        <div class="filter-row">
+          <button class="chip active" onclick="setFilter('all',this)">All</button>
+          <button class="chip f-a" onclick="setFilter('pending',this)">Pending</button>
+          <button class="chip f-g" onclick="setFilter('paid',this)">Paid</button>
+          <button class="chip f-r" onclick="setFilter('overdue',this)">Overdue</button>
+          <div class="filter-spacer"></div>
+          <select class="sort-sel" id="sortSel" onchange="applyFilters()">
+            <option value="">Sort by…</option>
+            <option value="amt-d">Amount ↓</option><option value="amt-a">Amount ↑</option>
+            <option value="date-d">Date ↓</option><option value="date-a">Date ↑</option>
+          </select>
+        </div>
+        <div class="tbl-card">
+          <div class="tbl-hdr">
+            <div><span class="tbl-title">Transactions</span><span class="tbl-count" id="billCount">— rows</span><span class="tbl-total" id="filteredTotal">Filtered Total: ₹0</span></div>
+          </div>
+          <div class="tbl-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th onclick="sortCol('Vendor Name')">Vendor</th>
+                  <th onclick="sortCol('Item')">Item</th>
+                  <th onclick="sortCol('Category')">Category</th>
+                  <th onclick="sortCol('Amount')">Amount</th>
+                  <th onclick="sortCol('Date')">Date</th>
+                  <th>Status</th>
+                  <th>Invoice</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="billBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="v-add" style="display:none">
+        <div class="sec-label">New Payment</div>
+        <div class="form-card">
+          <div class="form-grid">
+            <div class="fg">
+              <label>Vendor</label>
+              <div style="display:flex; gap:8px;">
+                <select id="f-vendor" class="fc" onchange="fillVendor()"><option value="">— Select vendor —</option></select>
+                <button class="tb-btn" onclick="openModal('vendorModal')" style="padding: 0 12px;"><i class="ti ti-plus"></i></button>
+              </div>
             </div>
+            <div class="fg"><label>Item / Product</label><input id="f-item" class="fc"/></div>
+            <div class="fg"><label>Category</label><input id="f-category" class="fc"/></div>
+            <div class="fg"><label>Quantity</label><input id="f-qty" type="number" class="fc" value="1"/></div>
+            <div class="fg"><label>Amount (₹)</label><input id="f-amount" type="number" class="fc"/></div>
+            <div class="fg"><label>Date</label><input id="f-date" type="date" class="fc"/></div>
+            
+            <div class="fg full" style="margin-top: 10px;">
+              <label>Upload Invoice(s) (Optional)</label>
+              <input type="file" id="f-invoice" class="fc" accept="image/*,.pdf" multiple/>
+              <span style="font-size:10px; color:var(--muted); margin-top:4px;">You can select multiple files at once.</span>
+            </div>
+            <div class="fg" style="display:none;"><input id="f-bank"/><input id="f-account"/><input id="f-ifsc"/></div>
           </div>
-          <div class="fg"><label>Item / Product</label><input id="f-item" class="fc"/></div>
-          <div class="fg"><label>Category</label><input id="f-category" class="fc"/></div>
-          <div class="fg"><label>Quantity</label><input id="f-qty" type="number" class="fc" value="1"/></div>
-          <div class="fg"><label>Amount (₹)</label><input id="f-amount" type="number" class="fc"/></div>
-          <div class="fg"><label>Date</label><input id="f-date" type="date" class="fc"/></div>
-          
-          <div class="fg full" style="margin-top: 10px;">
-            <label>Upload Invoice(s) (Optional)</label>
-            <input type="file" id="f-invoice" class="fc" accept="image/*,.pdf" multiple/>
-            <span style="font-size:10px; color:var(--muted); margin-top:4px;">You can select multiple files at once.</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
+            <button class="submit-btn" id="submitBtn" onclick="submitBill()"><i class="ti ti-send"></i> Submit Entry</button>
           </div>
-
-          <div class="fg" style="display:none;"><input id="f-bank"/><input id="f-account"/><input id="f-ifsc"/></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
-          <button class="submit-btn" id="submitBtn" onclick="submitBill()"><i class="ti ti-send"></i> Submit Entry</button>
         </div>
       </div>
-    </div>
 
-    <div id="v-vend" style="display:none">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <div class="sec-label" style="margin-bottom:0;">Vendor Directory</div>
-        <button class="tb-btn primary" onclick="openModal('vendorModal')"><i class="ti ti-plus"></i> Add Vendor</button>
+      <div id="v-vend" style="display:none">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div class="sec-label" style="margin-bottom:0;">Vendor Directory</div>
+          <button class="tb-btn primary" onclick="openModal('vendorModal')"><i class="ti ti-plus"></i> Add Vendor</button>
+        </div>
+        <div class="vend-grid" id="vendGrid"></div>
       </div>
-      <div class="vend-grid" id="vendGrid"></div>
-    </div>
 
+    </div>
   </div>
-</div>
-
-<div class="toast" id="toast"><i class="ti ti-check" style="font-size:16px"></i><span id="toastMsg"></span></div>
+</div> <div class="toast" id="toast"><i class="ti ti-check" style="font-size:16px"></i><span id="toastMsg"></span></div>
 
 <script>
 Chart.register(ChartDataLabels);
+
+// ── CONFIG & API ──
+const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // AAPKA LATEST URL
+let bills = [], vendors = [], vendorMap = {};
+let activeFilter = 'all', sortDir = {};
+let pendingUtrChange = null;
+let catChartInst = null, statusChartInst = null;
+const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34d39a','#fbbf24'];
+
+// ── SECURITY & LOGIN LOGIC ──
+const APP_PIN = "0420"; // 🔒 YAHAN SE AAP APNA PIN CHANGE KAR SAKTE HAIN
+
+function checkAuth() {
+  const isAuth = sessionStorage.getItem('skillbox_auth') === 'true';
+  if(isAuth) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'flex';
+    loadData(); // Sirf login ke baad data load hoga!
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-wrapper').style.display = 'none';
+  }
+}
+
+function submitLogin() {
+  const pinInput = document.getElementById('pin-input');
+  if(pinInput.value === APP_PIN) {
+    sessionStorage.setItem('skillbox_auth', 'true');
+    pinInput.value = '';
+    checkAuth();
+    toast('Login Successful!', 'ok');
+  } else {
+    toast('Incorrect PIN', 'err');
+    pinInput.value = '';
+    pinInput.focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('skillbox_auth');
+  checkAuth();
+  toast('App Locked Successfully', 'ok');
+}
 
 // ── THEME TOGGLE ──
 function toggleTheme() {
@@ -347,14 +415,6 @@ function toggleTheme() {
   if(catChartInst) renderCatChart();
 }
 document.getElementById('themeIcon').className = savedTheme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
-
-// ── CONFIG ──
-const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // AAPKA APPS SCRIPT URL YAHAN DAALEIN
-let bills = [], vendors = [], vendorMap = {};
-let activeFilter = 'all', sortDir = {};
-let pendingUtrChange = null;
-let catChartInst = null, statusChartInst = null;
-const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34d39a','#fbbf24'];
 
 function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
 function norm(s){ return String(s||'').toLowerCase().trim(); }
@@ -554,25 +614,18 @@ function fillVendor(){
   document.getElementById('f-bank').value = v['Bank Name']||''; document.getElementById('f-account').value = v['Account Details']||''; document.getElementById('f-ifsc').value = v['IFSC Code']||''; document.getElementById('f-category').value = v['Category']||'';
 }
 
-// ── HEAVY DEBUGGER WALA SUBMIT BILL ──
 async function submitBill(){
   console.log("🟢 1. Submit Button Clicked");
-  
   const btn = document.getElementById('submitBtn');
   const vendor = document.getElementById('f-vendor').value;
   const amount = document.getElementById('f-amount').value;
   
-  if(!vendor || !amount) { 
-    toast('Vendor and Amount required', 'err'); 
-    console.log("🔴 ERROR: Vendor ya Amount khali hai");
-    return; 
-  }
+  if(!vendor || !amount) { toast('Vendor and Amount required', 'err'); return; }
 
   btn.disabled = true; 
   btn.innerHTML = '<span class="spinner"></span>Processing...';
   
   const fileInput = document.getElementById('f-invoice');
-  console.log("🟡 2. Files selected:", fileInput.files.length);
 
   const readMultipleFiles = async () => {
     if (fileInput.files.length === 0) return [];
@@ -592,7 +645,6 @@ async function submitBill(){
 
   try {
     const uploadedFiles = await readMultipleFiles();
-    console.log("🟡 3. Files Processed successfully");
 
     const newBill = {
       _idx: bills.length + 2, 'Date': document.getElementById('f-date').value, 'Vendor Name': vendor,
@@ -608,52 +660,37 @@ async function submitBill(){
       files: uploadedFiles 
     };
     
-    console.log("🔵 4. Data ready to send:", payload);
-    
-    // UI mein dikhana
     bills.push(newBill); applyFilters(); updateCards(); renderCharts();
     toast('Sending data...', 'ok');
 
-    console.log("🔵 5. Calling Google Apps Script API...");
-    
     const response = await fetch(API, {
       method: 'POST',
       body: JSON.stringify(payload)
     });
     
-    console.log("🟣 6. Response Received! HTTP Status:", response.status);
-    
-    // JSON parse karne se pehle raw text check karna (kyunki Google kabhi HTML error bhej deta hai)
     const rawText = await response.text();
-    console.log("🟣 7. Raw Response from Google:", rawText);
-    
     let resData;
     try {
       resData = JSON.parse(rawText);
     } catch(parseErr) {
-      console.error("🔴 8. JSON Parse Failed. Google ne error HTML bheja hai:", parseErr);
-      throw new Error("Invalid response from Google (Not JSON). Check Network Tab for details.");
+      throw new Error("Invalid response from Google.");
     }
 
     if(resData.success) {
-      console.log("✅ 9. SUCCESS! Data saved in sheet.");
       toast('✅ Saved Successfully in Sheet!', 'ok');
       ['f-vendor','f-item','f-category','f-amount','f-invoice'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('f-qty').value = "1";
       loadData(); 
     } else {
-      console.error("🔴 9. BACKEND ERROR:", resData.message || resData.error);
       alert("❌ Backend Error:\n" + (resData.message || resData.error));
       bills.pop(); applyFilters(); updateCards(); renderCharts();
     }
   } catch(e) {
-    console.error("🔴 CRITICAL CRASH:", e.message);
-    alert("❌ Error: " + e.message + "\n(Please press F12 and check Console tab for details)");
+    alert("❌ Error: " + e.message);
     bills.pop(); applyFilters(); updateCards(); renderCharts();
   } finally {
     btn.disabled = false; 
     btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
-    console.log("🏁 10. Process Finished.");
   }
 }
 
@@ -695,7 +732,10 @@ function setSyncState(s){ document.querySelector('.pulse').style.background = s=
 let toastTimer; function toast(msg, type='ok'){ const el = document.getElementById('toast'); el.querySelector('i').className = type==='ok'?'ti ti-check':'ti ti-x'; document.getElementById('toastMsg').textContent = msg; el.className='toast '+type+' show'; clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.className='toast', 2800); }
 
 document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-loadData();
+
+// Page load hote hi Auth check karo
+checkAuth();
+
 </script>
 </body>
 </html>
