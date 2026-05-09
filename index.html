@@ -348,7 +348,7 @@ function toggleTheme() {
 document.getElementById('themeIcon').className = savedTheme === 'light' ? 'ti ti-sun' : 'ti ti-moon';
 
 // ── CONFIG ──
-const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // AAPKA APPS SCRIPT URL
+const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // AAPKA APPS SCRIPT URL YAHAN DAALEIN
 let bills = [], vendors = [], vendorMap = {};
 let activeFilter = 'all', sortDir = {};
 let pendingUtrChange = null;
@@ -385,7 +385,8 @@ function nav(page, btn){
 async function loadData(){
   setSyncState('loading');
   try {
-    const [bRes, vRes] = await Promise.all([ fetch(API + '?action=getBills'), fetch(API + '?action=getVendors') ]);
+    const timestamp = new Date().getTime(); 
+    const [bRes, vRes] = await Promise.all([ fetch(API + '?action=getBills&t=' + timestamp), fetch(API + '?action=getVendors&t=' + timestamp) ]);
     const bData = await bRes.json(); const vData = await vRes.json();
 
     bills = (bData.data || []).slice(1).map((row, i) => ({
@@ -458,7 +459,6 @@ function renderBillsTable(rows){
     const statusHtml = isPaid ? `<div class="stb paid"><span class="stb-dot"></span>Paid</div><div style="font-size:9.5px;color:var(--muted);margin-top:5px;font-family:var(--mono)">UTR: ${b.UTR||'N/A'}</div>`
       : `<select class="st-sel" onchange="initChangeStatus(${b._idx}, this.value, this)">${['Pending','Paid','Overdue'].map(o => `<option${norm(o)===st?' selected':''}>${o}</option>`).join('')}</select>`;
 
-    // STRICT MULTIPLE INVOICE LOGIC
     const invUrlsStr = (b.InvoiceURL ? String(b.InvoiceURL) : "").trim();
     const invUrls = invUrlsStr.split(',').map(u => u.trim()).filter(u => u.startsWith('http'));
     
@@ -466,9 +466,7 @@ function renderBillsTable(rows){
     if (invUrls.length === 1) {
       invHtml = `<a href="${invUrls[0]}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none;">View</a>`;
     } else if (invUrls.length > 1) {
-      invHtml = invUrls.map((url, i) => 
-        `<a href="${url}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none; margin-right: 4px; padding: 3px 6px;">${i+1}</a>`
-      ).join('');
+      invHtml = invUrls.map((url, i) => `<a href="${url}" target="_blank" class="cat-pill" style="color:var(--green); border:1px solid var(--green); background:transparent; text-decoration:none; margin-right: 4px; padding: 3px 6px;">${i+1}</a>`).join('');
     }
 
     const actionHtml = isPaid ? `<span style="font-size:11px;color:var(--green);font-weight:600;"><i class="ti ti-lock"></i> Locked</span>`
@@ -555,15 +553,25 @@ function fillVendor(){
   document.getElementById('f-bank').value = v['Bank Name']||''; document.getElementById('f-account').value = v['Account Details']||''; document.getElementById('f-ifsc').value = v['IFSC Code']||''; document.getElementById('f-category').value = v['Category']||'';
 }
 
-// ── FIXED SUBMIT BILL ──
+// ── HEAVY DEBUGGER WALA SUBMIT BILL ──
 async function submitBill(){
+  console.log("🟢 1. Submit Button Clicked");
+  
   const btn = document.getElementById('submitBtn');
-  const vendor = document.getElementById('f-vendor').value, amount = document.getElementById('f-amount').value;
-  if(!vendor || !amount) { toast('Vendor and Amount required', 'err'); return; }
+  const vendor = document.getElementById('f-vendor').value;
+  const amount = document.getElementById('f-amount').value;
+  
+  if(!vendor || !amount) { 
+    toast('Vendor and Amount required', 'err'); 
+    console.log("🔴 ERROR: Vendor ya Amount khali hai");
+    return; 
+  }
 
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Processing...';
+  btn.disabled = true; 
+  btn.innerHTML = '<span class="spinner"></span>Processing...';
   
   const fileInput = document.getElementById('f-invoice');
+  console.log("🟡 2. Files selected:", fileInput.files.length);
 
   const readMultipleFiles = async () => {
     if (fileInput.files.length === 0) return [];
@@ -583,6 +591,7 @@ async function submitBill(){
 
   try {
     const uploadedFiles = await readMultipleFiles();
+    console.log("🟡 3. Files Processed successfully");
 
     const newBill = {
       _idx: bills.length + 2, 'Date': document.getElementById('f-date').value, 'Vendor Name': vendor,
@@ -592,26 +601,58 @@ async function submitBill(){
       'Qty': document.getElementById('f-qty').value || 1, 'UTR': '', 'InvoiceURL': '' 
     };
 
-    bills.push(newBill); applyFilters(); updateCards(); renderCharts();
-    toast('Bill sent for processing!', 'ok');
+    const payload = {
+      action: 'addBill',
+      row: [newBill.Date, newBill['Vendor Name'], newBill.Item, newBill.Category, newBill.Amount, newBill.Status, newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR],
+      files: uploadedFiles 
+    };
     
-    ['f-vendor','f-item','f-category','f-amount','f-invoice'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('f-qty').value = "1";
-    btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
+    console.log("🔵 4. Data ready to send:", payload);
+    
+    // UI mein dikhana
+    bills.push(newBill); applyFilters(); updateCards(); renderCharts();
+    toast('Sending data...', 'ok');
 
-    await fetch(API, {
+    console.log("🔵 5. Calling Google Apps Script API...");
+    
+    const response = await fetch(API, {
       method: 'POST',
-      body: JSON.stringify({
-        action: 'addBill',
-        row: [newBill.Date, newBill['Vendor Name'], newBill.Item, newBill.Category, newBill.Amount, newBill.Status, newBill['Bank Name'], newBill['Account Details'], newBill['IFSC Code'], newBill.Qty, newBill.UTR],
-        files: uploadedFiles 
-      })
+      body: JSON.stringify(payload)
     });
     
-    loadData(); 
+    console.log("🟣 6. Response Received! HTTP Status:", response.status);
+    
+    // JSON parse karne se pehle raw text check karna (kyunki Google kabhi HTML error bhej deta hai)
+    const rawText = await response.text();
+    console.log("🟣 7. Raw Response from Google:", rawText);
+    
+    let resData;
+    try {
+      resData = JSON.parse(rawText);
+    } catch(parseErr) {
+      console.error("🔴 8. JSON Parse Failed. Google ne error HTML bheja hai:", parseErr);
+      throw new Error("Invalid response from Google (Not JSON). Check Network Tab for details.");
+    }
+
+    if(resData.success) {
+      console.log("✅ 9. SUCCESS! Data saved in sheet.");
+      toast('✅ Saved Successfully in Sheet!', 'ok');
+      ['f-vendor','f-item','f-category','f-amount','f-invoice'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-qty').value = "1";
+      loadData(); 
+    } else {
+      console.error("🔴 9. BACKEND ERROR:", resData.message || resData.error);
+      alert("❌ Backend Error:\n" + (resData.message || resData.error));
+      bills.pop(); applyFilters(); updateCards(); renderCharts();
+    }
   } catch(e) {
-    toast('Error saving to sheet', 'err');
-    btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
+    console.error("🔴 CRITICAL CRASH:", e.message);
+    alert("❌ Error: " + e.message + "\n(Please press F12 and check Console tab for details)");
+    bills.pop(); applyFilters(); updateCards(); renderCharts();
+  } finally {
+    btn.disabled = false; 
+    btn.innerHTML = '<i class="ti ti-send"></i> Submit Entry';
+    console.log("🏁 10. Process Finished.");
   }
 }
 
