@@ -524,16 +524,29 @@ function applyFilters(){
           </div>
          </div>`;
 
+    // 🔥 NEW: VENDOR BANK DETAILS UI 🔥
+    let bankDetails = '';
+    if(b['Bank Name'] || b['Account Details'] || b['IFSC Code']) {
+      bankDetails = `
+        <div style="font-size:9.5px; color:var(--muted); margin-top:6px; font-family:var(--mono); line-height:1.5;">
+          <div style="display:flex; align-items:center; gap:4px;"><i class="ti ti-building-bank" style="font-size:11px;"></i> ${b['Bank Name']||'—'}</div>
+          <div style="display:flex; align-items:center; gap:4px;"><i class="ti ti-credit-card" style="font-size:11px;"></i> ${b['Account Details']||'—'} | IFSC: ${b['IFSC Code']||'—'}</div>
+        </div>`;
+    }
+
     return `<tr>
-      <td style="text-align:center;">${chkHtml}</td>
-      <td style="font-weight:600">${b['Vendor Name']||'—'}</td>
-      <td>${b.Item||'—'} <span style="color:var(--muted); font-size:11px">(x${b.Qty||1})</span></td>
-      <td><span class="cat-pill">${b.Category||'—'}</span></td>
-      <td class="amt-cell">${fmt(b.Amount)}</td>
-      <td style="color:var(--muted);font-size:11px">${b.Date||'—'}</td>
-      <td>${statusHtml}</td>
-      <td>${invHtml}</td>
-      <td>${actionHtml}</td>
+      <td style="text-align:center; vertical-align:top; padding-top:14px;">${chkHtml}</td>
+      <td style="vertical-align:top; padding-top:14px;">
+        <div style="font-weight:600; font-size:13px; color:var(--txt);">${b['Vendor Name']||'—'}</div>
+        ${bankDetails}
+      </td>
+      <td style="vertical-align:top; padding-top:14px;">${b.Item||'—'} <span style="color:var(--muted); font-size:11px">(x${b.Qty||1})</span></td>
+      <td style="vertical-align:top; padding-top:14px;"><span class="cat-pill">${b.Category||'—'}</span></td>
+      <td class="amt-cell" style="vertical-align:top; padding-top:14px;">${fmt(b.Amount)}</td>
+      <td style="color:var(--muted); font-size:11px; vertical-align:top; padding-top:14px;">${b.Date||'—'}</td>
+      <td style="vertical-align:top; padding-top:12px;">${statusHtml}</td>
+      <td style="vertical-align:top; padding-top:12px;">${invHtml}</td>
+      <td style="vertical-align:top; padding-top:10px;">${actionHtml}</td>
     </tr>`;
   }).join('');
   checkBulk();
