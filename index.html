@@ -519,7 +519,7 @@ async function loadData(){
     const sel = document.getElementById('f-vendor'); sel.innerHTML = '<option value="">— Select vendor —</option>';
     Object.keys(vendorMap).forEach(name => sel.appendChild(new Option(name, name)));
     
-    updateCards(); renderCharts(); executeSearch(); setSyncState('ok');
+    updateCards(); renderCharts(); executeSearch(); renderTasks(); setSyncState('ok');
   } catch(e) { setSyncState('demo'); }
 }
 
