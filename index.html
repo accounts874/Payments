@@ -251,6 +251,28 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
     </div>
   </div>
 
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal" style="max-width: 400px;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+        <h3 style="font-size: 16px;">Task Details</h3>
+        <button onclick="closeModal('taskModal')" style="background:none; border:none; color:var(--txt); cursor:pointer; font-size: 18px;"><i class="ti ti-x"></i></button>
+      </div>
+      <input type="hidden" id="t-idx">
+      <div class="form-grid">
+        <div class="fg full"><label>Task Name / Description</label><input id="t-name" class="fc"/></div>
+        <div class="fg full"><label>Deadline</label><input id="t-date" type="date" class="fc"/></div>
+        <div class="fg full"><label>Status</label>
+          <select id="t-status" class="fc">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:20px;"><button class="submit-btn" onclick="submitTask()"><i class="ti ti-device-floppy"></i> Save Task</button></div>
+    </div>
+  </div>
+
   <aside class="sidebar">
     <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
     <nav class="sb-nav">
@@ -259,6 +281,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
       <button class="nav-item" id="n-bills" onclick="nav('bills',this)"><i class="ti ti-receipt"></i> Bills</button>
       <button class="nav-item" id="n-add" onclick="nav('add',this)"><i class="ti ti-circle-plus"></i> Add Payment</button>
       <button class="nav-item" id="n-vend" onclick="nav('vend',this)"><i class="ti ti-building-store"></i> Vendors</button>
+      <button class="nav-item" id="n-tasks" onclick="nav('tasks',this)"><i class="ti ti-checklist"></i> Tasks</button>
       <div class="nav-section" style="margin-top:20px">Actions</div>
       <button class="nav-item" onclick="loadData()"><i class="ti ti-refresh"></i> Sync Data</button>
     </nav>
@@ -378,6 +401,28 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
         <div class="vend-grid" id="vendGrid"></div>
       </div>
 
+      <div id="v-tasks" style="display:none">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div class="sec-label" style="margin-bottom:0;">Task Management</div>
+          <button class="tb-btn primary" onclick="openTaskModal()"><i class="ti ti-plus"></i> Add Task</button>
+        </div>
+        <div class="tbl-card">
+          <div class="tbl-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 40%;">Task Name</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="taskGrid"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div> <div class="toast" id="toast"><i class="ti ti-check" style="font-size:16px"></i><span id="toastMsg"></span></div>
@@ -389,7 +434,7 @@ Chart.register(ChartDataLabels);
 const API = "https://script.google.com/macros/s/AKfycbzdKZhhak2ScyLU5ck47E8qc587sUHebUPcRoVhW7Gtsq2PXIKt7dIrB47UPSP2x7u0/exec"; // ⚠️ APNA LATEST URL YAHAN DALEIN ⚠️
 const APP_PIN = "1234";
 
-let bills = [], vendors = [], vendorMap = {};
+let bills = [], vendors = [], vendorMap = {}, tasks = [];
 let activeFilter = 'all', sortDir = {};
 let pendingUtrChange = null; let bulkMode = false;
 let catChartInst = null, statusChartInst = null;
@@ -436,19 +481,27 @@ function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function toast(msg, type='ok'){ const el = document.getElementById('toast'); el.querySelector('i').className = type==='ok'?'ti ti-check':'ti ti-x'; document.getElementById('toastMsg').textContent = msg; el.className='toast '+type+' show'; setTimeout(()=>el.className='toast', 2800); }
 
 function nav(page, btn){
-  ['dash','bills','add','vend'].forEach(p => document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none');
+  ['dash','bills','add','vend', 'tasks'].forEach(p => document.getElementById('v-'+p).style.display = p===page ? 'block' : 'none');
   document.querySelectorAll('.sb-nav .nav-item').forEach(el => el.classList.remove('active')); if(btn) btn.classList.add('active');
-  const titles = { dash:['Dashboard','Overview'], bills:['Bills','Transactions'], add:['Add Payment','New Bill'], vend:['Vendors','Directory'] };
+  const titles = { dash:['Dashboard','Overview'], bills:['Bills','Transactions'], add:['Add Payment','New Bill'], vend:['Vendors','Directory'], tasks:['Tasks', 'To-Do List'] };
   document.getElementById('pgTitle').childNodes[0].textContent = titles[page][0] + ' '; document.getElementById('pgSub').textContent = titles[page][1];
-  if(page === 'bills') applyFilters(); if(page === 'vend') renderVendors();
+  if(page === 'bills') applyFilters(); 
+  if(page === 'vend') renderVendors();
+  if(page === 'tasks') renderTasks();
 }
 
 async function loadData(){
   setSyncState('loading');
   try {
     const t = new Date().getTime(); 
-    const [bRes, vRes] = await Promise.all([ fetch(API + '?action=getBills&t=' + t), fetch(API + '?action=getVendors&t=' + t) ]);
-    const bData = await bRes.json(); const vData = await vRes.json();
+    const [bRes, vRes, tRes] = await Promise.all([ 
+      fetch(API + '?action=getBills&t=' + t), 
+      fetch(API + '?action=getVendors&t=' + t),
+      fetch(API + '?action=getTasks&t=' + t) 
+    ]);
+    const bData = await bRes.json(); 
+    const vData = await vRes.json();
+    const tData = await tRes.json();
 
     bills = (bData.data || []).slice(1).map((r, i) => ({
       _idx: i + 2, 'Date': r[0]||'', 'Vendor Name': r[1]||'', 'Item': r[2]||'', 'Category': r[3]||'', 'Amount': r[4]||0, 'Status': r[5]||'Pending',
@@ -456,6 +509,9 @@ async function loadData(){
     }));
     vendors = (vData.data || []).slice(1).map((r, i) => ({ 
       _idx: i + 2, 'Vendor Name': r[0]||'', 'Item': r[1]||'', 'Category': r[2]||'', 'Bank Name': r[3]||'', 'Account Details': r[4]||'', 'IFSC Code': r[5]||'' 
+    }));
+    tasks = (tData.data || []).slice(1).map((r, i) => ({ 
+      _idx: i + 2, 'Name': r[0]||'', 'Deadline': r[1]||'', 'Status': r[2]||'Pending' 
     }));
     
     vendorMap = {}; vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; });
@@ -524,7 +580,6 @@ function applyFilters(){
           </div>
          </div>`;
 
-    // 🔥 NEW: VENDOR BANK DETAILS UI 🔥
     let bankDetails = '';
     if(b['Bank Name'] || b['Account Details'] || b['IFSC Code']) {
       bankDetails = `
@@ -573,7 +628,7 @@ function checkBulk() {
 
 function initChangeStatus(idx, status, selectEl){
   if (norm(status) === 'paid') { bulkMode = false; pendingUtrChange = [idx]; document.getElementById('u-utr').value = ''; openModal('utrModal'); }
-  else { const b = bills.find(x => x._idx === idx); if(b) b.Status = status; updateCards(); renderStatusChart(); applyFilters(); fetch(API, { method:'POST', body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status: status, utr: '' }) }); }
+  else { const b = bills.find(x => x._idx === idx); if(b) b.Status = status; updateCards(); applyFilters(); fetch(API, { method:'POST', body: JSON.stringify({ action:'updateStatus', rowIndex:idx, status: status, utr: '' }) }); }
 }
 function openBulkUtr() { bulkMode = true; pendingUtrChange = Array.from(document.querySelectorAll('.bill-chk:checked')).map(c=>Number(c.value)); document.getElementById('u-utr').value=''; openModal('utrModal'); }
 function cancelUtr() { if(!bulkMode && pendingUtrChange){ const b = bills.find(x=>x._idx===pendingUtrChange[0]); if(b) b.Status='Pending'; applyFilters(); } closeModal('utrModal'); }
@@ -623,7 +678,6 @@ function fillVendor(){
   document.getElementById('f-bank').value = v['Bank Name']||''; document.getElementById('f-account').value = v['Account Details']||''; document.getElementById('f-ifsc').value = v['IFSC Code']||''; document.getElementById('f-category').value = v['Category']||'';
 }
 
-// ── SMART FILE ADDER LOGIC ──
 function handleNewFiles(input) {
   if(!input.files || input.files.length === 0) return;
   for(let f of input.files) pendingFiles.push(f);
@@ -636,7 +690,6 @@ function renderFiles() {
   box.innerHTML = pendingFiles.map((f, i) => `<span class="cat-pill" style="display:flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--border2); color:var(--txt);">${f.name} <i class="ti ti-x" style="cursor:pointer; color:var(--red);" onclick="removeFile(${i})"></i></span>`).join('');
 }
 
-// ── SUBMIT BILL ──
 async function submitBill(){
   const btn = document.getElementById('submitBtn');
   const vendor = document.getElementById('f-vendor').value, amount = document.getElementById('f-amount').value;
@@ -682,7 +735,7 @@ function renderVendors(){
   const q = document.getElementById('searchQ').value.toLowerCase();
   const list = vendors.filter(v => !q || Object.values(v).some(x => String(x).toLowerCase().includes(q)));
   
-  if(!list.length){ document.getElementById('vendGrid').innerHTML = `<div class="empty"><i class="ti ti-building-store"></i><p>No vendors found</p></div>`; return; }
+  if(!list.length){ document.getElementById('vendGrid').innerHTML = `<div class="empty" style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;"><i class="ti ti-building-store" style="font-size: 30px; margin-bottom: 10px;"></i><p>No vendors found</p></div>`; return; }
   
   document.getElementById('vendGrid').innerHTML = list.map(v => `
     <div class="vend-card">
@@ -751,10 +804,85 @@ function viewVendorHistory(name) {
   openModal('historyModal');
 }
 
+// ── TASKS LOGIC ──
+function renderTasks() {
+  const grid = document.getElementById('taskGrid');
+  if(!tasks.length) { grid.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--muted)">No tasks found</td></tr>`; return; }
+  
+  grid.innerHTML = tasks.map(t => {
+    const isCompleted = norm(t.Status) === 'completed';
+    const statusHtml = `<select class="st-sel" onchange="updateTaskStatus(${t._idx}, this.value)" style="border-color:${isCompleted ? 'var(--green)' : 'var(--border2)'}">
+      ${['Pending','In Progress','Completed'].map(o => `<option${norm(o)===norm(t.Status)?' selected':''}>${o}</option>`).join('')}
+    </select>`;
+
+    return `<tr>
+      <td style="font-weight:600; color:${isCompleted ? 'var(--muted)' : 'var(--txt)'}; text-decoration:${isCompleted ? 'line-through' : 'none'}">${t.Name}</td>
+      <td style="color:var(--muted); font-size:11px;">${t.Deadline||'—'}</td>
+      <td>${statusHtml}</td>
+      <td>
+        <div class="action-menu">
+          <button class="action-btn" onclick="toggleMenu('t-${t._idx}')">⋮</button>
+          <div id="menu-t-${t._idx}" class="action-content">
+            <button onclick="openTaskModal(${t._idx})"><i class="ti ti-edit"></i> Edit</button>
+            <button class="del" onclick="deleteTask(${t._idx})"><i class="ti ti-trash"></i> Delete</button>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openTaskModal(idx = null) {
+  if(idx) {
+    const t = tasks.find(x => x._idx === idx);
+    document.getElementById('t-idx').value = idx;
+    document.getElementById('t-name').value = t.Name;
+    document.getElementById('t-date').value = t.Deadline;
+    document.getElementById('t-status').value = t.Status;
+  } else {
+    document.getElementById('t-idx').value = '';
+    document.getElementById('t-name').value = '';
+    document.getElementById('t-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('t-status').value = 'Pending';
+  }
+  openModal('taskModal');
+}
+
+function submitTask() {
+  const name = document.getElementById('t-name').value.trim();
+  if(!name) return toast('Task name is required', 'err');
+  
+  const idx = document.getElementById('t-idx').value;
+  const row = [name, document.getElementById('t-date').value, document.getElementById('t-status').value];
+  
+  closeModal('taskModal'); toast('Saving Task...', 'ok');
+  
+  if(idx) { 
+    fetch(API, { method:'POST', body: JSON.stringify({ action:'editTask', rowIndex: Number(idx), row: row }) }); 
+  } else { 
+    fetch(API, { method:'POST', body: JSON.stringify({ action:'addTask', row: row }) }); 
+  }
+  setTimeout(loadData, 2000); // Reload to reflect sheet updates
+}
+
+function updateTaskStatus(idx, status) {
+  const t = tasks.find(x => x._idx === idx);
+  if(t) t.Status = status;
+  renderTasks();
+  fetch(API, { method:'POST', body: JSON.stringify({ action:'updateTaskStatus', rowIndex: idx, status: status }) });
+}
+
+function deleteTask(idx) {
+  if(!confirm("Delete this task?")) return;
+  toast('Deleting task...', 'ok'); 
+  fetch(API, { method:'POST', body: JSON.stringify({ action:'deleteTask', rowIndex: idx }) });
+  setTimeout(loadData, 2000);
+}
+
 function setSyncState(s){ document.querySelector('.pulse').style.background = s==='ok'?'#20cf78':s==='loading'?'#f0a830':'#f05555'; document.getElementById('syncTxt').textContent = s==='ok'?'Synced '+new Date().toLocaleTimeString():s==='loading'?'Syncing…':'Demo mode'; }
 
 document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-checkAuth(); // Page load par PIN check
+checkAuth(); 
 </script>
 </body>
 </html>
