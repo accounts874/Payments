@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -261,7 +260,8 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
       <input type="hidden" id="t-idx">
       <div class="form-grid">
         <div class="fg full"><label>Task Name / Description</label><input id="t-name" class="fc"/></div>
-        <div class="fg full"><label>Deadline</label><input id="t-date" type="date" class="fc"/></div>
+        <div class="fg"><label>Assign Date</label><input id="t-assign" type="date" class="fc"/></div>
+        <div class="fg"><label>Deadline</label><input id="t-date" type="date" class="fc"/></div>
         <div class="fg full"><label>Status</label>
           <select id="t-status" class="fc">
             <option value="Pending">Pending</option>
@@ -297,7 +297,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
       <div class="topbar-title" id="pgTitle">Dashboard <em id="pgSub">Overview</em></div>
       <div class="search-wrap">
         <i class="ti ti-search"></i>
-        <input class="search-input" id="searchQ" placeholder="Search vendor, item..." oninput="executeSearch()"/>
+        <input class="search-input" id="searchQ" placeholder="Search vendor, item, tasks..." oninput="executeSearch()"/>
       </div>
       <button class="tb-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
       <button class="tb-btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
@@ -412,7 +412,8 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
             <table>
               <thead>
                 <tr>
-                  <th style="width: 40%;">Task Name</th>
+                  <th style="width: 35%;">Task Name</th>
+                  <th>Assign Date</th>
                   <th>Deadline</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -476,7 +477,7 @@ function norm(s){ return String(s||'').toLowerCase().trim(); }
 
 window.onclick = function(event) { if (!event.target.matches('.action-btn')) document.querySelectorAll('.action-content.show').forEach(el => el.classList.remove('show')); }
 function toggleMenu(idx) { document.getElementById("menu-" + idx).classList.toggle("show"); }
-function executeSearch() { applyFilters(); renderVendors(); }
+function executeSearch() { applyFilters(); renderVendors(); renderTasks(); }
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function toast(msg, type='ok'){ const el = document.getElementById('toast'); el.querySelector('i').className = type==='ok'?'ti ti-check':'ti ti-x'; document.getElementById('toastMsg').textContent = msg; el.className='toast '+type+' show'; setTimeout(()=>el.className='toast', 2800); }
@@ -512,7 +513,7 @@ async function loadData(){
       _idx: i + 2, 'Vendor Name': r[0]||'', 'Item': r[1]||'', 'Category': r[2]||'', 'Bank Name': r[3]||'', 'Account Details': r[4]||'', 'IFSC Code': r[5]||'' 
     }));
     tasks = (tData.data || []).slice(1).map((r, i) => ({ 
-      _idx: i + 2, 'Name': r[0]||'', 'Deadline': r[1]||'', 'Status': r[2]||'Pending' 
+      _idx: i + 2, 'Name': r[0]||'', 'AssignDate': r[1]||'', 'Deadline': r[2]||'', 'Status': r[3]||'Pending' 
     }));
     
     vendorMap = {}; vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; });
@@ -807,10 +808,13 @@ function viewVendorHistory(name) {
 
 // ── TASKS LOGIC ──
 function renderTasks() {
-  const grid = document.getElementById('taskGrid');
-  if(!tasks.length) { grid.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--muted)">No tasks found</td></tr>`; return; }
+  const q = document.getElementById('searchQ').value.toLowerCase();
+  const list = tasks.filter(t => !q || Object.values(t).some(x => String(x).toLowerCase().includes(q)));
   
-  grid.innerHTML = tasks.map(t => {
+  const grid = document.getElementById('taskGrid');
+  if(!list.length) { grid.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--muted)">No tasks found</td></tr>`; return; }
+  
+  grid.innerHTML = list.map(t => {
     const isCompleted = norm(t.Status) === 'completed';
     const statusHtml = `<select class="st-sel" onchange="updateTaskStatus(${t._idx}, this.value)" style="border-color:${isCompleted ? 'var(--green)' : 'var(--border2)'}">
       ${['Pending','In Progress','Completed'].map(o => `<option${norm(o)===norm(t.Status)?' selected':''}>${o}</option>`).join('')}
@@ -818,6 +822,7 @@ function renderTasks() {
 
     return `<tr>
       <td style="font-weight:600; color:${isCompleted ? 'var(--muted)' : 'var(--txt)'}; text-decoration:${isCompleted ? 'line-through' : 'none'}">${t.Name}</td>
+      <td style="color:var(--muted); font-size:11px;">${t.AssignDate||'—'}</td>
       <td style="color:var(--muted); font-size:11px;">${t.Deadline||'—'}</td>
       <td>${statusHtml}</td>
       <td>
@@ -838,12 +843,14 @@ function openTaskModal(idx = null) {
     const t = tasks.find(x => x._idx === idx);
     document.getElementById('t-idx').value = idx;
     document.getElementById('t-name').value = t.Name;
+    document.getElementById('t-assign').value = t.AssignDate;
     document.getElementById('t-date').value = t.Deadline;
     document.getElementById('t-status').value = t.Status;
   } else {
     document.getElementById('t-idx').value = '';
     document.getElementById('t-name').value = '';
-    document.getElementById('t-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('t-assign').value = new Date().toISOString().slice(0,10);
+    document.getElementById('t-date').value = '';
     document.getElementById('t-status').value = 'Pending';
   }
   openModal('taskModal');
@@ -854,7 +861,7 @@ function submitTask() {
   if(!name) return toast('Task name is required', 'err');
   
   const idx = document.getElementById('t-idx').value;
-  const row = [name, document.getElementById('t-date').value, document.getElementById('t-status').value];
+  const row = [name, document.getElementById('t-assign').value, document.getElementById('t-date').value, document.getElementById('t-status').value];
   
   closeModal('taskModal'); toast('Saving Task...', 'ok');
   
@@ -863,7 +870,7 @@ function submitTask() {
   } else { 
     fetch(API, { method:'POST', body: JSON.stringify({ action:'addTask', row: row }) }); 
   }
-  setTimeout(loadData, 2000); // Reload to reflect sheet updates
+  setTimeout(loadData, 2000); 
 }
 
 function updateTaskStatus(idx, status) {
