@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Skillinabox Finance Pro</title>
+<title>SkillBox Finance Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
@@ -173,7 +173,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 <div id="login-screen">
   <div class="login-box">
     <div class="sb-mark" style="margin: 0 auto 15px; width: 54px; height: 54px; font-size: 24px;">S</div>
-    <h2 style="margin-bottom: 5px; font-size: 20px;">Skillinabox Finance</h2>
+    <h2 style="margin-bottom: 5px; font-size: 20px;">SkillBox Finance</h2>
     <p style="font-size: 12px; color: var(--muted); margin-bottom: 25px;">Enter your Security PIN to unlock</p>
     <input type="password" id="pin-input" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') submitLogin()"/>
     <button class="submit-btn" style="width: 100%; justify-content: center; padding: 12px;" onclick="submitLogin()">
@@ -252,7 +252,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
   </div>
 
   <div class="modal-overlay" id="taskModal">
-    <div class="modal" style="max-width: 400px;">
+    <div class="modal" style="max-width: 450px;">
       <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
         <h3 style="font-size: 16px;">Task Details</h3>
         <button onclick="closeModal('taskModal')" style="background:none; border:none; color:var(--txt); cursor:pointer; font-size: 18px;"><i class="ti ti-x"></i></button>
@@ -269,13 +269,17 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
             <option value="Completed">Completed</option>
           </select>
         </div>
+        <div class="fg full">
+          <label>Additional Comments</label>
+          <textarea id="t-comments" class="fc" style="resize:vertical; min-height:60px;" placeholder="Add any extra details or notes here..."></textarea>
+        </div>
       </div>
       <div style="margin-top:20px;"><button class="submit-btn" onclick="submitTask()"><i class="ti ti-device-floppy"></i> Save Task</button></div>
     </div>
   </div>
 
   <aside class="sidebar">
-    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">Skillinabox</div><div class="sb-sub">Finance Pro</div></div></div>
+    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
     <nav class="sb-nav">
       <div class="nav-section">Workspace</div>
       <button class="nav-item active" id="n-dash" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
@@ -445,7 +449,7 @@ const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34
 
 // ── SECURITY & LOGIN ──
 function checkAuth() {
-  if(sessionStorage.getItem('Skillinabox_auth') === 'true') {
+  if(sessionStorage.getItem('skillbox_auth') === 'true') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'flex';
     loadData();
@@ -457,11 +461,11 @@ function checkAuth() {
 function submitLogin() {
   const pinInput = document.getElementById('pin-input');
   if(pinInput.value === APP_PIN) {
-    sessionStorage.setItem('Skillinabox_auth', 'true'); pinInput.value = '';
+    sessionStorage.setItem('skillbox_auth', 'true'); pinInput.value = '';
     checkAuth(); toast('Login Successful!', 'ok');
   } else { toast('Incorrect PIN', 'err'); pinInput.value = ''; pinInput.focus(); }
 }
-function logout() { sessionStorage.removeItem('Skillinabox_auth'); checkAuth(); toast('App Locked', 'ok'); }
+function logout() { sessionStorage.removeItem('skillbox_auth'); checkAuth(); toast('App Locked', 'ok'); }
 
 // ── THEME TOGGLE ──
 function toggleTheme() {
@@ -513,7 +517,7 @@ async function loadData(){
       _idx: i + 2, 'Vendor Name': r[0]||'', 'Item': r[1]||'', 'Category': r[2]||'', 'Bank Name': r[3]||'', 'Account Details': r[4]||'', 'IFSC Code': r[5]||'' 
     }));
     tasks = (tData.data || []).slice(1).map((r, i) => ({ 
-      _idx: i + 2, 'Name': r[0]||'', 'AssignDate': r[1]||'', 'Deadline': r[2]||'', 'Status': r[3]||'Pending' 
+      _idx: i + 2, 'Name': r[0]||'', 'AssignDate': r[1]||'', 'Deadline': r[2]||'', 'Status': r[3]||'Pending', 'Comments': r[4]||'' 
     }));
     
     vendorMap = {}; vendors.forEach(v => { if(v['Vendor Name']) vendorMap[v['Vendor Name']] = v; });
@@ -820,6 +824,11 @@ function renderTasks() {
       ${['Pending','In Progress','Completed'].map(o => `<option${norm(o)===norm(t.Status)?' selected':''}>${o}</option>`).join('')}
     </select>`;
 
+    // Lock the edit button if status is completed
+    const editBtn = isCompleted 
+      ? `<button disabled style="opacity:0.4; cursor:not-allowed;" title="Completed tasks cannot be edited"><i class="ti ti-edit"></i> Edit Locked</button>`
+      : `<button onclick="openTaskModal(${t._idx})"><i class="ti ti-edit"></i> Edit</button>`;
+
     return `<tr>
       <td style="font-weight:600; color:${isCompleted ? 'var(--muted)' : 'var(--txt)'}; text-decoration:${isCompleted ? 'line-through' : 'none'}">${t.Name}</td>
       <td style="color:var(--muted); font-size:11px;">${t.AssignDate||'—'}</td>
@@ -829,7 +838,7 @@ function renderTasks() {
         <div class="action-menu">
           <button class="action-btn" onclick="toggleMenu('t-${t._idx}')">⋮</button>
           <div id="menu-t-${t._idx}" class="action-content">
-            <button onclick="openTaskModal(${t._idx})"><i class="ti ti-edit"></i> Edit</button>
+            ${editBtn}
             <button class="del" onclick="deleteTask(${t._idx})"><i class="ti ti-trash"></i> Delete</button>
           </div>
         </div>
@@ -846,12 +855,14 @@ function openTaskModal(idx = null) {
     document.getElementById('t-assign').value = t.AssignDate;
     document.getElementById('t-date').value = t.Deadline;
     document.getElementById('t-status').value = t.Status;
+    document.getElementById('t-comments').value = t.Comments || '';
   } else {
     document.getElementById('t-idx').value = '';
     document.getElementById('t-name').value = '';
     document.getElementById('t-assign').value = new Date().toISOString().slice(0,10);
     document.getElementById('t-date').value = '';
     document.getElementById('t-status').value = 'Pending';
+    document.getElementById('t-comments').value = '';
   }
   openModal('taskModal');
 }
@@ -861,7 +872,13 @@ function submitTask() {
   if(!name) return toast('Task name is required', 'err');
   
   const idx = document.getElementById('t-idx').value;
-  const row = [name, document.getElementById('t-assign').value, document.getElementById('t-date').value, document.getElementById('t-status').value];
+  const row = [
+    name, 
+    document.getElementById('t-assign').value, 
+    document.getElementById('t-date').value, 
+    document.getElementById('t-status').value,
+    document.getElementById('t-comments').value
+  ];
   
   closeModal('taskModal'); toast('Saving Task...', 'ok');
   
