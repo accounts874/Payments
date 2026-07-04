@@ -138,6 +138,14 @@ tbody tr:hover { background: var(--s2); }
 .c-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:2px; transition:transform 0.2s; display:inline-flex; align-items:center; justify-content:center; }
 .c-btn:hover { color:var(--txt); }
 
+/* ── TIMELINE CSS FOR TASKS ── */
+.timeline { border-left: 2px solid var(--border2); padding-left: 15px; margin-left: 5px; margin-top: 5px; }
+.tl-item { position: relative; margin-bottom: 12px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-item::before { content: ''; position: absolute; left: -20.5px; top: 4px; width: 9px; height: 9px; background: var(--s2); border: 2px solid var(--purple); border-radius: 50%; }
+.tl-date { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-bottom: 2px; }
+.tl-text { font-size: 12px; color: var(--txt); line-height: 1.4; }
+
 /* ── VENDORS GRID ── */
 .vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 .vend-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px; position: relative; transition: var(--trans); }
@@ -260,7 +268,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
         <button onclick="closeModal('taskModal')" style="background:none; border:none; color:var(--txt); cursor:pointer; font-size: 18px;"><i class="ti ti-x"></i></button>
       </div>
       <input type="hidden" id="t-idx">
-      <div class="form-grid">
+      <input type="hidden" id="t-remarks-data"> <div class="form-grid">
         <div class="fg full"><label>Task Name / Description</label><input id="t-name" class="fc"/></div>
         <div class="fg"><label>Assign Date</label><input id="t-assign" type="date" class="fc"/></div>
         <div class="fg"><label>Deadline</label><input id="t-date" type="date" class="fc"/></div>
@@ -272,8 +280,8 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
           </select>
         </div>
         <div class="fg full">
-          <label>Additional Comments</label>
-          <textarea id="t-comments" class="fc" style="resize:vertical; min-height:60px;" placeholder="Add any extra details or notes here..."></textarea>
+          <label>Add New Remark</label>
+          <textarea id="t-new-remark" class="fc" style="resize:vertical; min-height:60px;" placeholder="Type an update or remark... it will be added to the timeline."></textarea>
         </div>
       </div>
       <div style="margin-top:20px;"><button class="submit-btn" onclick="submitTask()"><i class="ti ti-device-floppy"></i> Save Task</button></div>
@@ -834,18 +842,22 @@ function renderTasks() {
   
   grid.innerHTML = list.map(t => {
     const isCompleted = norm(t.Status) === 'completed';
-    const hasComment = t.Comments && t.Comments.trim() !== '';
+    
+    // Parse the remarks JSON array (or handle legacy text safely)
+    let remarks = [];
+    try { remarks = JSON.parse(t.Comments); } 
+    catch(e) { if(t.Comments && t.Comments.trim() !== '') remarks = [{d: 'Previous Note', t: t.Comments}]; }
+    
+    const hasComment = remarks.length > 0;
     
     const statusHtml = `<select class="st-sel" onchange="updateTaskStatus(${t._idx}, this.value)" style="border-color:${isCompleted ? 'var(--green)' : 'var(--border2)'}">
       ${['Pending','In Progress','Completed'].map(o => `<option${norm(o)===norm(t.Status)?' selected':''}>${o}</option>`).join('')}
     </select>`;
 
-    // Lock the edit button if status is completed
     const editBtn = isCompleted 
       ? `<button disabled style="opacity:0.4; cursor:not-allowed;" title="Completed tasks cannot be edited"><i class="ti ti-edit"></i> Edit Locked</button>`
       : `<button onclick="openTaskModal(${t._idx})"><i class="ti ti-edit"></i> Edit</button>`;
       
-    // Arrow button for expanding comments
     const arrowBtn = hasComment 
       ? `<button class="c-btn" id="c-icon-${t._idx}" onclick="toggleComment(${t._idx})"><i class="ti ti-chevron-down"></i></button>` 
       : `<span style="width:20px; display:inline-block"></span>`;
@@ -870,11 +882,21 @@ function renderTasks() {
       </td>
     </tr>`;
 
-    // Hidden comment row
+    // Render the Timeline HTML if there are remarks
+    let timelineHtml = '';
+    if(hasComment) {
+      timelineHtml = `<div class="timeline">` + remarks.map(r => `
+        <div class="tl-item">
+          <div class="tl-date">${r.d}</div>
+          <div class="tl-text">${r.t.replace(/\n/g, '<br>')}</div>
+        </div>
+      `).join('') + `</div>`;
+    }
+
     const commentRow = hasComment 
       ? `<tr id="c-row-${t._idx}" style="display:none; background:var(--s2);">
-           <td colspan="5" style="padding:10px 14px 10px 42px; font-size:11.5px; color:var(--muted2); border-bottom:1px solid var(--border); font-style:italic; line-height:1.5;">
-             ${t.Comments.replace(/\n/g, '<br>')}
+           <td colspan="5" style="padding:10px 14px 14px 38px;">
+             ${timelineHtml}
            </td>
          </tr>` 
       : '';
@@ -884,6 +906,8 @@ function renderTasks() {
 }
 
 function openTaskModal(idx = null) {
+  document.getElementById('t-new-remark').value = '';
+  
   if(idx) {
     const t = tasks.find(x => x._idx === idx);
     document.getElementById('t-idx').value = idx;
@@ -891,14 +915,14 @@ function openTaskModal(idx = null) {
     document.getElementById('t-assign').value = t.AssignDate;
     document.getElementById('t-date').value = t.Deadline;
     document.getElementById('t-status').value = t.Status;
-    document.getElementById('t-comments').value = t.Comments || '';
+    document.getElementById('t-remarks-data').value = t.Comments || '[]';
   } else {
     document.getElementById('t-idx').value = '';
     document.getElementById('t-name').value = '';
     document.getElementById('t-assign').value = new Date().toISOString().slice(0,10);
     document.getElementById('t-date').value = '';
     document.getElementById('t-status').value = 'Pending';
-    document.getElementById('t-comments').value = '';
+    document.getElementById('t-remarks-data').value = '[]';
   }
   openModal('taskModal');
 }
@@ -908,12 +932,26 @@ function submitTask() {
   if(!name) return toast('Task name is required', 'err');
   
   const idx = document.getElementById('t-idx').value;
+  const newRemarkText = document.getElementById('t-new-remark').value.trim();
+  const rawExisting = document.getElementById('t-remarks-data').value;
+  
+  let existingRemarks = [];
+  try { existingRemarks = JSON.parse(rawExisting); } 
+  catch(e) { if(rawExisting && rawExisting.trim() !== '') existingRemarks = [{d: 'Previous Note', t: rawExisting}]; }
+  
+  if (newRemarkText) {
+    const dateStr = new Date().toLocaleString('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    existingRemarks.unshift({ d: dateStr, t: newRemarkText }); // unshift puts the newest at the top
+  }
+  
+  const finalRemarksStr = JSON.stringify(existingRemarks);
+  
   const row = [
     name, 
     document.getElementById('t-assign').value, 
     document.getElementById('t-date').value, 
     document.getElementById('t-status').value,
-    document.getElementById('t-comments').value
+    finalRemarksStr
   ];
   
   closeModal('taskModal'); toast('Saving Task...', 'ok');
