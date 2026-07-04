@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkillBox Finance Pro</title>
+<title>Skillinabox Finance Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
@@ -127,7 +127,7 @@ tbody tr:hover { background: var(--s2); }
 .st-sel { background: transparent; border: 1px solid var(--border2); color: var(--txt); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; outline: none; }
 .cat-pill { font-size: 11px; background: var(--s3); padding: 3px 9px; border-radius: 5px; color: var(--muted); text-decoration: none; }
 
-/* ── ACTION MENUS ── */
+/* ── ACTION MENUS & TOGGLES ── */
 .action-menu { position: relative; display: inline-block; }
 .action-btn { background: none; border: none; color: var(--txt); font-size: 16px; cursor: pointer; padding: 4px; }
 .action-content { display: none; position: absolute; right: 0; background: var(--s2); min-width: 130px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 100; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -135,6 +135,8 @@ tbody tr:hover { background: var(--s2); }
 .action-content button { background: none; border: none; padding: 10px 14px; color: var(--txt); width: 100%; text-align: left; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; }
 .action-content button:hover { background: var(--s3); }
 .action-content button.del { color: var(--red); }
+.c-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:2px; transition:transform 0.2s; display:inline-flex; align-items:center; justify-content:center; }
+.c-btn:hover { color:var(--txt); }
 
 /* ── VENDORS GRID ── */
 .vend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
@@ -173,7 +175,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 <div id="login-screen">
   <div class="login-box">
     <div class="sb-mark" style="margin: 0 auto 15px; width: 54px; height: 54px; font-size: 24px;">S</div>
-    <h2 style="margin-bottom: 5px; font-size: 20px;">SkillBox Finance</h2>
+    <h2 style="margin-bottom: 5px; font-size: 20px;">Skillinabox Finance</h2>
     <p style="font-size: 12px; color: var(--muted); margin-bottom: 25px;">Enter your Security PIN to unlock</p>
     <input type="password" id="pin-input" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') submitLogin()"/>
     <button class="submit-btn" style="width: 100%; justify-content: center; padding: 12px;" onclick="submitLogin()">
@@ -279,7 +281,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
   </div>
 
   <aside class="sidebar">
-    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
+    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">Skillinabox</div><div class="sb-sub">Finance Pro</div></div></div>
     <nav class="sb-nav">
       <div class="nav-section">Workspace</div>
       <button class="nav-item active" id="n-dash" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
@@ -449,7 +451,7 @@ const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34
 
 // ── SECURITY & LOGIN ──
 function checkAuth() {
-  if(sessionStorage.getItem('skillbox_auth') === 'true') {
+  if(sessionStorage.getItem('Skillinabox_auth') === 'true') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'flex';
     loadData();
@@ -461,11 +463,11 @@ function checkAuth() {
 function submitLogin() {
   const pinInput = document.getElementById('pin-input');
   if(pinInput.value === APP_PIN) {
-    sessionStorage.setItem('skillbox_auth', 'true'); pinInput.value = '';
+    sessionStorage.setItem('Skillinabox_auth', 'true'); pinInput.value = '';
     checkAuth(); toast('Login Successful!', 'ok');
   } else { toast('Incorrect PIN', 'err'); pinInput.value = ''; pinInput.focus(); }
 }
-function logout() { sessionStorage.removeItem('skillbox_auth'); checkAuth(); toast('App Locked', 'ok'); }
+function logout() { sessionStorage.removeItem('Skillinabox_auth'); checkAuth(); toast('App Locked', 'ok'); }
 
 // ── THEME TOGGLE ──
 function toggleTheme() {
@@ -811,6 +813,18 @@ function viewVendorHistory(name) {
 }
 
 // ── TASKS LOGIC ──
+function toggleComment(idx) {
+  const row = document.getElementById('c-row-' + idx);
+  const icon = document.getElementById('c-icon-' + idx);
+  if(row.style.display === 'none' || row.style.display === '') {
+    row.style.display = 'table-row';
+    icon.style.transform = 'rotate(180deg)';
+  } else {
+    row.style.display = 'none';
+    icon.style.transform = 'rotate(0deg)';
+  }
+}
+
 function renderTasks() {
   const q = document.getElementById('searchQ').value.toLowerCase();
   const list = tasks.filter(t => !q || Object.values(t).some(x => String(x).toLowerCase().includes(q)));
@@ -820,6 +834,8 @@ function renderTasks() {
   
   grid.innerHTML = list.map(t => {
     const isCompleted = norm(t.Status) === 'completed';
+    const hasComment = t.Comments && t.Comments.trim() !== '';
+    
     const statusHtml = `<select class="st-sel" onchange="updateTaskStatus(${t._idx}, this.value)" style="border-color:${isCompleted ? 'var(--green)' : 'var(--border2)'}">
       ${['Pending','In Progress','Completed'].map(o => `<option${norm(o)===norm(t.Status)?' selected':''}>${o}</option>`).join('')}
     </select>`;
@@ -828,9 +844,18 @@ function renderTasks() {
     const editBtn = isCompleted 
       ? `<button disabled style="opacity:0.4; cursor:not-allowed;" title="Completed tasks cannot be edited"><i class="ti ti-edit"></i> Edit Locked</button>`
       : `<button onclick="openTaskModal(${t._idx})"><i class="ti ti-edit"></i> Edit</button>`;
+      
+    // Arrow button for expanding comments
+    const arrowBtn = hasComment 
+      ? `<button class="c-btn" id="c-icon-${t._idx}" onclick="toggleComment(${t._idx})"><i class="ti ti-chevron-down"></i></button>` 
+      : `<span style="width:20px; display:inline-block"></span>`;
 
-    return `<tr>
-      <td style="font-weight:600; color:${isCompleted ? 'var(--muted)' : 'var(--txt)'}; text-decoration:${isCompleted ? 'line-through' : 'none'}">${t.Name}</td>
+    const mainRow = `<tr>
+      <td style="font-weight:600; color:${isCompleted ? 'var(--muted)' : 'var(--txt)'}; text-decoration:${isCompleted ? 'line-through' : 'none'};">
+        <div style="display:flex; align-items:center; gap:8px;">
+          ${arrowBtn} <span>${t.Name}</span>
+        </div>
+      </td>
       <td style="color:var(--muted); font-size:11px;">${t.AssignDate||'—'}</td>
       <td style="color:var(--muted); font-size:11px;">${t.Deadline||'—'}</td>
       <td>${statusHtml}</td>
@@ -844,6 +869,17 @@ function renderTasks() {
         </div>
       </td>
     </tr>`;
+
+    // Hidden comment row
+    const commentRow = hasComment 
+      ? `<tr id="c-row-${t._idx}" style="display:none; background:var(--s2);">
+           <td colspan="5" style="padding:10px 14px 10px 42px; font-size:11.5px; color:var(--muted2); border-bottom:1px solid var(--border); font-style:italic; line-height:1.5;">
+             ${t.Comments.replace(/\n/g, '<br>')}
+           </td>
+         </tr>` 
+      : '';
+
+    return mainRow + commentRow;
   }).join('');
 }
 
