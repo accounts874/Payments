@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkillBox Finance Pro</title>
+<title>Skillinabox Finance Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
@@ -173,7 +173,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
 <div id="login-screen">
   <div class="login-box">
     <div class="sb-mark" style="margin: 0 auto 15px; width: 54px; height: 54px; font-size: 24px;">S</div>
-    <h2 style="margin-bottom: 5px; font-size: 20px;">SkillBox Finance</h2>
+    <h2 style="margin-bottom: 5px; font-size: 20px;">Skillinabox Finance</h2>
     <p style="font-size: 12px; color: var(--muted); margin-bottom: 25px;">Enter your Security PIN to unlock</p>
     <input type="password" id="pin-input" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') submitLogin()"/>
     <button class="submit-btn" style="width: 100%; justify-content: center; padding: 12px;" onclick="submitLogin()">
@@ -275,7 +275,7 @@ input[type="file"]::file-selector-button { background: var(--s3); color: var(--t
   </div>
 
   <aside class="sidebar">
-    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">SkillBox</div><div class="sb-sub">Finance Pro</div></div></div>
+    <div class="sb-logo"><div class="sb-mark">S</div><div><div class="sb-name">Skillinabox</div><div class="sb-sub">Finance Pro</div></div></div>
     <nav class="sb-nav">
       <div class="nav-section">Workspace</div>
       <button class="nav-item active" id="n-dash" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
@@ -445,7 +445,7 @@ const COLORS = ['#8b7cf8','#20cf78','#f0a830','#f05555','#35c9ef','#a78bfa','#34
 
 // ── SECURITY & LOGIN ──
 function checkAuth() {
-  if(sessionStorage.getItem('skillbox_auth') === 'true') {
+  if(sessionStorage.getItem('Skillinabox_auth') === 'true') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'flex';
     loadData();
@@ -457,11 +457,11 @@ function checkAuth() {
 function submitLogin() {
   const pinInput = document.getElementById('pin-input');
   if(pinInput.value === APP_PIN) {
-    sessionStorage.setItem('skillbox_auth', 'true'); pinInput.value = '';
+    sessionStorage.setItem('Skillinabox_auth', 'true'); pinInput.value = '';
     checkAuth(); toast('Login Successful!', 'ok');
   } else { toast('Incorrect PIN', 'err'); pinInput.value = ''; pinInput.focus(); }
 }
-function logout() { sessionStorage.removeItem('skillbox_auth'); checkAuth(); toast('App Locked', 'ok'); }
+function logout() { sessionStorage.removeItem('Skillinabox_auth'); checkAuth(); toast('App Locked', 'ok'); }
 
 // ── THEME TOGGLE ──
 function toggleTheme() {
